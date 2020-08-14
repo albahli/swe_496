@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:swe496/services/database.dart';
+import 'package:password/password.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -7,14 +9,17 @@ class AuthService {
   );
 
   // Email & Password Sign Up
-  Future<String> createUserWithEmailAndPassword(String email, String password, String name) async {
+  Future<String> createUserWithEmailAndPassword(String email, String password, String username, name, birthDate) async {
+
     final currentUser = await _firebaseAuth.createUserWithEmailAndPassword(email: email.trim(), password: password);
 
-    //Update username
-    var userUpdateInfo = UserUpdateInfo();
-    userUpdateInfo.displayName = name;
-    await currentUser.updateProfile(userUpdateInfo);
-    await currentUser.reload();
+    // Encrypting the password
+
+    String hashedPassword = Password.hash(password, new PBKDF2());
+
+    // Create a new document for the user with uid
+    await DatabaseService(uid: currentUser.uid).setNewUserProfile(username, email, hashedPassword, name, birthDate);
+
     return currentUser.uid;
   }
 

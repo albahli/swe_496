@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:swe496/SignIn.dart';
-import 'ProjectsGroup/home.dart';
 import 'LoadingScreens/loading.dart';
 import 'package:get/get.dart';
 import 'services/auth_service.dart';
@@ -15,15 +14,17 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final formKey = GlobalKey<FormState>();
   bool loading = false; // loading screen
+
   String _username = '';
   String _email = '';
   String _password = '';
-
+  String _name ='';
+  // birth date
+  var birthDate = TextEditingController();
   // Error message
   String error;
 
-  // birth date
-  var birthDate = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +58,11 @@ class _SignUpState extends State<SignUp> {
                           child: TextFormField(
                             validator: (value) {
                               return UsernameValidator.validate(value);
+                            },
+                            onSaved: (usernameVal){
+                              setState(() {
+                                _username = usernameVal;
+                              });
                             },
                             decoration: InputDecoration(
                                 labelText: 'Username',
@@ -105,6 +111,11 @@ class _SignUpState extends State<SignUp> {
                           child: TextFormField(
                             validator: (value) {
                               return NameValidator.validate(value);
+                            },
+                            onSaved: (nameVal){
+                              setState(() {
+                                _name = nameVal;
+                              });
                             },
                             decoration: InputDecoration(
                                 labelText: 'Name',
@@ -215,7 +226,7 @@ class _SignUpState extends State<SignUp> {
                                   final auth = Provider.of(context).auth;
                                   String uid =
                                       await auth.createUserWithEmailAndPassword(
-                                          _email, _password, _username);
+                                          _email, _password, _username, _name, birthDate.text);
                                   print("Signed Up with New ID $uid");
                                   //Get.to(ProjectsGroups());
                                   Get.back(result: 'Successful Registration');
