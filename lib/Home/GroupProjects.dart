@@ -5,14 +5,14 @@ import 'package:swe496/provider_widget.dart';
 import 'package:swe496/services/auth_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-class ProjectsGroups extends StatefulWidget {
-  ProjectsGroups({Key key}) : super(key: key);
+class GroupProjects extends StatefulWidget {
+  GroupProjects({Key key}) : super(key: key);
 
   @override
-  _ProjectsGroups createState() => _ProjectsGroups();
+  _GroupProjects createState() => _GroupProjects();
 }
 
-class _ProjectsGroups extends State<ProjectsGroups> {
+class _GroupProjects extends State<GroupProjects> {
   int i = 0;
 
   @override

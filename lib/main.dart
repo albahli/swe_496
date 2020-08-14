@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swe496/ProjectsGroup//home.dart';
+import 'package:swe496/Home/GroupProjects.dart';
 import 'package:swe496/SignUp.dart';
 import 'package:swe496/services/auth_service.dart';
 import 'SignIn.dart';
@@ -38,7 +38,7 @@ class HomeController extends StatelessWidget {
       builder: (context, AsyncSnapshot<String> snapshot){
         if(snapshot.connectionState == ConnectionState.active){
           final bool signedIn = snapshot.hasData;
-          return signedIn ? ProjectsGroups() : SignIn();
+          return signedIn ? GroupProjects() : SignIn();
         }
         return CircularProgressIndicator();
       },

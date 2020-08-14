@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/ProjectsGroup/home.dart';
+import 'package:swe496/Home/GroupProjects.dart';
 import 'SignUp.dart';
 import 'services/auth_service.dart';
 import 'provider_widget.dart';
@@ -125,7 +125,7 @@ class _SignInState extends State<SignIn> {
                               String uid = await auth
                                   .signInWithEmailAndPassword(email, password);
                               print("Signed In with ID $uid");
-                              Get.off(ProjectsGroups());
+                              Get.off(GroupProjects());
                             } catch (e) {
                               setState(() {
                                 loading = false;

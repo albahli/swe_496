@@ -12,7 +12,6 @@ class AuthService {
   Future<String> createUserWithEmailAndPassword(String email, String password, String username, name, birthDate) async {
 
     final currentUser = await _firebaseAuth.createUserWithEmailAndPassword(email: email.trim(), password: password);
-
     // Encrypting the password
 
     String hashedPassword = Password.hash(password, new PBKDF2());
