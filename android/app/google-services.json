@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "907629198317",
+    "firebase_url": "https://swe-68240.firebaseio.com",
+    "project_id": "swe-68240",
+    "storage_bucket": "swe-68240.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907629198317:android:f0b92506df77f858e205e4",
+        "android_client_info": {
+          "package_name": "com.faisal.swe496"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "907629198317-7mms0v7rughquguh0a283l54mact1btr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNpKUHNILzjygkBFGivlxvxJKefj59CVU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "907629198317-7mms0v7rughquguh0a283l54mact1btr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
