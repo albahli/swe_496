@@ -17,4 +17,8 @@ class DatabaseService {
     });
   }
 
+  // Get users stream
+  Stream<QuerySnapshot> get users{
+    return userProfileCollection.snapshots();
+  }
 }

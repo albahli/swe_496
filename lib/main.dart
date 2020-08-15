@@ -15,6 +15,9 @@ class MyApp extends StatelessWidget {
       auth: AuthService(),
       child: (
            MaterialApp(
+             theme: ThemeData(
+               primaryColor: Colors.red,
+             ),
              title: "Task management",
              navigatorKey: Get.key,
              home: HomeController(),

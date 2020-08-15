@@ -4,6 +4,8 @@ import 'package:swe496/SignIn.dart';
 import 'package:swe496/provider_widget.dart';
 import 'package:swe496/services/auth_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:titled_navigation_bar/titled_navigation_bar.dart';
 
 class GroupProjects extends StatefulWidget {
   GroupProjects({Key key}) : super(key: key);
@@ -14,149 +16,201 @@ class GroupProjects extends StatefulWidget {
 
 class _GroupProjects extends State<GroupProjects> {
   int i = 0;
+  int barIndex = 0 ;
+
+  var listOfProjects;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false, // still not working in landscape mode
-      appBar: AppBar(
-        leading: Transform.rotate(
-          angle: 180 * 3.14 / 180,
-          child: IconButton(
-            icon: Icon(
-              Icons.exit_to_app,
-              size: 30,
-              color: Colors.white,
+        resizeToAvoidBottomPadding: false,
+        // still not working in landscape mode
+        appBar: AppBar(
+          leading: Transform.rotate(
+            angle: 180 * 3.14 / 180,
+            child: IconButton(
+              icon: Icon(
+                Icons.exit_to_app,
+                size: 30,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                try {
+                  AuthService auth = Provider.of(context).auth;
+                  await auth.signOut();
+                  Get.off(SignIn());
+                  print("Signed Out");
+                } catch (e) {
+                  print(e.toString());
+                }
+              },
             ),
-            onPressed: () async {
-              try {
-                AuthService auth = Provider.of(context).auth;
-                await auth.signOut();
-                Get.off(SignIn());
-                print("Signed Out");
-              } catch (e) {
-                print(e.toString());
-              }
-            },
           ),
+          title: const Text('Group Projects'),
+          centerTitle: true,
+          backgroundColor: Colors.red,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.search,
+                size: 30,
+                color: Colors.white,
+              ),
+              onPressed: () {},
+            ),
+          ],
         ),
-        title: const Text('Group Projects'),
-        centerTitle: true,
-        backgroundColor: Colors.red,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.search,
-              size: 30,
-              color: Colors.white,
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Container(
-        child: Center(
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
           child: Column(
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Row(),
-                  Center(
-                    child: Row(
-                      children: <Widget>[
-                        RaisedButton(
-                          color: Colors.white,
-                          textColor: Colors.red,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(
-                                  left: Radius.circular(30.0),
-                                  right: Radius.circular(0.0)),
-                              side: BorderSide(color: Colors.red)),
-                          onPressed: () {
-                            createProjectAlert(context);
-                          },
-                          child: Row(
-                            children: <Widget>[
-                              const Text('Create Project ',
-                                  style: TextStyle(fontSize: 15)),
-                              Icon(Icons.add),
-                            ],
-                          ),
-                        ),
-                        //const SizedBox(height: 30, width: 20,),
-                        RaisedButton(
-                          color: Colors.white,
-                          textColor: Colors.red,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.horizontal(
-                                  left: Radius.circular(0.0),
-                                  right: Radius.circular(30.0)),
-                              side: BorderSide(color: Colors.red)),
-                          onPressed: () {},
-                          child: Row(
-                            children: <Widget>[
-                              const Text('Join Project  ',
-                                  style: TextStyle(fontSize: 15)),
-                              Icon(Icons.group_add),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Container(
-                height: 490,
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: 50,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      height: 50,
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          child: Text(
-                            'Project ${++i}',
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) =>
-                      const Divider(),
-                ),
+              _searchBar(),
+              Expanded(
+                child: getListOfProjects(),
               ),
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.red,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            title: Text('Group Projects'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            title: Text('Personal Projects'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            title: Text('Account / Settings'),
-          ),
-        ],
+        bottomNavigationBar: bottomCustomNavigationBar(),
+        floatingActionButton: floatingButtons()
+    );
+  }
+
+  // Search Bar
+  _searchBar(){
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Search'
+        ),
+        onChanged: (textVal){
+          textVal = textVal.toLowerCase();
+          setState(() {
+          });
+        },
       ),
     );
   }
 
-  void createProjectAlert(BuildContext context) {
+  List<String> getListElement(){
+    int length = 30; // Number of projects, ex: 30.
+    var items = List<String>.generate(length, (counter){
+      counter++;
+      return 'Project $counter';
+    });
+    return items;
+  }
+
+  Widget getListOfProjects(){
+
+     listOfProjects = getListElement();
+    return ListView.builder(
+        itemCount: listOfProjects.length,
+        itemBuilder: (context, index){
+          return ListTile(
+            leading: Icon(Icons.account_circle),
+            title: Text(listOfProjects[index]),
+            subtitle: Text('Details ...'),
+          );
+        }
+
+    );
+  }
+
+  // Bottom Navigation Bar
+  Widget bottomCustomNavigationBar() {
+    return TitledBottomNavigationBar(
+        currentIndex: barIndex, // Use this to update the Bar giving a position
+        activeColor: Colors.red,
+        indicatorColor: Colors.red,
+        inactiveColor: Colors.black45,
+        onTap: (index){
+          setState(() {
+            barIndex = index;
+          });
+          print("Selected Index: $barIndex");
+
+          if(index == 0)
+            // Nothing, stay in the same page;
+
+          if(index == 1)
+           // Get.to(PersonalProjects());
+
+          if(index == 2)
+            // Get.to(Search());
+
+          if(index == 3)
+            // Get.to(Messages());
+
+          if(index == 4)
+            // Get.to(Profile());
+
+            return;
+        },
+        items: [
+          TitledNavigationBarItem(title: Text('Groups'), icon: Icons.group),
+          TitledNavigationBarItem(title: Text('Personal'), icon: Icons.inbox),
+          TitledNavigationBarItem(title: Text('Search'), icon: Icons.search),
+          TitledNavigationBarItem(title: Text('Messages'), icon: Icons.chat),
+          TitledNavigationBarItem(title: Text('Profile'), icon: Icons.person_outline),
+        ]
+    );
+  }
+
+  // Buttons for creating or joining project
+  Widget floatingButtons() {
+    return SpeedDial(
+      // both default to 16
+      marginRight: 18,
+      marginBottom: 20,
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 25.0),
+      // this is ignored if animatedIcon is non null
+      // child: Icon(Icons.add),
+      // If true user is forced to close dial manually
+      // by tapping main button and overlay is not rendered.
+      closeManually: false,
+      curve: Curves.bounceIn,
+      overlayColor: Colors.black,
+      overlayOpacity: 0.3,
+      onOpen: () => print('OPENING MENU'),
+      onClose: () => print('MENU CLOSED'),
+      tooltip: 'Menu',
+      heroTag: '',
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.red,
+      elevation: 8.0,
+      shape: CircleBorder(),
+      children: [
+        SpeedDialChild(
+          child: Icon(
+            Icons.add,
+            size: 25,
+          ),
+          backgroundColor: Colors.red,
+          label: 'New Project',
+          labelStyle: TextStyle(fontSize: 16.0),
+          onTap: () => alertCreateProjectForm(context),
+        ),
+        SpeedDialChild(
+          child: Icon(
+            Icons.group_add,
+            size: 25,
+          ),
+          backgroundColor: Colors.red,
+          label: 'Join Project',
+          labelStyle: TextStyle(fontSize: 16.0),
+          onTap: () => print('SECOND CHILD'),
+        ),
+      ],
+    );
+  }
+
+
+  // Form to create new project
+  void alertCreateProjectForm(BuildContext context) {
     Alert(
         context: context,
         title: 'Create New Project',
@@ -196,10 +250,11 @@ class _GroupProjects extends State<GroupProjects> {
                 value: false,
                 onChanged: (newValue) {
                   setState(() {
-                   // checkedValue = newValue;
+                    // checkedValue = newValue;
                   });
                 },
-                controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+                controlAffinity:
+                    ListTileControlAffinity.leading, //  <-- leading Checkbox
               )
             ],
           ),
@@ -219,5 +274,4 @@ class _GroupProjects extends State<GroupProjects> {
           )
         ]).show();
   }
-
 }
