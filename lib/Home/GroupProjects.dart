@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:swe496/Project/Project.dart';
 import 'package:swe496/SignIn.dart';
 import 'package:swe496/provider_widget.dart';
 import 'package:swe496/services/auth_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:titled_navigation_bar/titled_navigation_bar.dart';
 
 class GroupProjects extends StatefulWidget {
   GroupProjects({Key key}) : super(key: key);
@@ -50,14 +50,6 @@ class _GroupProjects extends State<GroupProjects> {
           centerTitle: true,
           backgroundColor: Colors.red,
           actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.search,
-                size: 30,
-                color: Colors.white,
-              ),
-              onPressed: () {},
-            ),
           ],
         ),
         body: Container(
@@ -113,6 +105,9 @@ class _GroupProjects extends State<GroupProjects> {
             leading: Icon(Icons.account_circle),
             title: Text(listOfProjects[index]),
             subtitle: Text('Details ...'),
+            onTap: (){
+              Get.to(ProjectPage());
+            },
           );
         }
 
@@ -120,44 +115,44 @@ class _GroupProjects extends State<GroupProjects> {
   }
 
   // Bottom Navigation Bar
-  Widget bottomCustomNavigationBar() {
-    return TitledBottomNavigationBar(
-        currentIndex: barIndex, // Use this to update the Bar giving a position
-        activeColor: Colors.red,
-        indicatorColor: Colors.red,
-        inactiveColor: Colors.black45,
-        onTap: (index){
+
+    Widget bottomCustomNavigationBar() {
+      return BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_outline),
+            title: Text('Groups'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inbox),
+            title: Text('Personal'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            title: Text('Search'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message),
+            title: Text('Messages'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            title: Text('Account'),
+          ),
+        ],
+        currentIndex: barIndex,
+        selectedItemColor: Colors.red,
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        onTap: (index) {
           setState(() {
             barIndex = index;
           });
-          print("Selected Index: $barIndex");
-
-          if(index == 0)
-            // Nothing, stay in the same page;
-
-          if(index == 1)
-           // Get.to(PersonalProjects());
-
-          if(index == 2)
-            // Get.to(Search());
-
-          if(index == 3)
-            // Get.to(Messages());
-
-          if(index == 4)
-            // Get.to(Profile());
-
-            return;
+          print(index);
         },
-        items: [
-          TitledNavigationBarItem(title: Text('Groups'), icon: Icons.group),
-          TitledNavigationBarItem(title: Text('Personal'), icon: Icons.inbox),
-          TitledNavigationBarItem(title: Text('Search'), icon: Icons.search),
-          TitledNavigationBarItem(title: Text('Messages'), icon: Icons.chat),
-          TitledNavigationBarItem(title: Text('Profile'), icon: Icons.person_outline),
-        ]
-    );
-  }
+      );
+    }
 
   // Buttons for creating or joining project
   Widget floatingButtons() {
