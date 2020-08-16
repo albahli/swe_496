@@ -95,16 +95,16 @@ class _GroupProjects extends State<GroupProjects> {
         if (snapshot.connectionState == ConnectionState.active) {
 
            if (snapshot.hasData && snapshot.data != null) {
-
              return ListView.builder(
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
+                  String projectName = snapshot.data.documents[index]['projectName'];
                   return ListTile(
                     leading: Icon(Icons.account_circle),
-                    title: Text(snapshot.data.documents[index]['projectName']),
+                    title: Text(projectName),
                     subtitle: Text('Details ...'),
                     onTap: () {
-                      Get.to(ProjectPage());
+                      Get.to(ProjectPage(projectName: projectName));
                     },
                   );
                 });

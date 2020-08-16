@@ -7,7 +7,8 @@ import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
 class ProjectPage extends StatefulWidget {
-  ProjectPage({Key key}) : super(key: key);
+  final String projectName;
+  ProjectPage({Key key, this.projectName}) : super(key: key);
 
   @override
   _ProjectPage createState() => _ProjectPage();
@@ -34,7 +35,7 @@ class _ProjectPage extends State<ProjectPage> {
             print("back to Group Projects");
           },
         ),
-        title: const Text('Project Example'),
+        title: Text(widget.projectName),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: <Widget>[
