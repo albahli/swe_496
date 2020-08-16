@@ -23,7 +23,6 @@ class _GroupProjects extends State<GroupProjects> {
   int barIndex = 0;
 
   String projectName;
-  var listOfProjects;
 
   @override
   Widget build(BuildContext context) {
