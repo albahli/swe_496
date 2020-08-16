@@ -7,6 +7,9 @@ import 'package:swe496/services/auth_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
+
 class GroupProjects extends StatefulWidget {
   GroupProjects({Key key}) : super(key: key);
 
@@ -15,9 +18,11 @@ class GroupProjects extends StatefulWidget {
 }
 
 class _GroupProjects extends State<GroupProjects> {
+  final formKey = GlobalKey<FormState>();
   int i = 0;
-  int barIndex = 0 ;
+  int barIndex = 0;
 
+  String projectName;
   var listOfProjects;
 
   @override
@@ -49,8 +54,7 @@ class _GroupProjects extends State<GroupProjects> {
           title: const Text('Group Projects'),
           centerTitle: true,
           backgroundColor: Colors.red,
-          actions: <Widget>[
-          ],
+          actions: <Widget>[],
         ),
         body: Container(
           width: MediaQuery.of(context).size.width,
@@ -58,101 +62,98 @@ class _GroupProjects extends State<GroupProjects> {
           child: Column(
             children: <Widget>[
               _searchBar(),
-              Expanded(
-                child: getListOfProjects(),
-              ),
+              Expanded(child: getListOfProjects()),
             ],
           ),
         ),
         bottomNavigationBar: bottomCustomNavigationBar(),
-        floatingActionButton: floatingButtons()
-    );
+        floatingActionButton: floatingButtons());
   }
 
   // Search Bar
-  _searchBar(){
+  _searchBar() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Search'
-        ),
-        onChanged: (textVal){
+        decoration: InputDecoration(hintText: 'Search'),
+        onChanged: (textVal) {
           textVal = textVal.toLowerCase();
-          setState(() {
-          });
+          setState(() {});
         },
       ),
     );
   }
 
-  List<String> getListElement(){
-    int length = 30; // Number of projects, ex: 30.
-    var items = List<String>.generate(length, (counter){
-      counter++;
-      return 'Project $counter';
-    });
-    return items;
-  }
-
-  Widget getListOfProjects(){
-
-     listOfProjects = getListElement();
-    return ListView.builder(
-        itemCount: listOfProjects.length,
-        itemBuilder: (context, index){
-          return ListTile(
-            leading: Icon(Icons.account_circle),
-            title: Text(listOfProjects[index]),
-            subtitle: Text('Details ...'),
-            onTap: (){
-              Get.to(ProjectPage());
-            },
-          );
+  Widget getListOfProjects() {
+    return StreamBuilder(
+      stream: Firestore.instance.collection('projects').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text(snapshot.error.toString());
         }
 
+        if (snapshot.connectionState == ConnectionState.active) {
+
+           if (snapshot.hasData && snapshot.data != null) {
+
+             return ListView.builder(
+                itemCount: snapshot.data.documents.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Icon(Icons.account_circle),
+                    title: Text(snapshot.data.documents[index]['projectName']),
+                    subtitle: Text('Details ...'),
+                    onTap: () {
+                      Get.to(ProjectPage());
+                    },
+                  );
+                });
+          }
+        }
+        return Text('No connection');
+      },
     );
   }
 
   // Bottom Navigation Bar
 
-    Widget bottomCustomNavigationBar() {
-      return BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline),
-            title: Text('Groups'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inbox),
-            title: Text('Personal'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            title: Text('Search'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            title: Text('Messages'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            title: Text('Account'),
-          ),
-        ],
-        currentIndex: barIndex,
-        selectedItemColor: Colors.red,
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        onTap: (index) {
-          setState(() {
-            barIndex = index;
-          });
-          print(index);
-        },
-      );
-    }
+  Widget bottomCustomNavigationBar() {
+    return BottomNavigationBar(
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.people_outline),
+          title: Text('Groups'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.inbox),
+          title: Text('Personal'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.people),
+          title: Text('Friends'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.message),
+          title: Text('Messages'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          title: Text('Account'),
+        ),
+      ],
+      currentIndex: barIndex,
+      selectedItemColor: Colors.red,
+      unselectedItemColor: Colors.grey,
+      showSelectedLabels: true,
+      showUnselectedLabels: true,
+      onTap: (index) {
+        setState(() {
+          barIndex = index;
+        });
+        print(index);
+      },
+    );
+  }
 
   // Buttons for creating or joining project
   Widget floatingButtons() {
@@ -203,7 +204,6 @@ class _GroupProjects extends State<GroupProjects> {
     );
   }
 
-
   // Form to create new project
   void alertCreateProjectForm(BuildContext context) {
     Alert(
@@ -222,43 +222,75 @@ class _GroupProjects extends State<GroupProjects> {
           data: ThemeData(
             primaryColor: Colors.red,
           ),
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                validator: (value) {
-                  return;
-                },
-                onSaved: (value) {
-                  setState(() {});
-                },
-                decoration: InputDecoration(
-                  icon: Icon(Icons.edit),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.red),
+          child: Form(
+            key: formKey,
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  validator: (value) => value.isEmpty ? "Project name can't be empty" : null,
+                  onSaved: (projectNameVal) {
+                    setState(() {
+                      projectName = projectNameVal;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.edit),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
+                    hintText: 'Graduation Project',
+                    labelText: 'Project Name',
                   ),
-                  hintText: 'Graduation Project',
-                  labelText: 'Project Name',
                 ),
-              ),
-              CheckboxListTile(
-                title: Text("title text"),
-                value: false,
-                onChanged: (newValue) {
-                  setState(() {
-                    // checkedValue = newValue;
-                  });
-                },
-                controlAffinity:
-                    ListTileControlAffinity.leading, //  <-- leading Checkbox
-              )
-            ],
+                CheckboxListTile(
+                  title: Text("title text"),
+                  value: false,
+                  onChanged: (newValue) {
+                    setState(() {
+                      // checkedValue = newValue;
+                    });
+                  },
+                  controlAffinity:
+                      ListTileControlAffinity.leading, //  <-- leading Checkbox
+                )
+              ],
+            ),
           ),
         ),
         buttons: [
           DialogButton(
             color: Colors.red,
             radius: BorderRadius.circular(30),
-            onPressed: () async {},
+            onPressed: () async {
+              formKey.currentState.save();
+              if (formKey.currentState.validate()) {
+                try {
+                  final auth = Provider.of(context).auth;
+                  String uid = await auth.getUserUID();
+                  ProjectInDatabase(uid: uid).createNewProject(projectName);
+                  print('project has been created: $projectName');
+                  Get.back();
+
+                  // Display success message
+                  Get.snackbar(
+                    "Success !", // title
+                    "Project '$projectName'' has been created successfully.", // message
+                    icon: Icon(
+                      Icons.check_circle_outline,
+                      color: Colors.green,
+                    ),
+                    shouldIconPulse: true,
+                    borderColor: Colors.green,
+                    borderWidth: 1,
+                    barBlur: 20,
+                    isDismissible: true,
+                    duration: Duration(seconds: 5),
+                  );
+                } catch (e) {
+                  print(e.message);
+                }
+              }
+            },
             child: Text(
               "Submit",
               style: TextStyle(
@@ -268,5 +300,25 @@ class _GroupProjects extends State<GroupProjects> {
             ),
           )
         ]).show();
+  }
+}
+
+class ProjectInDatabase {
+  final String uid;
+
+  ProjectInDatabase({this.uid});
+
+  // Collection Reference
+  // Checks if there is a collection named profile, if not it creates new one.
+  final CollectionReference projectCollection =
+      Firestore.instance.collection('projects');
+
+  Future createNewProject(String projectName) async {
+    String projectID =
+        Uuid().v1(); //project ID, UuiD is package that generates random ID
+    return await projectCollection.document(projectID).setData({
+      'projectName': projectName,
+      'Owner': uid,
+    });
   }
 }

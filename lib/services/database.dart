@@ -7,6 +7,8 @@ class DatabaseService {
   // Collection Reference
   // Checks if there is a collection named profile, if not it creates new one.
   final CollectionReference userProfileCollection = Firestore.instance.collection('userProfile');
+  final CollectionReference projectCollection = Firestore.instance.collection('projects');
+
 
   Future setNewUserProfile (String username, String email, String password, String name, String birthDate) async {
     return await userProfileCollection.document(uid).setData({
@@ -16,6 +18,7 @@ class DatabaseService {
       'birthDate': birthDate,
     });
   }
+
 
   // Get users stream
   Stream<QuerySnapshot> get users{

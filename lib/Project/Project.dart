@@ -153,6 +153,10 @@ class _ProjectPage extends State<ProjectPage> {
           position: TimelineItemPosition.left,
           iconBackground: Colors.redAccent,
           icon: Icon(Icons.event)),
+      TimelineModel(Placeholder(),
+          position: TimelineItemPosition.right,
+          iconBackground: Colors.redAccent,
+          icon: Icon(Icons.event)),
     ];
 
     return Timeline(children: items, position: TimelinePosition.Center);

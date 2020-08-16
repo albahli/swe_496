@@ -228,7 +228,6 @@ class _SignUpState extends State<SignUp> {
                                       await auth.createUserWithEmailAndPassword(
                                           _email, _password, _username, _name, birthDate.text);
                                   print("Signed Up with New ID $uid");
-                                  //Get.to(ProjectsGroups());
                                   Get.back(result: 'Successful Registration');
                                 } catch (e) {
                                   setState(() {
