@@ -11,6 +11,7 @@ class DatabaseService {
 
 
   Future setNewUserProfile (String username, String email, String password, String name, String birthDate) async {
+
     // Creating new profile after registration
     await userProfileCollection.document(uid).setData({
       'username': username,
