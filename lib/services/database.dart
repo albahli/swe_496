@@ -11,14 +11,17 @@ class DatabaseService {
 
 
   Future setNewUserProfile (String username, String email, String password, String name, String birthDate) async {
-    return await userProfileCollection.document(uid).setData({
+    // Creating new profile after registration
+    await userProfileCollection.document(uid).setData({
       'username': username,
       'email': email,
       'password': password,
       'name': name,
       'birthDate': birthDate,
-      'privateTasksList': ['']
     });
+
+    // Creating a sub collection for private tasks folder
+   return await userProfileCollection.document(uid).collection('privateTasksFolder').document().setData({});
   }
 
 

@@ -1,17 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
+import 'package:multilevel_drawer/multilevel_drawer.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Project/Project.dart';
 import 'package:swe496/SignIn.dart';
 import 'package:swe496/provider_widget.dart';
 import 'package:swe496/services/auth_service.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
-import 'package:multilevel_drawer/multilevel_drawer.dart';
 
 class GroupProjects extends StatefulWidget {
   GroupProjects({Key key}) : super(key: key);
@@ -62,8 +61,13 @@ class _GroupProjects extends State<GroupProjects> {
           children: [
             // Child Elements for Each Drawer Item
             MLMenuItem(
-                leading: Icon(Icons.person, color: Colors.red,),
-                content: Text("My Profile",),
+                leading: Icon(
+                  Icons.person,
+                  color: Colors.red,
+                ),
+                content: Text(
+                  "My Profile",
+                ),
                 onClick: () {}),
             MLMenuItem(
               leading: Icon(Icons.settings, color: Colors.red),
@@ -72,7 +76,9 @@ class _GroupProjects extends State<GroupProjects> {
             ),
             MLMenuItem(
                 leading: Icon(Icons.power_settings_new, color: Colors.red),
-                content: Text("Log out",),
+                content: Text(
+                  "Log out",
+                ),
                 onClick: () async {
                   try {
                     AuthService auth = Provider.of(context).auth;
@@ -82,8 +88,7 @@ class _GroupProjects extends State<GroupProjects> {
                   } catch (e) {
                     print(e.toString());
                   }
-                }
-                ),
+                }),
           ],
         ),
         body: Container(
