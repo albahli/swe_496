@@ -6,9 +6,12 @@ import 'package:swe496/provider_widget.dart';
 import 'package:swe496/services/auth_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:timeline_list/timeline.dart';
+import 'package:timeline_list/timeline_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
+import 'package:multilevel_drawer/multilevel_drawer.dart';
 
 class GroupProjects extends StatefulWidget {
   GroupProjects({Key key}) : super(key: key);
@@ -19,9 +22,8 @@ class GroupProjects extends StatefulWidget {
 
 class _GroupProjects extends State<GroupProjects> {
   final formKey = GlobalKey<FormState>();
-  int i = 0;
-  int barIndex = 0;
 
+  int barIndex = 0; // fot bottom navigation tabs
   String projectName;
 
   @override
@@ -30,30 +32,59 @@ class _GroupProjects extends State<GroupProjects> {
         resizeToAvoidBottomPadding: false,
         // still not working in landscape mode
         appBar: AppBar(
-          leading: Transform.rotate(
-            angle: 180 * 3.14 / 180,
-            child: IconButton(
-              icon: Icon(
-                Icons.exit_to_app,
-                size: 30,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                try {
-                  AuthService auth = Provider.of(context).auth;
-                  await auth.signOut();
-                  Get.off(SignIn());
-                  print("Signed Out");
-                } catch (e) {
-                  print(e.toString());
-                }
-              },
-            ),
-          ),
           title: const Text('Group Projects'),
           centerTitle: true,
           backgroundColor: Colors.red,
           actions: <Widget>[],
+        ),
+        drawer: MultiLevelDrawer(
+          backgroundColor: Colors.white,
+          rippleColor: Colors.grey.shade100,
+          subMenuBackgroundColor: Colors.grey.shade100,
+          divisionColor: Colors.black12,
+          header: Container(
+            // Header for Drawer
+            height: MediaQuery.of(context).size.height * 0.25,
+            child: Center(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                CircleAvatar(
+                  radius: 40,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text("RetroPortal Studio")
+              ],
+            )),
+          ),
+          children: [
+            // Child Elements for Each Drawer Item
+            MLMenuItem(
+                leading: Icon(Icons.person, color: Colors.red,),
+                content: Text("My Profile",),
+                onClick: () {}),
+            MLMenuItem(
+              leading: Icon(Icons.settings, color: Colors.red),
+              content: Text("Settings"),
+              onClick: () {},
+            ),
+            MLMenuItem(
+                leading: Icon(Icons.power_settings_new, color: Colors.red),
+                content: Text("Log out",),
+                onClick: () async {
+                  try {
+                    AuthService auth = Provider.of(context).auth;
+                    await auth.signOut();
+                    Get.off(SignIn());
+                    print("Signed Out");
+                  } catch (e) {
+                    print(e.toString());
+                  }
+                }
+                ),
+          ],
         ),
         body: Container(
           width: MediaQuery.of(context).size.width,
@@ -92,12 +123,12 @@ class _GroupProjects extends State<GroupProjects> {
         }
 
         if (snapshot.connectionState == ConnectionState.active) {
-
-           if (snapshot.hasData && snapshot.data != null) {
-             return ListView.builder(
+          if (snapshot.hasData && snapshot.data != null) {
+            return ListView.builder(
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
-                  String projectName = snapshot.data.documents[index]['projectName'];
+                  String projectName =
+                      snapshot.data.documents[index]['projectName'];
                   return ListTile(
                     leading: Icon(Icons.account_circle),
                     title: Text(projectName),
@@ -109,7 +140,16 @@ class _GroupProjects extends State<GroupProjects> {
                 });
           }
         }
-        return Text('No connection');
+        return Container(
+          child: Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.grey,
+              valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
+              semanticsLabel: 'Loading',
+              strokeWidth: 4,
+            ),
+          ),
+        );
       },
     );
   }
@@ -120,31 +160,32 @@ class _GroupProjects extends State<GroupProjects> {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.people_outline),
+          icon: Icon(Icons.people),
           title: Text('Groups'),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.inbox),
-          title: Text('Personal'),
+          icon: Icon(Icons.assignment_turned_in),
+          title: Text('Tasks'),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.people),
+          icon: Icon(Icons.contacts),
           title: Text('Friends'),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.message),
           title: Text('Messages'),
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
+        /* BottomNavigationBarItem(
+          icon: Icon(Icons.person_pin),
           title: Text('Account'),
-        ),
+        ),*/
       ],
       currentIndex: barIndex,
       selectedItemColor: Colors.red,
       unselectedItemColor: Colors.grey,
       showSelectedLabels: true,
       showUnselectedLabels: true,
+      selectedFontSize: 15,
       onTap: (index) {
         setState(() {
           barIndex = index;
@@ -181,6 +222,16 @@ class _GroupProjects extends State<GroupProjects> {
       children: [
         SpeedDialChild(
           child: Icon(
+            Icons.calendar_today,
+            size: 25,
+          ),
+          backgroundColor: Colors.red,
+          label: 'Upcoming',
+          labelStyle: TextStyle(fontSize: 16.0),
+          onTap: () => showTimelineInBottomSheet(),
+        ),
+        SpeedDialChild(
+          child: Icon(
             Icons.add,
             size: 25,
           ),
@@ -203,13 +254,58 @@ class _GroupProjects extends State<GroupProjects> {
     );
   }
 
+  // Displays a bottom sheet contains a timeline of all the user's tasks in each group/personal project
+  void showTimelineInBottomSheet() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Timeline'),
+            centerTitle: true,
+            leading: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () {
+                Get.back();
+              },
+            ),
+          ),
+          body: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: viewTimeLineOfTasksAndEvents(),
+          ),
+        );
+      },
+    );
+  }
+
+  // Used in showTimelineInBottomSheet()
+  Widget viewTimeLineOfTasksAndEvents() {
+    List<TimelineModel> items = [
+      TimelineModel(Placeholder(),
+          position: TimelineItemPosition.right,
+          iconBackground: Colors.redAccent,
+          icon: Icon(Icons.assignment)),
+      TimelineModel(Placeholder(),
+          position: TimelineItemPosition.left,
+          iconBackground: Colors.redAccent,
+          icon: Icon(Icons.event)),
+      TimelineModel(Placeholder(),
+          position: TimelineItemPosition.right,
+          iconBackground: Colors.redAccent,
+          icon: Icon(Icons.event)),
+    ];
+
+    return Timeline(children: items, position: TimelinePosition.Center);
+  }
+
   // Form to create new project
   void alertCreateProjectForm(BuildContext context) {
     Alert(
         context: context,
         title: 'Create New Project',
-        desc:
-            "We will send you a link to your account's email to reset your password.",
         closeFunction: () => null,
         style: AlertStyle(
             animationType: AnimationType.fromBottom,
@@ -226,7 +322,8 @@ class _GroupProjects extends State<GroupProjects> {
             child: Column(
               children: <Widget>[
                 TextFormField(
-                  validator: (value) => value.isEmpty ? "Project name can't be empty" : null,
+                  validator: (value) =>
+                      value.isEmpty ? "Project name can't be empty" : null,
                   onSaved: (projectNameVal) {
                     setState(() {
                       projectName = projectNameVal;
@@ -273,7 +370,8 @@ class _GroupProjects extends State<GroupProjects> {
                   // Display success message
                   Get.snackbar(
                     "Success !", // title
-                    "Project '$projectName'' has been created successfully.", // message
+                    "Project '$projectName'' has been created successfully.",
+                    // message
                     icon: Icon(
                       Icons.check_circle_outline,
                       color: Colors.green,

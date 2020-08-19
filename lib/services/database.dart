@@ -15,7 +15,9 @@ class DatabaseService {
       'username': username,
       'email': email,
       'password': password,
+      'name': name,
       'birthDate': birthDate,
+      'privateTasksList': ['']
     });
   }
 

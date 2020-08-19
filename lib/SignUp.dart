@@ -5,6 +5,7 @@ import 'LoadingScreens/loading.dart';
 import 'package:get/get.dart';
 import 'services/auth_service.dart';
 import 'provider_widget.dart';
+import 'Home/GroupProjects.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -261,7 +262,7 @@ class _SignUpState extends State<SignUp> {
                                         barBlur: 20,
                                         isDismissible: true,
                                         onTap: (value){
-                                          Get.to(SignIn());
+                                          Get.off(GroupProjects());
                                           return;
                                         },
                                         duration: Duration(seconds: 15),
