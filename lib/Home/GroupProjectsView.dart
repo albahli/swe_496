@@ -12,7 +12,6 @@ import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 import 'package:uuid/uuid.dart';
 
-
 class GroupProjects extends StatefulWidget {
   GroupProjects({Key key}) : super(key: key);
 
@@ -290,18 +289,115 @@ class _GroupProjects extends State<GroupProjects> {
   // Used in showTimelineInBottomSheet()
   Widget viewTimeLineOfTasksAndEvents() {
     List<TimelineModel> items = [
-      TimelineModel(Placeholder(),
+      TimelineModel(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: (){
+
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.grey[250],
+                  boxShadow: [
+                    BoxShadow(color: Colors.black12, spreadRadius: 0.5),
+                  ],
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth:300, minWidth: 200, minHeight: 200),
+                  child: Center(
+                    child: Column(
+                      children: <Widget>[
+                        Text('Task name: ', style: TextStyle(color: Colors.black),),
+                        Text('Description: ', style: TextStyle(color: Colors.black),),
+                        Text('Status: ', style: TextStyle(color: Colors.black),),
+                        Text('Priority: ', style: TextStyle(color: Colors.black),),
+                        Text('Start date: ', style: TextStyle(color: Colors.black),),
+                        Text('End date: ', style: TextStyle(color: Colors.black),),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           position: TimelineItemPosition.right,
-          iconBackground: Colors.redAccent,
-          icon: Icon(Icons.assignment)),
-      TimelineModel(Placeholder(),
+          iconBackground: Colors.red,
+          isFirst: true,
+          icon: Icon(Icons.assignment, color: Colors.white,)),
+      TimelineModel(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: (){
+
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.grey[250],
+                  boxShadow: [
+                    BoxShadow(color: Colors.black12, spreadRadius: 0.5),
+                  ],
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth:300, minWidth: 200, minHeight: 200),
+                  child: Center(
+                    child: Column(
+                      children: <Widget>[
+                        Text('Event name: ', style: TextStyle(color: Colors.black),),
+                        Text('Description: ', style: TextStyle(color: Colors.black),),
+                        Text('Loaction: (optional) ', style: TextStyle(color: Colors.black),),
+                        Text('Date: ', style: TextStyle(color: Colors.black),),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           position: TimelineItemPosition.left,
-          iconBackground: Colors.redAccent,
-          icon: Icon(Icons.event)),
-      TimelineModel(Placeholder(),
+          iconBackground: Colors.red,
+          isFirst: true,
+          icon: Icon(Icons.event, color: Colors.white,)),
+      TimelineModel(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: (){
+
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.grey[250],
+                  boxShadow: [
+                    BoxShadow(color: Colors.black12, spreadRadius: 0.5),
+                  ],
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth:300, minWidth: 200, minHeight: 200),
+                  child: Center(
+                    child: Column(
+                      children: <Widget>[
+                        Text('Task name: ', style: TextStyle(color: Colors.black),),
+                        Text('Description: ', style: TextStyle(color: Colors.black),),
+                        Text('Status: ', style: TextStyle(color: Colors.black),),
+                        Text('Priority: ', style: TextStyle(color: Colors.black),),
+                        Text('Start date: ', style: TextStyle(color: Colors.black),),
+                        Text('End date: ', style: TextStyle(color: Colors.black),),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           position: TimelineItemPosition.right,
-          iconBackground: Colors.redAccent,
-          icon: Icon(Icons.event)),
+          iconBackground: Colors.red,
+          isFirst: true,
+          icon: Icon(Icons.assignment, color: Colors.white,)),
     ];
 
     return Timeline(children: items, position: TimelinePosition.Center);
@@ -426,15 +522,29 @@ class ProjectInDatabase {
       'ImageIcon': '',
       'IsJoiningEnabled': true,
       'joiningLink': projectID,
-      'pinnedMessage':'',
+      'pinnedMessage': '',
     });
-    await projectCollection.document(projectID).collection('chat').document().setData({}); // creating chat as sub collection
-    await projectCollection.document(projectID).collection('events').document().setData({}); // creating events as sub collection
-    await projectCollection.document(projectID).collection('members').document().setData({
-      '$uid' : {
-        'role' : 'admin'
-      }
+    await projectCollection
+        .document(projectID)
+        .collection('chat')
+        .document()
+        .setData({}); // creating chat as sub collection
+    await projectCollection
+        .document(projectID)
+        .collection('events')
+        .document()
+        .setData({}); // creating events as sub collection
+    await projectCollection
+        .document(projectID)
+        .collection('members')
+        .document()
+        .setData({
+      '$uid': {'role': 'admin'}
     }); // creating members as sub collection
-   return await projectCollection.document(projectID).collection('tasks').document().setData({}); // creating tasks as sub collection
+    return await projectCollection
+        .document(projectID)
+        .collection('tasks')
+        .document()
+        .setData({}); // creating tasks as sub collection
   }
 }
