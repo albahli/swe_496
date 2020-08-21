@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:swe496/Home/GroupProjectsView.dart';
+import 'package:swe496/Project/membersView.dart';
 import 'package:swe496/provider_widget.dart';
 import 'package:swe496/services/auth_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
-class ProjectPage extends StatefulWidget {
+class TasksAndEvents extends StatefulWidget {
   final String projectName;
-  ProjectPage({Key key, this.projectName}) : super(key: key);
+  TasksAndEvents({Key key, this.projectName}) : super(key: key);
 
   @override
-  _ProjectPage createState() => _ProjectPage();
+  _TasksAndEvents createState() => _TasksAndEvents();
 }
 
-class _ProjectPage extends State<ProjectPage> {
-  int i = 0;
-  int barIndex = 0;
+class _TasksAndEvents extends State<TasksAndEvents> {
+  int barIndex = 0; // Current page index in bottom navigation bar
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class _ProjectPage extends State<ProjectPage> {
             color: Colors.white,
           ),
           onPressed: () {
-            Get.back();
+            Get.offAll(GroupProjects());
             print("back to Group Projects");
           },
         ),
@@ -101,6 +102,14 @@ class _ProjectPage extends State<ProjectPage> {
       onTap: (index) {
         setState(() {
           barIndex = index;
+
+          if(barIndex == 0) // Do nothing, stay in the same page
+            return;
+          else if(barIndex == 1)
+            return;
+          else if(barIndex == 2)
+            Get.offAll(MembersView(projectName: widget.projectName,));
+
         });
         print(index);
       },
@@ -117,7 +126,7 @@ class _ProjectPage extends State<ProjectPage> {
       backgroundColor: Colors.red,
       tooltip: 'Timeline',
       onPressed: () {
-        // Go to Timeline page
+        // Show bottom sheet to display Timeline page
         showModalBottomSheet(
           context: context,
           builder: (BuildContext context) {
@@ -133,8 +142,6 @@ class _ProjectPage extends State<ProjectPage> {
                 ),
               ),
               body: Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
                   child: viewTimeLineOfTasksAndEvents()),
             );
           },

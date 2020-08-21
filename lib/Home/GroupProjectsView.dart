@@ -4,13 +4,14 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/Project/Project.dart';
+import 'package:swe496/Project/TasksAndEvents.dart';
 import 'package:swe496/SignIn.dart';
 import 'package:swe496/provider_widget.dart';
 import 'package:swe496/services/auth_service.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 import 'package:uuid/uuid.dart';
+
 
 class GroupProjects extends StatefulWidget {
   GroupProjects({Key key}) : super(key: key);
@@ -21,7 +22,7 @@ class GroupProjects extends StatefulWidget {
 
 class _GroupProjects extends State<GroupProjects> {
   final formKey = GlobalKey<FormState>();
-
+  final uid = AuthService().getUserUID();
   int barIndex = 0; // fot bottom navigation tabs
   String projectName;
 
@@ -54,7 +55,7 @@ class _GroupProjects extends State<GroupProjects> {
                 SizedBox(
                   height: 10,
                 ),
-                Text("RetroPortal Studio")
+                Text("username example")
               ],
             )),
           ),
@@ -139,7 +140,7 @@ class _GroupProjects extends State<GroupProjects> {
                     title: Text(projectName),
                     subtitle: Text('Details ...'),
                     onTap: () {
-                      Get.to(ProjectPage(projectName: projectName));
+                      Get.to(TasksAndEvents(projectName: projectName));
                     },
                   );
                 });
@@ -375,7 +376,7 @@ class _GroupProjects extends State<GroupProjects> {
                   // Display success message
                   Get.snackbar(
                     "Success !", // title
-                    "Project '$projectName'' has been created successfully.",
+                    "Project '$projectName' has been created successfully.",
                     // message
                     icon: Icon(
                       Icons.check_circle_outline,
@@ -417,10 +418,23 @@ class ProjectInDatabase {
 
   Future createNewProject(String projectName) async {
     String projectID =
-        Uuid().v1(); //project ID, UuiD is package that generates random ID
-    return await projectCollection.document(projectID).setData({
+        Uuid().v1(); // Project ID, UuiD is package that generates random ID
+
+    await projectCollection.document(projectID).setData({
       'projectName': projectName,
       'Owner': uid,
+      'ImageIcon': '',
+      'IsJoiningEnabled': true,
+      'joiningLink': projectID,
+      'pinnedMessage':'',
     });
+    await projectCollection.document(projectID).collection('chat').document().setData({}); // creating chat as sub collection
+    await projectCollection.document(projectID).collection('events').document().setData({}); // creating events as sub collection
+    await projectCollection.document(projectID).collection('members').document().setData({
+      '$uid' : {
+        'role' : 'admin'
+      }
+    }); // creating members as sub collection
+   return await projectCollection.document(projectID).collection('tasks').document().setData({}); // creating tasks as sub collection
   }
 }

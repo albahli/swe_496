@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swe496/Home/GroupProjects.dart';
+import 'package:swe496/Home/GroupProjectsView.dart';
 import 'package:swe496/SignUp.dart';
 import 'package:swe496/services/auth_service.dart';
 import 'SignIn.dart';

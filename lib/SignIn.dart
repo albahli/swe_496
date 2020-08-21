@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/Home/GroupProjects.dart';
+import 'package:swe496/Home/GroupProjectsView.dart';
 import 'SignUp.dart';
 import 'services/auth_service.dart';
 import 'provider_widget.dart';

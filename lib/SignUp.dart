@@ -5,7 +5,7 @@ import 'LoadingScreens/loading.dart';
 import 'package:get/get.dart';
 import 'services/auth_service.dart';
 import 'provider_widget.dart';
-import 'Home/GroupProjects.dart';
+import 'Home/GroupProjectsView.dart';
 
 class SignUp extends StatefulWidget {
   @override
