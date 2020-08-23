@@ -15,15 +15,15 @@ class AuthService {
   }
 
   // Email & Password Sign Up
-  Future<String> createUserWithEmailAndPassword(String email, String password, String username, name, birthDate) async {
+  Future<String> createUserWithEmailAndPassword(String email, String password, String username, String name, String birthDate) async {
 
-    final currentUser = await _firebaseAuth.createUserWithEmailAndPassword(email: email.trim(), password: password);
+    final currentUser = await _firebaseAuth.createUserWithEmailAndPassword(email: email.trim(), password: password.trim());
     // Encrypting the password
 
-    String hashedPassword = Password.hash(password, new PBKDF2());
+    String hashedPassword = Password.hash(password.trim(), new PBKDF2());
 
     // Create a new document for the user with uid
-    await DatabaseService(uid: currentUser.uid).setNewUserProfile(username, email, hashedPassword, name, birthDate);
+    await DatabaseService(uid: currentUser.uid).setNewUserProfile(username.toLowerCase().trim(), email.trim(), hashedPassword, name.trim(), birthDate.trim());
 
     return currentUser.uid;
   }
@@ -49,6 +49,8 @@ class AuthService {
   }
 }
 class UsernameValidator {
+
+
   static String validate(String value){
 
     if(value.isEmpty)
