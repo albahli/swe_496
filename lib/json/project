@@ -1,0 +1,63 @@
+{
+  "projectID": "projectID",
+  "projectName": "graduation project",
+  "image": "icon1.png",
+  "joiningLink": "4jffs3",
+  "isJoiningLinkEnabled": true,
+  "pinnedMessage": "important meesage",
+  "chat": {
+    "chatID": "same as projectID",
+    "message": [
+      {
+        "messageID": "434fhs",
+        "messageFrom": "uid",
+        "contentOfMessage": "hello",
+        "time": "8:45"
+      }
+    ]
+  },
+  "events": [
+    {
+      "eventID": "djkfjk43",
+      "eventName": "event1",
+      "eventDate": "843894",
+      "eventDescription": "dfdgdg",
+      "eventLocation": "s"
+    }
+  ],
+  "members": [
+    {
+      "memberUID": "djkfjk43",
+      "isAdmin": true
+    }
+  ],
+  "tasksOfProject": [
+    {
+      "taskID": "2344d2fc",
+      "taskName": "task1",
+      "taskDescription": "some details..",
+      "taskStatus": "not-started",
+      "taskPriority": "high",
+      "startDate": "8 aug",
+      "dueDate": "9 aug",
+      "isAssigned": "false",
+      "assignedBy": "uid exmaple 1",
+      "assignedTo": "uid example 2",
+      "subTask": [
+        {
+          "subTaskName": "subtask1",
+          "subTaskDescription": "....",
+          "subTaskStatus": "not-started"
+        }
+      ],
+      "message": [
+        {
+          "messageID": "-434fs",
+          "messageFrom": "uid",
+          "contentOfMessage": "hello",
+          "time": "8:45"
+        }
+      ]
+    }
+  ]
+}

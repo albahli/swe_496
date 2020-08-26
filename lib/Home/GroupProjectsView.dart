@@ -22,7 +22,7 @@ class GroupProjects extends StatefulWidget {
 class _GroupProjects extends State<GroupProjects> {
   final formKey = GlobalKey<FormState>();
   final uid = AuthService().getUserUID();
-  int barIndex = 0; // fot bottom navigation tabs
+  int barIndex = 0; // Currently we are at 0, for bottom navigation tabs
   String projectName;
 
   @override
@@ -120,9 +120,9 @@ class _GroupProjects extends State<GroupProjects> {
   }
 
   Widget getListOfProjects() {
-    return StreamBuilder(
+    return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('projects').snapshots(),
-      builder: (context, snapshot) {
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text(snapshot.error.toString());
         }
@@ -499,6 +499,9 @@ class _GroupProjects extends State<GroupProjects> {
             ),
           )
         ]).show();
+  }
+  Future getUID()async{
+    return AuthService().getUserUID();
   }
 }
 

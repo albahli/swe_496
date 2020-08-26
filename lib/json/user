@@ -1,0 +1,19 @@
+{
+  "userID": "uid example",
+  "userName": "userName",
+  "email": "example@gmail.com",
+  "password": "123456",
+  "name": "faisal",
+  "birthDate": "4jffs3",
+  "UserAvatar": "icon.png",
+  "projects": [
+    {
+      "projectID": "project id"
+    }
+  ],
+  "User": [
+    {
+      "userID": "uid example"
+    }
+  ]
+}
