@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:swe496/Home/GroupProjectsView.dart';
+import 'package:swe496/Views/GroupProjectsView.dart';
 import 'package:swe496/Project/membersView.dart';
-import 'package:swe496/provider_widget.dart';
-import 'package:swe496/services/auth_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';

@@ -11,7 +11,7 @@
       "projectID": "project id"
     }
   ],
-  "User": [
+  "friends": [
     {
       "userID": "uid example"
     }

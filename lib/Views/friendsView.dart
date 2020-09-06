@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
-import 'package:swe496/services/auth_service.dart';
-import 'package:swe496/provider_widget.dart';
 import 'package:get/get.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:swe496/SignIn.dart';
+import 'package:swe496/Views/SignIn.dart';
 
 class FriendsView extends StatefulWidget {
   @override
@@ -71,8 +69,8 @@ class _FriendsViewState extends State<FriendsView> {
                 ),
                 onClick: () async {
                   try {
-                    AuthService auth = Provider.of(context).auth;
-                    await auth.signOut();
+                    //AuthService auth = Provider.of(context).auth;
+                    //await auth.signOut();
                     Get.off(SignIn());
                     print("Signed Out");
                   } catch (e) {

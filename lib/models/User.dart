@@ -6,8 +6,8 @@ class User {
   String name;
   String birthDate;
   String userAvatar;
-  List<Projects> projects;
-  List<User> user;
+  List<String> listOfProjects;
+  List<String> listOfFriends;
 
   User(
       {this.userID,
@@ -17,8 +17,8 @@ class User {
         this.name,
         this.birthDate,
         this.userAvatar,
-        this.projects,
-        this.user});
+        this.listOfProjects,
+        this.listOfFriends});
 
   User.fromJson(Map<String, dynamic> json) {
     userID = json['userID'];
@@ -28,18 +28,8 @@ class User {
     name = json['name'];
     birthDate = json['birthDate'];
     userAvatar = json['UserAvatar'];
-    if (json['projects'] != null) {
-      projects = new List<Projects>();
-      json['projects'].forEach((v) {
-        projects.add(new Projects.fromJson(v));
-      });
-    }
-    if (json['User'] != null) {
-      user = new List<User>();
-      json['User'].forEach((v) {
-        user.add(new User.fromJson(v));
-      });
-    }
+    listOfProjects = json['listOfProjects'].cast<String>();
+    listOfFriends = json['listOfFriends'].cast<String>();
   }
 
   Map<String, dynamic> toJson() {
@@ -51,28 +41,8 @@ class User {
     data['name'] = this.name;
     data['birthDate'] = this.birthDate;
     data['UserAvatar'] = this.userAvatar;
-    if (this.projects != null) {
-      data['projects'] = this.projects.map((v) => v.toJson()).toList();
-    }
-    if (this.user != null) {
-      data['User'] = this.user.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class Projects {
-  String projectID;
-
-  Projects({this.projectID});
-
-  Projects.fromJson(Map<String, dynamic> json) {
-    projectID = json['projectID'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['projectID'] = this.projectID;
+    data['listOfProjects'] = this.listOfProjects;
+    data['listOfFriends'] = this.listOfFriends;
     return data;
   }
 }

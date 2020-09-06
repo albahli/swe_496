@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:swe496/Home/GroupProjectsView.dart';
+import 'package:swe496/Views/GroupProjectsView.dart';
 import 'package:swe496/Project/TasksAndEvents.dart';
 
 class MembersView extends StatefulWidget {
