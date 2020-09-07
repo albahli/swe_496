@@ -27,7 +27,7 @@ class _MembersViewState extends State<MembersView> {
               color: Colors.white,
             ),
             onPressed: () {
-              Get.offAll(GroupProjects());
+              Get.offAll(GroupProjects(), transition: Transition.noTransition);
               print("back to Group Projects");
             },
           )),
@@ -92,7 +92,7 @@ class _MembersViewState extends State<MembersView> {
           barIndex = index;
 
           if(barIndex == 0)
-            Get.offAll(TasksAndEvents(projectName: widget.projectName,));
+            Get.offAll(TasksAndEvents(projectName: widget.projectName,), transition: Transition.noTransition);
           else if(barIndex == 1)
             return;
           else if(barIndex == 2) // Do nothing, stay in the same page

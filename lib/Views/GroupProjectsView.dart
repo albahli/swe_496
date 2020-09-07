@@ -61,7 +61,9 @@ class _GroupProjectsState extends State<GroupProjects> {
                     height: 10,
                   ),
                   GetX<UserController>(builder: (_){
+                    if(_.user.userName!=null)
                     return Text(_.user.userName.toString());
+                    else return Text('Loading');
                   },)
               ],
             ),
@@ -141,7 +143,7 @@ class _GroupProjectsState extends State<GroupProjects> {
                     title: Text(projectName),
                     subtitle: Text('Details ...'),
                     onTap: () {
-                      Get.to(TasksAndEvents(projectName: projectName));
+                      Get.to(TasksAndEvents(projectName: projectName), transition: Transition.noTransition );
                     },
                   );
                 });

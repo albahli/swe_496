@@ -30,7 +30,7 @@ class _TasksAndEvents extends State<TasksAndEvents> {
             color: Colors.white,
           ),
           onPressed: () {
-            Get.offAll(GroupProjects());
+            Get.offAll(GroupProjects(), transition: Transition.noTransition);
             print("back to Group Projects");
           },
         ),
@@ -106,7 +106,7 @@ class _TasksAndEvents extends State<TasksAndEvents> {
           else if(barIndex == 1)
             return;
           else if(barIndex == 2)
-            Get.offAll(MembersView(projectName: widget.projectName,));
+            Get.offAll(MembersView(projectName: widget.projectName,), transition: Transition.noTransition);
 
         });
         print(index);
