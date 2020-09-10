@@ -4,7 +4,7 @@ import 'package:swe496/controllers/userController.dart';
 import 'package:swe496/models/User.dart';
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';
-import 'package:swe496/services/database.dart';
+import 'package:swe496/Database/UserProfileCollection.dart';
 
 class AuthController extends GetxController {
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -22,7 +22,7 @@ class AuthController extends GetxController {
       String birthDate) async {
     try {
       // Check first if username is taken
-      bool userTaken = await Database()
+      bool userTaken = await UserProfileCollection()
           .checkIfUsernameIsTaken(username.toLowerCase().trim());
       if (userTaken) throw FormatException("Username is taken");
 
@@ -34,10 +34,10 @@ class AuthController extends GetxController {
       String hashedPassword = Password.hash(password.trim(), new PBKDF2());
 
       // Create new list of project for the user
-      List<String> listOfProjects = new List();
+      List<UserProjects> userProjects = new List();
 
       // Create new list of friends for the user
-      List<String> listOfFriends = new List();
+      List<Friends> friends = new List();
 
       // Creating user object and assigning the parameters
       User _user = new User(
@@ -48,12 +48,12 @@ class AuthController extends GetxController {
         name: name,
         birthDate: birthDate.trim(),
         userAvatar: '',
-        listOfProjects: listOfProjects,
-        listOfFriends: listOfFriends,
+        userProjects: userProjects,
+        friends: friends,
       );
 
       // Create a new user in the fire store database
-      if (await Database().createNewUser(_user)) {
+      if (await UserProfileCollection().createNewUser(_user)) {
         // User created successfully
         Get.find<UserController>().user = _user;
         Get.back();
@@ -80,10 +80,12 @@ class AuthController extends GetxController {
     try {
       FirebaseUser firebaseUser = await _auth.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
-      Get.find<UserController>().user = await Database().getUser(firebaseUser.uid);
+      Get.find<UserController>().user =
+          await UserProfileCollection().getUser(firebaseUser.uid);
+      print(Get.find<UserController>().user.userName);
     } catch (e) {
       Get.snackbar(
-        "Error.", // title
+        "Error22.", // title
         e.toString(), // message
         icon: Icon(
           Icons.error_outline,

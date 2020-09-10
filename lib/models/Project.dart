@@ -7,7 +7,8 @@ class Project {
   String pinnedMessage;
   Chat chat;
   List<Events> events;
-  List<Members> members;
+  List<MembersUIDs> membersUIDs;
+  List<MembersRoles> membersRoles;
   List<TasksOfProject> tasksOfProject;
 
   Project(
@@ -19,7 +20,8 @@ class Project {
         this.pinnedMessage,
         this.chat,
         this.events,
-        this.members,
+        this.membersUIDs,
+        this.membersRoles,
         this.tasksOfProject});
 
   Project.fromJson(Map<String, dynamic> json) {
@@ -36,10 +38,16 @@ class Project {
         events.add(new Events.fromJson(v));
       });
     }
-    if (json['members'] != null) {
-      members = new List<Members>();
-      json['members'].forEach((v) {
-        members.add(new Members.fromJson(v));
+    if (json['membersUIDs'] != null) {
+      membersUIDs = new List<MembersUIDs>();
+      json['membersUIDs'].forEach((v) {
+        membersUIDs.add(new MembersUIDs.fromJson(v));
+      });
+    }
+    if (json['membersRoles'] != null) {
+      membersRoles = new List<MembersRoles>();
+      json['membersRoles'].forEach((v) {
+        membersRoles.add(new MembersRoles.fromJson(v));
       });
     }
     if (json['tasksOfProject'] != null) {
@@ -64,8 +72,11 @@ class Project {
     if (this.events != null) {
       data['events'] = this.events.map((v) => v.toJson()).toList();
     }
-    if (this.members != null) {
-      data['members'] = this.members.map((v) => v.toJson()).toList();
+    if (this.membersUIDs != null) {
+      data['membersUIDs'] = this.membersUIDs.map((v) => v.toJson()).toList();
+    }
+    if (this.membersRoles != null) {
+      data['membersRoles'] = this.membersRoles.map((v) => v.toJson()).toList();
     }
     if (this.tasksOfProject != null) {
       data['tasksOfProject'] =
@@ -159,13 +170,29 @@ class Events {
   }
 }
 
-class Members {
+class MembersUIDs {
+  String memberUID;
+
+  MembersUIDs({this.memberUID});
+
+  MembersUIDs.fromJson(Map<String, dynamic> json) {
+    memberUID = json['memberUID'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['memberUID'] = this.memberUID;
+    return data;
+  }
+}
+
+class MembersRoles {
   String memberUID;
   bool isAdmin;
 
-  Members({this.memberUID, this.isAdmin});
+  MembersRoles({this.memberUID, this.isAdmin});
 
-  Members.fromJson(Map<String, dynamic> json) {
+  MembersRoles.fromJson(Map<String, dynamic> json) {
     memberUID = json['memberUID'];
     isAdmin = json['isAdmin'];
   }

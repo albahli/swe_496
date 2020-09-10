@@ -5,7 +5,7 @@ import 'package:swe496/Views/SignUp.dart';
 import 'package:flutter/services.dart';
 import 'package:swe496/LoadingScreens/loading.dart';
 import 'package:swe496/controllers/authController.dart';
-import 'package:swe496/services/Validators.dart';
+import 'package:swe496/Database/Validators.dart';
 
 class SignIn extends GetWidget<AuthController> {
   final formKey = GlobalKey<FormState>(); // for login
@@ -109,7 +109,6 @@ class SignIn extends GetWidget<AuthController> {
                                     if (formKey.currentState.validate()) {
                                       controller.signIn(emailController.text,
                                           passwordController.text);
-
                                     }
                                   },
                                   child: Row(

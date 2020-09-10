@@ -4,6 +4,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:swe496/Database/UserProfileCollection.dart';
 import 'package:swe496/Project/TasksAndEvents.dart';
 import 'package:swe496/controllers/authController.dart';
 import 'package:swe496/controllers/userController.dart';
@@ -21,14 +22,22 @@ class GroupProjects extends StatefulWidget {
 }
 
 class _GroupProjectsState extends State<GroupProjects> {
-  final formKey = GlobalKey<FormState>();
 
-  User initStatedUser ;
+  AuthController authController = Get.find<AuthController>();
+  UserController userController = Get.find<UserController>();
+
+  final formKey = GlobalKey<FormState>();
+  final TextEditingController _newProjectNameController = TextEditingController();
 
   int barIndex = 0;
-  String projectName;
 
- AuthController authController = Get.find<AuthController>();
+
+  @override
+  void initState() {
+    this.authController = Get.find<AuthController>();
+    this.userController = Get.find<UserController>();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,11 +69,7 @@ class _GroupProjectsState extends State<GroupProjects> {
                   SizedBox(
                     height: 10,
                   ),
-                  GetX<UserController>(builder: (_){
-                    if(_.user.userName!=null)
-                    return Text(_.user.userName.toString());
-                    else return Text('Loading');
-                  },)
+                userController.user.userName == null ?Text('NULL ??') : Text('${userController.user.userName}'),
               ],
             ),
                 )),
@@ -124,26 +129,27 @@ class _GroupProjectsState extends State<GroupProjects> {
   }
 
   Widget getListOfProjects() {
+// STOPPED HERE SHOW ONLY THE USERS PROJECT
+  print(userController.user.userID);
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('projects').snapshots(),
+      stream: Firestore.instance.collection('projects').where('membersUIDs', arrayContains:{'memberUID':'${userController.user.userID}'}).snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text(snapshot.error.toString());
         }
-
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData && snapshot.data != null) {
+
             return ListView.builder(
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
-                  String projectName =
-                      snapshot.data.documents[index]['projectName'];
+                  //Project project = new Project.fromJson(snapshot.data.documents[index].data);
                   return ListTile(
                     leading: Icon(Icons.account_circle),
-                    title: Text(projectName),
+                    title: Text(snapshot.data.documents[index]['projectName']),
                     subtitle: Text('Details ...'),
                     onTap: () {
-                      Get.to(TasksAndEvents(projectName: projectName), transition: Transition.noTransition );
+                      Get.to(TasksAndEvents(projectName: snapshot.data.documents[index]['projectName']), transition: Transition.noTransition );
                     },
                   );
                 });
@@ -478,9 +484,8 @@ class _GroupProjectsState extends State<GroupProjects> {
                 TextFormField(
                   validator: (value) =>
                       value.isEmpty ? "Project name can't be empty" : null,
-                  onSaved: (projectNameVal) {
-                      projectName = projectNameVal;
-                  },
+                  controller: _newProjectNameController,
+                  onSaved: (projectNameVal) => _newProjectNameController.text = projectNameVal,
                   decoration: InputDecoration(
                     icon: Icon(Icons.edit),
                     focusedBorder: UnderlineInputBorder(
@@ -510,17 +515,13 @@ class _GroupProjectsState extends State<GroupProjects> {
               formKey.currentState.save();
               if (formKey.currentState.validate()) {
                 try {
-               //   final auth = Provider.of(context).auth;
-                //  String uid = await auth.getUserUID();
-
-                  createNewProject(projectName);
-                  print('project has been created: $projectName');
+                  UserProfileCollection().createNewProject(_newProjectNameController.text, userController.user);
+                  print('project has been created: ${_newProjectNameController.text}');
                   Get.back();
-
                   // Display success message
                   Get.snackbar(
                     "Success !", // title
-                    "Project '$projectName' has been created successfully.",
+                    "Project '${_newProjectNameController.text}' has been created successfully.",
                     // message
                     icon: Icon(
                       Icons.check_circle_outline,
@@ -533,6 +534,7 @@ class _GroupProjectsState extends State<GroupProjects> {
                     isDismissible: true,
                     duration: Duration(seconds: 5),
                   );
+                  _newProjectNameController.clear();
                 } catch (e) {
                   print(e.message);
                 }
@@ -548,68 +550,5 @@ class _GroupProjectsState extends State<GroupProjects> {
           )
         ]).show();
   }
-
-  Future createNewProject(String projectName) async {
-
-    String projectID =
-    Uuid().v1(); // Project ID, UuiD is package that generates random ID
-
-    // Problem that the user is NULL
-    print('now inside create method $initStatedUser');
-    print(initStatedUser.userName);
-    print(initStatedUser.userID);
-    print(initStatedUser.password);
-    // Add the creator of the project to the members list and assign him as admin
-    var member = Members(
-      memberUID: initStatedUser.userID,
-      isAdmin: true,
-    );
-    List<Members> membersList = new List();
-    membersList.add(member);
-
-    // Create chat for the new project
-    var chat = Chat(chatID: projectID);
-
-    // Create the project object
-    var newProject = Project(
-      projectID: projectID,
-      projectName: projectName,
-      image: '',
-      joiningLink: '$projectID',
-      isJoiningLinkEnabled: true,
-      pinnedMessage: '',
-      chat: chat,
-      members: membersList,
-    );
-
-    print('the length is : ${initStatedUser.listOfProjects.length}');
-
-    // Add the new project ID to the user's project list
-    initStatedUser.listOfProjects.add(newProject.projectID);
-
-    // Convert the project object to be a JSON
-    var jsonUser = initStatedUser.toJson();
-
-    // Send the user JSON data to the fire base
-    await Firestore.instance.collection('userProfile').document(initStatedUser.userID).setData(jsonUser);
-
-    // Convert the project object to be a JSON
-    var jsonProject = newProject.toJson();
-
-    // Send the project JSON data to the fire base
-    return await Firestore.instance.collection('projects').document(projectID).setData(jsonProject);
-  }
 }
 
-class ProjectInDatabase {
-
-
-  ProjectInDatabase();
-
-  // Collection Reference
-  // Checks if there is a collection named profile, if not it creates new one.
-  final CollectionReference projectCollection =
-      Firestore.instance.collection('projects');
-
-
-}

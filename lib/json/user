@@ -6,7 +6,7 @@
   "name": "faisal",
   "birthDate": "4jffs3",
   "UserAvatar": "icon.png",
-  "projects": [
+  "userProjects": [
     {
       "projectID": "project id"
     }
