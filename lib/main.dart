@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.red,
       ),
+      defaultTransition: Transition.noTransition,
       title: "Task", // Name of the app
       home: Root(),
     );

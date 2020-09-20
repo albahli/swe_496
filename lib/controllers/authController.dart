@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:swe496/Views/GroupProjectsView.dart';
 import 'package:swe496/controllers/userController.dart';
 import 'package:swe496/models/User.dart';
 import 'package:flutter/material.dart';
@@ -18,13 +20,12 @@ class AuthController extends GetxController {
     _firebaseUser.bindStream(_auth.onAuthStateChanged);
   }
 
-  void createUser(String email, String password, String username, String name,
-      String birthDate) async {
+  void createUser(String email, String password, String username, String name, String birthDate) async {
     try {
       // Check first if username is taken
-      bool userTaken = await UserProfileCollection()
+      bool usernameIsTaken = await UserProfileCollection()
           .checkIfUsernameIsTaken(username.toLowerCase().trim());
-      if (userTaken) throw FormatException("Username is taken");
+      if (usernameIsTaken) throw FormatException("Username is taken");
 
       // Create the user in the Authentication first
       final firebaseUser = await _auth.createUserWithEmailAndPassword(
@@ -34,10 +35,10 @@ class AuthController extends GetxController {
       String hashedPassword = Password.hash(password.trim(), new PBKDF2());
 
       // Create new list of project for the user
-      List<UserProjects> userProjects = new List();
+      List<String> userProjects = new List<String>();
 
       // Create new list of friends for the user
-      List<Friends> friends = new List();
+      List<String> friends = new List<String>();
 
       // Creating user object and assigning the parameters
       User _user = new User(
@@ -48,16 +49,16 @@ class AuthController extends GetxController {
         name: name,
         birthDate: birthDate.trim(),
         userAvatar: '',
-        userProjects: userProjects,
-        friends: friends,
+        userProjectsIDs: userProjects,
+        friendsIDs: friends,
       );
 
       // Create a new user in the fire store database
-      if (await UserProfileCollection().createNewUser(_user)) {
+      await UserProfileCollection().createNewUser(_user);
         // User created successfully
         Get.find<UserController>().user = _user;
         Get.back();
-      }
+
     } catch (e) {
       Get.snackbar(
         "Error.", // title
@@ -78,11 +79,17 @@ class AuthController extends GetxController {
 
   void signIn(String email, String password) async {
     try {
-      FirebaseUser firebaseUser = await _auth.signInWithEmailAndPassword(
-          email: email.trim(), password: password.trim());
-      Get.find<UserController>().user =
-          await UserProfileCollection().getUser(firebaseUser.uid);
+      // Signing in
+      FirebaseUser firebaseUser = await _auth.signInWithEmailAndPassword(email: email.trim(), password: password.trim());
+
+      // Getting user document form firebase
+      DocumentSnapshot userDoc = await UserProfileCollection().getUser(firebaseUser.uid);
+      print(userDoc.data);
+
+      // Converting the json data to user object
+      Get.find<UserController>().user = User.fromJson(userDoc.data);
       print(Get.find<UserController>().user.userName);
+
     } catch (e) {
       Get.snackbar(
         "Error22.", // title
@@ -122,4 +129,5 @@ class AuthController extends GetxController {
       );
     }
   }
+
 }

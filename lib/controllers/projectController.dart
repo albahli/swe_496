@@ -1,19 +1,17 @@
 import 'package:get/get.dart';
-import 'package:swe496/Database/ProjectCollection.dart';
-import 'package:swe496/controllers/authController.dart';
-import 'package:swe496/controllers/userController.dart';
 import 'package:swe496/models/Project.dart';
-import 'package:swe496/models/User.dart';
+
 
 class ProjectController extends GetxController {
 
-  Rx<List<Project>> projectList = Rx<List<Project>>();
+  Rx<Project> _project = Project().obs;
 
-  List<Project> get projects => projectList.value;
+  Project get project => _project.value;
 
-  @override
-  void onInit() {
-    User user = Get.find<UserController>().user;
-   // projectList.bindStream(ProjectCollection().projectStream(user)); // stream coming from firebase
+  // Set the value for project model and we will be able to observe it by 'get project' function above
+  set project(Project value) => this._project.value = value;
+
+  void clear() {
+    _project.value = Project();
   }
 }

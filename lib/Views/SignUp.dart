@@ -225,7 +225,7 @@ class SignUp extends GetWidget<AuthController> {
                         ),
                         InkWell(
                           onTap: () {
-                            Get.to(SignIn());
+                            Get.offAll(SignIn(), transition: Transition.fade);
                           }, //Open some form to register
                           child: Text(
                             "Already have an account? Sign In",

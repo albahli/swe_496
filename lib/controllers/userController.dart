@@ -12,4 +12,5 @@ class UserController extends GetxController {
   void clear() {
     _user.value = User();
   }
+
 }

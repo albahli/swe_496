@@ -10,11 +10,13 @@ class Root extends GetWidget<AuthController> {
   Widget build(BuildContext context) {
     return GetX(
       initState: (_) async {
+        Get.put<AuthController>(AuthController());
         Get.put<UserController>(UserController());
       },
       builder: (_) {
         if (Get.find<AuthController>().user?.uid != null) {
-          return GroupProjects();
+          Get.find<UserController>().user;
+          return GroupProjectsView();
         } else {
           return SignIn();
         }

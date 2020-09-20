@@ -16,7 +16,7 @@
       }
     ]
   },
-  "events": [
+  "event": [
     {
       "eventID": "djkfjk43",
       "eventName": "event1",
@@ -31,7 +31,10 @@
       "isAdmin": true
     }
   ],
-  "tasksOfProject": [
+  "membersIDs": [
+    "djkfjk43"
+  ],
+  "Task": [
     {
       "taskID": "2344d2fc",
       "taskName": "task1",

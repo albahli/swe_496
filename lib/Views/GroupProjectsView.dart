@@ -4,40 +4,27 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/Database/UserProfileCollection.dart';
-import 'package:swe496/Project/TasksAndEvents.dart';
+import 'package:swe496/Database/ProjectCollection.dart';
+import 'package:swe496/Views/friendsView.dart';
+import 'package:swe496/Views/Project/TasksAndEventsView.dart';
 import 'package:swe496/controllers/authController.dart';
+import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/controllers/userController.dart';
 import 'package:swe496/models/Project.dart';
-import 'package:swe496/models/User.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
-import 'package:uuid/uuid.dart';
 
-
-class GroupProjects extends StatefulWidget {
-
+class GroupProjectsView extends StatefulWidget {
   @override
-  _GroupProjectsState createState() => _GroupProjectsState();
+  _GroupProjectsViewState createState() => _GroupProjectsViewState();
 }
 
-class _GroupProjectsState extends State<GroupProjects> {
-
+class _GroupProjectsViewState extends State<GroupProjectsView> {
   AuthController authController = Get.find<AuthController>();
   UserController userController = Get.find<UserController>();
-
   final formKey = GlobalKey<FormState>();
-  final TextEditingController _newProjectNameController = TextEditingController();
-
-  int barIndex = 0;
-
-
-  @override
-  void initState() {
-    this.authController = Get.find<AuthController>();
-    this.userController = Get.find<UserController>();
-    super.initState();
-  }
+  final TextEditingController _newProjectNameController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -60,19 +47,19 @@ class _GroupProjectsState extends State<GroupProjects> {
             height: MediaQuery.of(context).size.height * 0.25,
             child: Center(
                 child: SingleChildScrollView(
-                  child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                  CircleAvatar(
-                    radius: 40,
-                  ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.account_circle, size: 90, color: Colors.grey,),
                   SizedBox(
                     height: 10,
                   ),
-                userController.user.userName == null ?Text('NULL ??') : Text('${userController.user.userName}'),
-              ],
-            ),
-                )),
+                  userController.user.userName == null
+                      ? Text('NULL ??')
+                      : Text('${userController.user.userName}'),
+                ],
+              ),
+            )),
           ),
           children: [
             // Child Elements for Each Drawer Item
@@ -96,8 +83,8 @@ class _GroupProjectsState extends State<GroupProjects> {
                   "Log out",
                 ),
                 onClick: () async {
-                    authController.signOut();
-                    print("Signed Out");
+                  authController.signOut();
+                  print("Signed Out");
                 }),
           ],
         ),
@@ -122,34 +109,49 @@ class _GroupProjectsState extends State<GroupProjects> {
         decoration: InputDecoration(hintText: 'Search'),
         onChanged: (textVal) {
           textVal = textVal.toLowerCase();
-
         },
       ),
     );
   }
 
   Widget getListOfProjects() {
-// STOPPED HERE SHOW ONLY THE USERS PROJECT
-  print(userController.user.userID);
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('projects').where('membersUIDs', arrayContains:{'memberUID':'${userController.user.userID}'}).snapshots(),
+      stream: Firestore.instance
+          .collection('projects')
+          .where('membersIDs', arrayContains: userController.user.userID)
+          .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text(snapshot.error.toString());
         }
+
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData && snapshot.data != null) {
+            if (snapshot.data.documents.length == 0)
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: Text("You don't have any projects")),
+              );
 
             return ListView.builder(
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
-                  //Project project = new Project.fromJson(snapshot.data.documents[index].data);
                   return ListTile(
-                    leading: Icon(Icons.account_circle),
+                    leading: Icon(Icons.supervised_user_circle),
                     title: Text(snapshot.data.documents[index]['projectName']),
                     subtitle: Text('Details ...'),
-                    onTap: () {
-                      Get.to(TasksAndEvents(projectName: snapshot.data.documents[index]['projectName']), transition: Transition.noTransition );
+                    onTap: () async {
+                      Get.put<ProjectController>(ProjectController());
+                      ProjectController projectController =
+                          Get.find<ProjectController>();
+                      projectController.project = Project.fromJson(
+                          new Map<String, dynamic>.from(
+                              snapshot.data.documents[index].data));
+                      Get.to(
+                          TasksAndEventsView(
+                              projectID: projectController.project.projectID),
+                          transition: Transition.rightToLeft,
+                          duration: Duration(milliseconds: 300));
                     },
                   );
                 });
@@ -193,15 +195,21 @@ class _GroupProjectsState extends State<GroupProjects> {
           title: Text('Account'),
         ),*/
       ],
-      currentIndex: barIndex,
+      currentIndex: 0,
       selectedItemColor: Colors.red,
       unselectedItemColor: Colors.grey,
       showSelectedLabels: true,
       showUnselectedLabels: true,
       selectedFontSize: 15,
       onTap: (index) {
+        if (index == 0) return; // Do nothing because we are in the same page
 
-          barIndex = index;
+        // if(index == 1 )
+        //  return Get.off(page);
+
+        if (index == 2) Get.off(FriendsView());
+
+        if (index == 3) return;
 
         print(index);
       },
@@ -240,7 +248,26 @@ class _GroupProjectsState extends State<GroupProjects> {
           backgroundColor: Colors.red,
           label: 'Upcoming',
           labelStyle: TextStyle(fontSize: 16.0),
-          onTap: () => showTimelineInBottomSheet(context),
+          onTap: () => Get.bottomSheet(
+            Container(
+              child: Column(
+                children: [
+                  AppBar(
+                    title: Text('Timeline'),
+                    centerTitle: true,
+                    leading: IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: () => Get.back(),
+                    ),
+                  ),
+                  Expanded(child: viewTimeLineOfTasksAndEvents()),
+                ],
+              ),
+            ),
+            isScrollControlled: true,
+            ignoreSafeArea: false,
+            backgroundColor: Colors.white,
+          ),
         ),
         SpeedDialChild(
           child: Icon(
@@ -263,32 +290,6 @@ class _GroupProjectsState extends State<GroupProjects> {
           onTap: () => print('SECOND CHILD'),
         ),
       ],
-    );
-  }
-
-  void showTimelineInBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Timeline'),
-            centerTitle: true,
-            leading: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                Get.back();
-              },
-            ),
-          ),
-          body: Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: viewTimeLineOfTasksAndEvents(),
-          ),
-        );
-      },
     );
   }
 
@@ -485,7 +486,8 @@ class _GroupProjectsState extends State<GroupProjects> {
                   validator: (value) =>
                       value.isEmpty ? "Project name can't be empty" : null,
                   controller: _newProjectNameController,
-                  onSaved: (projectNameVal) => _newProjectNameController.text = projectNameVal,
+                  onSaved: (projectNameVal) =>
+                      _newProjectNameController.text = projectNameVal,
                   decoration: InputDecoration(
                     icon: Icon(Icons.edit),
                     focusedBorder: UnderlineInputBorder(
@@ -498,8 +500,7 @@ class _GroupProjectsState extends State<GroupProjects> {
                 CheckboxListTile(
                   title: Text("title text"),
                   value: false,
-                  onChanged: (newValue) {
-                  },
+                  onChanged: (newValue) {},
                   controlAffinity:
                       ListTileControlAffinity.leading, //  <-- leading Checkbox
                 )
@@ -515,8 +516,8 @@ class _GroupProjectsState extends State<GroupProjects> {
               formKey.currentState.save();
               if (formKey.currentState.validate()) {
                 try {
-                  UserProfileCollection().createNewProject(_newProjectNameController.text, userController.user);
-                  print('project has been created: ${_newProjectNameController.text}');
+                  ProjectCollection().createNewProject(
+                      _newProjectNameController.text, userController.user);
                   Get.back();
                   // Display success message
                   Get.snackbar(
@@ -551,4 +552,3 @@ class _GroupProjectsState extends State<GroupProjects> {
         ]).show();
   }
 }
-

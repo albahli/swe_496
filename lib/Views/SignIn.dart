@@ -139,7 +139,7 @@ class SignIn extends GetWidget<AuthController> {
                           ),
                           InkWell(
                             onTap: () async {
-                              var registerStatus = await Get.to(SignUp());
+                              var registerStatus = await Get.to(SignUp(), transition: Transition.fade);
                               if (registerStatus == 'Successful Registration') {
                                 Get.snackbar(
                                   "Registered Successfully !", // title

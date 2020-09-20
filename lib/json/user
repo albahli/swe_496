@@ -6,14 +6,10 @@
   "name": "faisal",
   "birthDate": "4jffs3",
   "UserAvatar": "icon.png",
-  "userProjects": [
-    {
-      "projectID": "project id"
-    }
+  "userProjectsIDs": [
+    "sss"
   ],
-  "friends": [
-    {
-      "userID": "uid example"
-    }
+  "friendsIDs": [
+    "uid example"
   ]
 }
