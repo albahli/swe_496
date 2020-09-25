@@ -173,6 +173,7 @@ class SignIn extends GetWidget<AuthController> {
   }
 
   void showPasswordAlert(BuildContext context) {
+    TextEditingController restedEmail = new TextEditingController();
     Alert(
         context: context,
         title: 'Reset your password',
@@ -196,7 +197,7 @@ class SignIn extends GetWidget<AuthController> {
                 TextFormField(
                   keyboardType: TextInputType.emailAddress,
                   validator: (emailVal) => Validate.validateEmail(emailVal),
-                  onSaved: (value) {},
+                  onSaved: (emailVal) => restedEmail.text = emailVal,
                   decoration: InputDecoration(
                     icon: Icon(Icons.mail_outline),
                     focusedBorder: UnderlineInputBorder(
@@ -216,7 +217,9 @@ class SignIn extends GetWidget<AuthController> {
             radius: BorderRadius.circular(30),
             onPressed: () async {
               formAccountResetKey.currentState.save();
-              if (formAccountResetKey.currentState.validate()) {}
+              if (formAccountResetKey.currentState.validate()) {
+                await controller.sendPasswordResetEmail(restedEmail.text);
+              }
             },
             child: Text(
               "Submit",
@@ -226,6 +229,7 @@ class SignIn extends GetWidget<AuthController> {
                   fontWeight: FontWeight.w300),
             ),
           )
+
         ]).show();
   }
 }

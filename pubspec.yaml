@@ -34,7 +34,7 @@ dependencies:
   material_design_icons_flutter: 4.0.5345
   multilevel_drawer: ^1.0.3
   date_range_picker: ^1.0.5
-
+  grouped_buttons: ^1.0.4
   json_annotation: ^3.0.1
 
 

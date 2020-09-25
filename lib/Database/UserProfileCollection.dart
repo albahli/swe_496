@@ -49,4 +49,12 @@ class UserProfileCollection {
             });
     return userNameIsTaken;
   }
+
+  Stream<QuerySnapshot> checkUserProjectsIDs(String projectID){
+    return Firestore.instance
+        .collection('userProfile')
+        .where('userProjectsIDs',
+        arrayContains: projectID)
+        .snapshots();
+  }
 }

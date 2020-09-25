@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:swe496/Database/UserProfileCollection.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
 import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/controllers/userController.dart';
+import 'package:swe496/models/Members.dart';
 import 'package:swe496/utils/root.dart';
 
-
 class MembersView extends StatefulWidget {
-
   final String projectID;
+
   MembersView({Key key, this.projectID}) : super(key: key);
 
   @override
@@ -17,9 +19,10 @@ class MembersView extends StatefulWidget {
 }
 
 class _MembersViewState extends State<MembersView> {
-  int barIndex = 0; // Current page index in bottom navigation bar
+  int barIndex = 2; // Current page index in bottom navigation bar
   ProjectController projectController = Get.find<ProjectController>();
   UserController userController = Get.find<UserController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +33,6 @@ class _MembersViewState extends State<MembersView> {
           icon: Icon(
             Icons.arrow_back_ios,
             size: 30,
-            color: Colors.white,
           ),
           onPressed: () {
             Get.offAll(Root());
@@ -40,11 +42,9 @@ class _MembersViewState extends State<MembersView> {
         ),
         title: Text(projectController.project.projectName),
         centerTitle: true,
-        backgroundColor: Colors.red,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
-            color: Colors.white,
             onPressed: () {
               // Open project settings page
             },
@@ -61,6 +61,9 @@ class _MembersViewState extends State<MembersView> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.person_add),
+          onPressed: () => alertAddNewMemberWindow()),
       bottomNavigationBar: bottomCustomNavigationBar(),
     );
   }
@@ -97,21 +100,22 @@ class _MembersViewState extends State<MembersView> {
         ),
       ],
       currentIndex: barIndex,
-      selectedItemColor: Colors.red,
-      unselectedItemColor: Colors.grey,
       showSelectedLabels: true,
       showUnselectedLabels: true,
       onTap: (index) {
         setState(() {
           barIndex = index;
 
-          if(barIndex == 0)
-            Get.off(TasksAndEventsView(projectID: widget.projectID,), transition: Transition.noTransition);
-          else if(barIndex == 1)
+          if (barIndex == 0)
+            Get.off(
+                TasksAndEventsView(
+                  projectID: widget.projectID,
+                ),
+                transition: Transition.noTransition);
+          else if (barIndex == 1)
             return;
-          else if(barIndex == 2) // Do nothing, stay in the same page
+          else if (barIndex == 2) // Do nothing, stay in the same page
             return;
-
         });
         print(index);
       },
@@ -120,10 +124,7 @@ class _MembersViewState extends State<MembersView> {
 
   Widget _getListOfMembers() {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('userProfile')
-          .where('userProjectsIDs', arrayContains: projectController.project.projectID)
-          .snapshots(),
+      stream: UserProfileCollection().checkUserProjectsIDs(projectController.project.projectID),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text(snapshot.error.toString());
@@ -136,28 +137,62 @@ class _MembersViewState extends State<MembersView> {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Text("No members in the project")),
               );
-            print('snap shots before sorting');
-            snapshot.data.documents.forEach((DocumentSnapshot documentSnapshot) {
-              print(documentSnapshot.data);
-            });
-            print('snap shots after sorting');
-            snapshot.data.documents.forEach((DocumentSnapshot documentSnapshot) {
-              print(documentSnapshot.data);
-            });
-
-            projectController.project.members.sort();
-            // String userID = projectController.project.members.firstWhere((i) => i.memberUID == );
+            List<Member> mappedMembersList =
+                new List(); // List containing the username and the role
+            List<String> userIDs = new List(); // List containing the user IDs
+            for (int i = 0; i < snapshot.data.documents.length; i++) {
+              for (int j = 0;
+                  j < projectController.project.members.length;
+                  j++) {
+                if (snapshot.data.documents[i]['userID'] ==
+                    projectController.project.members[j].memberUID) {
+                  mappedMembersList.add(new Member(
+                      memberUID: snapshot.data.documents[i]['userName'],
+                      isAdmin: projectController.project.members[j].isAdmin));
+                  userIDs.add(snapshot.data.documents[i]['userID']);
+                }
+              }
+            }
             return ListView.builder(
-                itemCount: snapshot.data.documents.length,
+                itemCount: mappedMembersList.length,
                 itemBuilder: (context, index) {
-                  //TODO: Modify the members list view to show the username and the role.
-                  // Stopped here
-                 // Member member =  projectController.project.members.s;
-                  return ListTile(
+                  //TODO: Modify the members list view to show the username and the role. check the below comment, if the current id of the user == member id then the he can't do anything such as (promote as admin, remove from project ...)
+                  //userController.user.userID == userIDs[index]
+                   return ListTile(
                     leading: Icon(Icons.account_circle),
-                    title: Text(snapshot.data.documents[index]['userName']),
-                    subtitle: Text(''),
-                    onTap: () async{
+                    title: Text(mappedMembersList[index].memberUID),
+                    subtitle:
+                        Text(mappedMembersList[index].isAdmin ? 'Admin' : ''),
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext bc) {
+                            return Container(
+                              child: new Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: <Widget>[
+                                  new ListTile(
+                                    title: new Text(
+                                        mappedMembersList[index].memberUID),
+                                  ),
+                                  Divider(),
+                                  mappedMembersList[index].isAdmin
+                                      ? new ListTile(
+                                          title: new Text('Dismiss As Admin'),
+                                          onTap: () => {},
+                                        )
+                                      : new ListTile(
+                                          title: new Text('Promote As Admin'),
+                                          onTap: () => {},
+                                        ),
+                                  new ListTile(
+                                    title: new Text('Remove From Project', style: TextStyle(color: Colors.red),),
+                                    onTap: () => {},
+                                  ),
+                                ],
+                              ),
+                            );
+                          });
                     },
                   );
                 });
@@ -166,8 +201,6 @@ class _MembersViewState extends State<MembersView> {
         return Container(
           child: Center(
             child: CircularProgressIndicator(
-              backgroundColor: Colors.grey,
-              valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
               semanticsLabel: 'Loading',
               strokeWidth: 4,
             ),
@@ -176,7 +209,150 @@ class _MembersViewState extends State<MembersView> {
       },
     );
   }
-}
-/*
-  */
 
+  alertMembersOptions(String username, String userID, bool isAdmin) {
+    Alert(
+        context: context,
+        title: username,
+        closeFunction: () => null,
+        style: AlertStyle(
+            animationType: AnimationType.fromBottom,
+            animationDuration: Duration(milliseconds: 300),
+            descStyle: TextStyle(
+              fontSize: 12,
+            )),
+        content: Theme(
+          data: Get.theme,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                FlatButton(
+                  onPressed: () async {},
+                  child: Row(
+                    children: [
+                      Icon(Icons.people),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        userID,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(),
+                FlatButton(
+                  onPressed: () async {},
+                  child: Row(
+                    children: [
+                      Icon(Icons.alternate_email),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        isAdmin.toString(),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(),
+                FlatButton(
+                  onPressed: () async {},
+                  child: Row(
+                    children: [
+                      Icon(Icons.link),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        "Copy project joining link",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )).show();
+  }
+
+  alertAddNewMemberWindow() {
+    Alert(
+        context: context,
+        title: 'Add New Member',
+        closeFunction: () => null,
+        style: AlertStyle(
+            animationType: AnimationType.fromBottom,
+            animationDuration: Duration(milliseconds: 300),
+            descStyle: TextStyle(
+              fontSize: 12,
+            )),
+        content: Theme(
+          data: Get.theme,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                FlatButton(
+                  onPressed: () async {},
+                  child: Row(
+                    children: [
+                      Icon(Icons.people),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        "Add from friends list",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(),
+                FlatButton(
+                  onPressed: () async {},
+                  child: Row(
+                    children: [
+                      Icon(Icons.alternate_email),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        "Add by username",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(),
+                FlatButton(
+                  onPressed: () async {},
+                  child: Row(
+                    children: [
+                      Icon(Icons.link),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        "Copy project joining link",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )).show();
+  }
+}

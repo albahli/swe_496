@@ -11,9 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       initialBinding: AuthBinding(),
-      theme: ThemeData(
-        primaryColor: Colors.red,
-      ),
+      theme: ThemeData.light(),
       defaultTransition: Transition.noTransition,
       title: "Task", // Name of the app
       home: Root(),

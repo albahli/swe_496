@@ -20,7 +20,8 @@ class AuthController extends GetxController {
     _firebaseUser.bindStream(_auth.onAuthStateChanged);
   }
 
-  void createUser(String email, String password, String username, String name, String birthDate) async {
+  void createUser(String email, String password, String username, String name,
+      String birthDate) async {
     try {
       // Check first if username is taken
       bool usernameIsTaken = await UserProfileCollection()
@@ -55,10 +56,9 @@ class AuthController extends GetxController {
 
       // Create a new user in the fire store database
       await UserProfileCollection().createNewUser(_user);
-        // User created successfully
-        Get.find<UserController>().user = _user;
-        Get.back();
-
+      // User created successfully
+      Get.find<UserController>().user = _user;
+      Get.back();
     } catch (e) {
       Get.snackbar(
         "Error.", // title
@@ -80,16 +80,17 @@ class AuthController extends GetxController {
   void signIn(String email, String password) async {
     try {
       // Signing in
-      FirebaseUser firebaseUser = await _auth.signInWithEmailAndPassword(email: email.trim(), password: password.trim());
+      FirebaseUser firebaseUser = await _auth.signInWithEmailAndPassword(
+          email: email.trim(), password: password.trim());
 
       // Getting user document form firebase
-      DocumentSnapshot userDoc = await UserProfileCollection().getUser(firebaseUser.uid);
+      DocumentSnapshot userDoc =
+          await UserProfileCollection().getUser(firebaseUser.uid);
       print(userDoc.data);
 
       // Converting the json data to user object
       Get.find<UserController>().user = User.fromJson(userDoc.data);
       print(Get.find<UserController>().user.userName);
-
     } catch (e) {
       Get.snackbar(
         "Error22.", // title
@@ -130,4 +131,13 @@ class AuthController extends GetxController {
     }
   }
 
+  Future sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      Get.back();
+      Get.snackbar('Successful', 'An email sent to you containing a link to reset your password.');
+    } catch (e) {
+      print(e);
+    }
+  }
 }

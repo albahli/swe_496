@@ -25,6 +25,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController _newProjectNameController =
       TextEditingController();
+  int barIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +35,9 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
         appBar: AppBar(
           title: const Text('Group Projects'),
           centerTitle: true,
-          backgroundColor: Colors.red,
           actions: <Widget>[],
         ),
         drawer: MultiLevelDrawer(
-          backgroundColor: Colors.white,
-          rippleColor: Colors.grey.shade100,
-          subMenuBackgroundColor: Colors.grey.shade100,
-          divisionColor: Colors.black12,
           header: Container(
             // Header for Drawer
             height: MediaQuery.of(context).size.height * 0.25,
@@ -50,7 +46,10 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(Icons.account_circle, size: 90, color: Colors.grey,),
+                  Icon(
+                    Icons.account_circle,
+                    size: 90,
+                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -66,19 +65,20 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             MLMenuItem(
                 leading: Icon(
                   Icons.person,
-                  color: Colors.red,
                 ),
-                content: Text(
-                  "My Profile",
-                ),
+                content: Text("My Profile"),
                 onClick: () {}),
             MLMenuItem(
-              leading: Icon(Icons.settings, color: Colors.red),
+              leading: Icon(
+                Icons.settings,
+              ),
               content: Text("Settings"),
               onClick: () {},
             ),
             MLMenuItem(
-                leading: Icon(Icons.power_settings_new, color: Colors.red),
+                leading: Icon(
+                  Icons.power_settings_new,
+                ),
                 content: Text(
                   "Log out",
                 ),
@@ -160,8 +160,6 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
         return Container(
           child: Center(
             child: CircularProgressIndicator(
-              backgroundColor: Colors.grey,
-              valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
               semanticsLabel: 'Loading',
               strokeWidth: 4,
             ),
@@ -173,6 +171,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
 
   Widget bottomCustomNavigationBar() {
     return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.people),
@@ -190,26 +189,21 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           icon: Icon(Icons.message),
           title: Text('Messages'),
         ),
-        /* BottomNavigationBarItem(
-          icon: Icon(Icons.person_pin),
-          title: Text('Account'),
-        ),*/
       ],
-      currentIndex: 0,
-      selectedItemColor: Colors.red,
-      unselectedItemColor: Colors.grey,
+      currentIndex: barIndex,
       showSelectedLabels: true,
       showUnselectedLabels: true,
-      selectedFontSize: 15,
       onTap: (index) {
-        if (index == 0) return; // Do nothing because we are in the same page
+        setState(() {
+          barIndex = index;
 
-        // if(index == 1 )
-        //  return Get.off(page);
-
-        if (index == 2) Get.off(FriendsView());
-
-        if (index == 3) return;
+          if (barIndex == 0) // Do nothing, stay in the same page
+            return;
+          else if (barIndex == 1)
+            return;
+          else if (barIndex == 2)
+            Get.off(FriendsView(), transition: Transition.noTransition);
+        });
 
         print(index);
       },
@@ -218,9 +212,6 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
 
   Widget floatingButtons(BuildContext context) {
     return SpeedDial(
-      // both default to 16
-      marginRight: 18,
-      marginBottom: 20,
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 25.0),
       // this is ignored if animatedIcon is non null
@@ -229,14 +220,11 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
       // by tapping main button and overlay is not rendered.
       closeManually: false,
       curve: Curves.bounceIn,
-      overlayColor: Colors.black,
-      overlayOpacity: 0.3,
+      overlayOpacity: 0.5,
       onOpen: () => print('OPENING MENU'),
       onClose: () => print('MENU CLOSED'),
       tooltip: 'Menu',
       heroTag: '',
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.red,
       elevation: 8.0,
       shape: CircleBorder(),
       children: [
@@ -245,9 +233,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             Icons.calendar_today,
             size: 25,
           ),
-          backgroundColor: Colors.red,
           label: 'Upcoming',
-          labelStyle: TextStyle(fontSize: 16.0),
           onTap: () => Get.bottomSheet(
             Container(
               child: Column(
@@ -264,9 +250,9 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                 ],
               ),
             ),
+            backgroundColor: Get.theme.canvasColor,
             isScrollControlled: true,
             ignoreSafeArea: false,
-            backgroundColor: Colors.white,
           ),
         ),
         SpeedDialChild(
@@ -274,9 +260,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             Icons.add,
             size: 25,
           ),
-          backgroundColor: Colors.red,
           label: 'New Project',
-          labelStyle: TextStyle(fontSize: 16.0),
           onTap: () => alertCreateProjectForm(context),
         ),
         SpeedDialChild(
@@ -284,9 +268,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             Icons.group_add,
             size: 25,
           ),
-          backgroundColor: Colors.red,
           label: 'Join Project',
-          labelStyle: TextStyle(fontSize: 16.0),
           onTap: () => print('SECOND CHILD'),
         ),
       ],
@@ -303,9 +285,8 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[250],
                   boxShadow: [
-                    BoxShadow(color: Colors.black12, spreadRadius: 0.5),
+                    BoxShadow(spreadRadius: 0.5),
                   ],
                 ),
                 child: ConstrainedBox(
@@ -316,27 +297,21 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                       children: <Widget>[
                         Text(
                           'Task name: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Description: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Status: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Priority: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Start date: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'End date: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                       ],
                     ),
@@ -346,11 +321,9 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             ),
           ),
           position: TimelineItemPosition.right,
-          iconBackground: Colors.red,
           isFirst: true,
           icon: Icon(
             Icons.assignment,
-            color: Colors.white,
           )),
       TimelineModel(
           Padding(
@@ -360,9 +333,8 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[250],
                   boxShadow: [
-                    BoxShadow(color: Colors.black12, spreadRadius: 0.5),
+                    BoxShadow(spreadRadius: 0.5),
                   ],
                 ),
                 child: ConstrainedBox(
@@ -373,19 +345,15 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                       children: <Widget>[
                         Text(
                           'Event name: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Description: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Location: (optional) ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Date: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                       ],
                     ),
@@ -395,11 +363,9 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             ),
           ),
           position: TimelineItemPosition.left,
-          iconBackground: Colors.red,
           isFirst: true,
           icon: Icon(
             Icons.event,
-            color: Colors.white,
           )),
       TimelineModel(
           Padding(
@@ -409,9 +375,8 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[250],
                   boxShadow: [
-                    BoxShadow(color: Colors.black12, spreadRadius: 0.5),
+                    BoxShadow(spreadRadius: 0.5),
                   ],
                 ),
                 child: ConstrainedBox(
@@ -422,27 +387,21 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                       children: <Widget>[
                         Text(
                           'Task name: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Description: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Status: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Priority: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'Start date: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                         Text(
                           'End date: ',
-                          style: TextStyle(color: Colors.black),
                         ),
                       ],
                     ),
@@ -452,11 +411,9 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             ),
           ),
           position: TimelineItemPosition.right,
-          iconBackground: Colors.red,
           isFirst: true,
           icon: Icon(
             Icons.assignment,
-            color: Colors.white,
           )),
     ];
 
@@ -475,9 +432,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
               fontSize: 12,
             )),
         content: Theme(
-          data: ThemeData(
-            primaryColor: Colors.red,
-          ),
+          data: Get.theme,
           child: Form(
             key: formKey,
             child: Column(
@@ -490,9 +445,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                       _newProjectNameController.text = projectNameVal,
                   decoration: InputDecoration(
                     icon: Icon(Icons.edit),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                    ),
+                    focusedBorder: UnderlineInputBorder(),
                     hintText: 'Graduation Project',
                     labelText: 'Project Name',
                   ),
@@ -510,7 +463,6 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
         ),
         buttons: [
           DialogButton(
-            color: Colors.red,
             radius: BorderRadius.circular(30),
             onPressed: () async {
               formKey.currentState.save();
@@ -526,10 +478,8 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                     // message
                     icon: Icon(
                       Icons.check_circle_outline,
-                      color: Colors.green,
                     ),
                     shouldIconPulse: true,
-                    borderColor: Colors.green,
                     borderWidth: 1,
                     barBlur: 20,
                     isDismissible: true,
@@ -543,10 +493,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             },
             child: Text(
               "Submit",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
             ),
           )
         ]).show();
