@@ -256,19 +256,19 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
         ),
         SpeedDialChild(
           child: Icon(
-            Icons.add,
-            size: 25,
-          ),
-          label: 'New Project',
-          onTap: () => alertCreateProjectForm(context),
-        ),
-        SpeedDialChild(
-          child: Icon(
             Icons.group_add,
             size: 25,
           ),
           label: 'Join Project',
           onTap: () => print('SECOND CHILD'),
+        ),
+        SpeedDialChild(
+          child: Icon(
+            Icons.add,
+            size: 25,
+          ),
+          label: 'New Project',
+          onTap: () => alertCreateProjectForm(context),
         ),
       ],
     );

@@ -80,6 +80,9 @@ class ProjectCollection {
       String _taskAssignedTo,
       String _taskAssignedBy,
       String _taskStatus) async {
+
+    String taskID = Uuid().v1(); // Task ID, UuiD is package that generates random ID.
+
     // Creating a list of sub tasks for that task.
     List<SubTask> subTasksList = new List();
 
@@ -94,8 +97,7 @@ class ProjectCollection {
 
     // Creating the task object for the project
     TaskOfProject taskOfProject = new TaskOfProject(
-      taskID: Uuid().v1(),
-      // Task ID, UuiD is package that generates random ID.
+      taskID: taskID,
       taskName: _taskName,
       taskDescription: _taskDescription,
       startDate: _taskStartDate,
@@ -120,9 +122,10 @@ class ProjectCollection {
 
     print(listOfTasksJson);
     //TODO: stopped here
-     return await Firestore.instance
+     return await _firestore
         .collection('projects')
-        .document(projectID)
-        .setData({'listOfTasks': listOfTasksJson},  merge: true);
+        .document(projectID).collection('tasks').document(taskID)
+        .setData(listOfTasksJson);
+
   }
 }
