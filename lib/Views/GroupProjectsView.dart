@@ -148,8 +148,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                           new Map<String, dynamic>.from(
                               snapshot.data.documents[index].data));
                       Get.to(
-                          TasksAndEventsView(
-                              projectID: projectController.project.projectID),
+                          TasksAndEventsView(),
                           transition: Transition.rightToLeft,
                           duration: Duration(milliseconds: 300));
                     },

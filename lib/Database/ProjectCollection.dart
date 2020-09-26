@@ -123,6 +123,6 @@ class ProjectCollection {
      return await Firestore.instance
         .collection('projects')
         .document(projectID)
-        .updateData({'listOfTasks': listOfTasksJson},);
+        .setData({'listOfTasks': listOfTasksJson},  merge: true);
   }
 }

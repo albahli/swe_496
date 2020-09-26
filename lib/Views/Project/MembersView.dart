@@ -109,7 +109,6 @@ class _MembersViewState extends State<MembersView> {
           if (barIndex == 0)
             Get.off(
                 TasksAndEventsView(
-                  projectID: widget.projectID,
                 ),
                 transition: Transition.noTransition);
           else if (barIndex == 1)

@@ -17,9 +17,8 @@ import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 class TasksAndEventsView extends StatefulWidget {
-  final String projectID;
 
-  TasksAndEventsView({Key key, this.projectID}) : super(key: key);
+  TasksAndEventsView({Key key}) : super(key: key);
 
   @override
   _TasksAndEvents createState() => _TasksAndEvents();
