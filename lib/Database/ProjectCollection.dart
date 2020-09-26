@@ -86,6 +86,9 @@ class ProjectCollection {
     // Creating a list of messages/comment for that task.
     List<Message> messagesList = new List();
 
+    // Splitting the username and the ID by (,)
+    List listOfUserNameAndID = _taskAssignedTo.split(',');
+
     // Determine if the task is assigned or not.
     String isAssigned = _taskAssignedTo.isEmpty ? 'false' : 'true' ;
 
@@ -99,7 +102,7 @@ class ProjectCollection {
       dueDate: _taskDueDate,
       taskPriority: _taskPriority,
       isAssigned: isAssigned,
-      assignedTo: _taskAssignedTo,
+      assignedTo: listOfUserNameAndID[1], // Storing only the user ID
       assignedBy: _taskAssignedBy,
       taskStatus: _taskStatus,
       subTask: subTasksList,

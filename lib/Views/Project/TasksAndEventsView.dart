@@ -591,7 +591,9 @@ class _TasksAndEvents extends State<TasksAndEventsView> {
                                     snapshot.data.documents.toList().map((i) {
                                   return (DropdownMenuItem(
                                     child: Text(i.data['userName']),
-                                    value: i.data['userName'],
+                                    value: i.data['userName'] + ',' + i.data['userID'],
+                                    onTap: (){},
+
                                   ));
                                 }).toList(),
                                 displayItem: (item, selected) {
