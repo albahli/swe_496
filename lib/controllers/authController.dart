@@ -20,7 +20,7 @@ class AuthController extends GetxController {
     _firebaseUser.bindStream(_auth.onAuthStateChanged);
   }
 
-  void createUser(String email, String password, String username, String name,
+  void signUp(String email, String password, String username, String name,
       String birthDate) async {
     try {
       // Check first if username is taken

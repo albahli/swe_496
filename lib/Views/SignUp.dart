@@ -200,7 +200,7 @@ class SignUp extends GetWidget<AuthController> {
                                 onPressed: () {
                                   formKey.currentState.save();
                                   if (formKey.currentState.validate()) {
-                                    controller.createUser(
+                                    controller.signUp(
                                         _emailController.text,
                                         _passwordController.text,
                                         _usernameController.text,
