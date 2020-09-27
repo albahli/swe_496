@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:swe496/models/Project.dart';
 
-
 class ProjectController extends GetxController {
 
   Rx<Project> _project = Project().obs;

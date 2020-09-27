@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
+import 'package:swe496/Views/Project/CreateEventWidgetView.dart';
 import 'package:swe496/Views/Project/MembersView.dart';
 import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/controllers/userController.dart';
@@ -15,8 +17,9 @@ import 'package:timeline_list/timeline_model.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
-class TasksAndEventsView extends StatefulWidget {
+import 'GoogleMapWidgetView.dart';
 
+class TasksAndEventsView extends StatefulWidget {
   TasksAndEventsView({Key key}) : super(key: key);
 
   @override
@@ -187,33 +190,7 @@ class _TasksAndEvents extends State<TasksAndEventsView> {
           ),
           label: 'New Event',
           onTap: () {
-            Get.bottomSheet(
-              Container(
-                child: Column(
-                  children: [
-                    AppBar(
-                      title: Text('New Event'),
-                      centerTitle: true,
-                      leading: IconButton(
-                        icon: Icon(Icons.close),
-                        onPressed: () => Get.back(),
-                      ),
-                    ),
-                    Expanded(
-                      child: StatefulBuilder(
-                        builder:
-                            (BuildContext context, StateSetter innerSetState) {
-                          return createNewEvent();
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              backgroundColor: Get.theme.canvasColor,
-              isScrollControlled: true,
-              ignoreSafeArea: false,
-            );
+            Get.to(CreateEventWidgetView());
           },
         ),
         SpeedDialChild(
@@ -589,9 +566,10 @@ class _TasksAndEvents extends State<TasksAndEventsView> {
                                     snapshot.data.documents.toList().map((i) {
                                   return (DropdownMenuItem(
                                     child: Text(i.data['userName']),
-                                    value: i.data['userName'] + ',' + i.data['userID'],
-                                    onTap: (){},
-
+                                    value: i.data['userName'] +
+                                        ',' +
+                                        i.data['userID'],
+                                    onTap: () {},
                                   ));
                                 }).toList(),
                                 displayItem: (item, selected) {
@@ -653,7 +631,6 @@ class _TasksAndEvents extends State<TasksAndEventsView> {
                     onPressed: () async {
                       formKey.currentState.save();
                       if (formKey.currentState.validate()) {
-
                         _taskAssignedBy.text = userController.user.userID;
                         _taskStatus.text = 'Not-Started';
 
@@ -718,199 +695,6 @@ class _TasksAndEvents extends State<TasksAndEventsView> {
       _due = picked[1];
       _taskDueDate.text = picked[1].toString().substring(0, 10);
     }
-  }
-
-  Widget createNewEvent() {
-    TextEditingController _eventName = new TextEditingController();
-    TextEditingController _eventDescription = new TextEditingController();
-    TextEditingController _eventLocation = new TextEditingController();
-    TextEditingController _eventStartDate = new TextEditingController();
-    TextEditingController _eventEndDate = new TextEditingController();
-    final eventFormKey = GlobalKey<FormState>();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 20, 20, 8),
-      child: Container(
-        child: SingleChildScrollView(
-          child: Form(
-            key: eventFormKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _eventName,
-                  validator: (eventNameVal) =>
-                  eventNameVal.isEmpty ? "Event name cannot be empty" : null,
-                  onSaved: (eventNameVal) => _eventName.text = eventNameVal,
-                  decoration: InputDecoration(
-                      labelText: 'Event name',
-                      hintText: 'Meeting at Marriott hotel.',
-                      prefixIcon: Icon(Icons.edit),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20))),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _eventDescription,
-                  validator: (eventDescriptionVal) =>
-                  eventDescriptionVal.isEmpty ? "Event description cannot be empty" : null,
-                  onSaved: (eventDescriptionVal) =>
-                  _eventDescription.text = eventDescriptionVal,
-                  decoration: InputDecoration(
-                      labelText: 'Event description',
-                      hintText:
-                      'We are going to meet at the Marriott hotel 8:30 PM in the conference room to discuss the future activities of our project.',
-                      prefixIcon: Icon(Icons.description),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20))),
-                  maxLines: 5,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _eventStartDate,
-                        validator: (startDateVal) => startDateVal.isEmpty
-                            ? 'Start date cannot be empty'
-                            : null,
-                        onSaved: (startDateVal) => startDateVal.length >= 10
-                            ? _eventStartDate.text =
-                            startDateVal.substring(0, 10)
-                            : _eventStartDate.clear(),
-                        readOnly: true,
-                        decoration: InputDecoration(
-                            labelText: 'Start date',
-                            hintText:
-                            DateTime.now().toString().substring(0, 10),
-                            prefixIcon: Icon(Icons.calendar_today),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.horizontal(
-                                    left: Radius.circular(20)))),
-                        onTap: () async {
-                          pickDate();
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _eventEndDate,
-                        validator: (dueDateVal) => dueDateVal.isEmpty
-                            ? 'End date cannot be empty'
-                            : null,
-                        onSaved: (dueDateVal) => dueDateVal.length >= 10
-                            ? _eventEndDate.text = dueDateVal.substring(0, 10)
-                            : _eventEndDate.clear(),
-                        readOnly: true,
-                        decoration: InputDecoration(
-                            labelText: 'End date',
-                            hintText:
-                            DateTime.now().toString().substring(0, 10),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.horizontal(
-                                    right: Radius.circular(20)))),
-                        onTap: () async => pickDate(),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                InkWell(
-                  onTap: () {
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                  },
-                  child: Container(
-                    foregroundDecoration: BoxDecoration(
-                        border:
-                        Border.all(color: Get.theme.unselectedWidgetColor),
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  focusNode: AlwaysDisabledFocusNode(),
-                                  textAlignVertical: TextAlignVertical.center,
-                                  readOnly: true,
-                                  decoration: InputDecoration(
-                                      hintText: 'Task Priority',
-                                      prefixIcon: Icon(
-                                        Icons.assignment_late,
-                                      ),
-                                      border: InputBorder.none),
-                                ),
-                              ),
-                            ],
-                          ),
-                          RadioButtonGroup(
-                              labels: <String>["Low", "Medium", "High"],
-                              onSelected: (String selected) {
-                                _taskPriority.text = selected;
-                                print(_taskPriority.text);
-                              }),
-                          SizedBox(
-                            height: 10,
-                          ),
-                        ]),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                ButtonTheme(
-                  minWidth: 20,
-                  height: 50.0,
-                  child: RaisedButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.horizontal(
-                            left: Radius.circular(30.0),
-                            right: Radius.circular(30.0))),
-                    onPressed: () async {
-                      eventFormKey.currentState.save();
-                      if (eventFormKey.currentState.validate()) {
-                      }
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        const Text('Add Event',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w300,
-                            )),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 

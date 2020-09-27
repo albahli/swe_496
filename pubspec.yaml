@@ -35,6 +35,8 @@ dependencies:
   multilevel_drawer: ^1.0.3
   date_range_picker: ^1.0.5
   grouped_buttons: ^1.0.4
+  google_maps_flutter: ^0.5.33
+  location: ^3.0.2
   json_annotation: ^3.0.1
 
 
