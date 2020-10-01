@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:swe496/models/Chat.dart';
+import 'package:swe496/models/Event.dart';
 import 'package:swe496/models/Members.dart';
 import 'package:swe496/models/Message.dart';
 import 'package:swe496/models/Project.dart';
@@ -80,8 +81,8 @@ class ProjectCollection {
       String _taskAssignedTo,
       String _taskAssignedBy,
       String _taskStatus) async {
-
-    String taskID = Uuid().v1(); // Task ID, UuiD is package that generates random ID.
+    String taskID =
+        Uuid().v1(); // Task ID, UuiD is package that generates random ID.
 
     // Creating a list of sub tasks for that task.
     List<SubTask> subTasksList = new List();
@@ -92,9 +93,6 @@ class ProjectCollection {
     // Splitting the username and the ID by (,)
     List listOfUserNameAndID = _taskAssignedTo.split(',');
 
-    // Determine if the task is assigned or not.
-    String isAssigned = _taskAssignedTo.isEmpty ? 'false' : 'true' ;
-
     // Creating the task object for the project
     TaskOfProject taskOfProject = new TaskOfProject(
       taskID: taskID,
@@ -103,8 +101,10 @@ class ProjectCollection {
       startDate: _taskStartDate,
       dueDate: _taskDueDate,
       taskPriority: _taskPriority,
-      isAssigned: isAssigned,
-      assignedTo: listOfUserNameAndID[1], // Storing only the user ID
+      isAssigned: _taskAssignedTo.isEmpty ? 'false' : 'true',
+      // Determine if the task is assigned or not.
+      assignedTo: _taskAssignedTo.isEmpty ? '' : listOfUserNameAndID[1],
+      // Storing only the user ID
       assignedBy: _taskAssignedBy,
       taskStatus: _taskStatus,
       subTask: subTasksList,
@@ -118,14 +118,68 @@ class ProjectCollection {
     listOfTasks.add(taskOfProject);
 
     // Convert the task object to JSON
-    var listOfTasksJson = taskOfProject.toJson();
+    try {
+      var listOfTasksJson = taskOfProject.toJson();
 
-    print(listOfTasksJson);
-    //TODO: stopped here
-     return await _firestore
+      print(listOfTasksJson);
+
+      return await _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID)
+          .setData(listOfTasksJson);
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> createNewEvent(
+      String projectID,
+      String eventName,
+      String eventDescription,
+      String startDate,
+      String endDate,
+      String location) async {
+    String eventID =
+        Uuid().v1(); // Event ID, UuiD is package that generates random ID.
+
+    Event event = new Event(
+      eventID: eventID,
+      eventName: eventName.trim(),
+      eventDescription: eventDescription,
+      eventStartDate: startDate,
+      eventEndDate: endDate,
+      eventLocation: location,
+    );
+
+    try {
+      var eventJson = event.toJson();
+
+      return await _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('events')
+          .document(eventID)
+          .setData(eventJson);
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Stream<QuerySnapshot> getTasksOfProject(String projectID, String assignedBy) {
+    return Firestore.instance
         .collection('projects')
-        .document(projectID).collection('tasks').document(taskID)
-        .setData(listOfTasksJson);
-
+        .document(projectID)
+        .collection('tasks')
+        .where('assignedBy', isEqualTo: assignedBy)
+        .snapshots();
+  }
+  Stream<QuerySnapshot> getEventsOfProject(String projectID) {
+    return Firestore.instance
+        .collection('projects')
+        .document(projectID)
+        .collection('events')
+        .snapshots();
   }
 }

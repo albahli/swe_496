@@ -15,6 +15,7 @@ import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
 class GroupProjectsView extends StatefulWidget {
+
   @override
   _GroupProjectsViewState createState() => _GroupProjectsViewState();
 }

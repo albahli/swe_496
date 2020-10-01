@@ -1,21 +1,24 @@
 class Event {
   String eventID;
   String eventName;
-  String eventDate;
+  String eventStartDate;
+  String eventEndDate;
   String eventDescription;
   String eventLocation;
 
   Event(
       {this.eventID,
         this.eventName,
-        this.eventDate,
+        this.eventStartDate,
+        this.eventEndDate,
         this.eventDescription,
         this.eventLocation});
 
   Event.fromJson(Map<String, dynamic> json) {
     eventID = json['eventID'];
     eventName = json['eventName'];
-    eventDate = json['eventDate'];
+    eventStartDate = json['eventStartDate'];
+    eventEndDate = json['eventEndDate'];
     eventDescription = json['eventDescription'];
     eventLocation = json['eventLocation'];
   }
@@ -24,7 +27,8 @@ class Event {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['eventID'] = this.eventID;
     data['eventName'] = this.eventName;
-    data['eventDate'] = this.eventDate;
+    data['eventStartDate'] = this.eventStartDate;
+    data['eventEndDate'] = this.eventEndDate;
     data['eventDescription'] = this.eventDescription;
     data['eventLocation'] = this.eventLocation;
     return data;
