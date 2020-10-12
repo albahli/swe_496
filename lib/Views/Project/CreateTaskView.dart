@@ -379,14 +379,6 @@ class _CreateTaskViewState extends State<CreateTaskView> {
     }
   }
 
-  bool _decideWhichDayToEnable(DateTime day) {
-    if ((day.isAfter(DateTime.now().subtract(Duration(days: 1))) &&
-        day.isBefore(DateTime.now().add(Duration(days: 365 * 2))))) {
-      return true;
-    }
-    return false;
-  }
-}
 
 class AlwaysDisabledFocusNode extends FocusNode {
   @override
