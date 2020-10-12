@@ -200,15 +200,19 @@ class _TaskViewState extends State<TaskView> {
                     border: Border(
                         left: BorderSide(
                             width: 3,
-                            color: taskOfProject.taskStatus.toUpperCase()=='COMPLETED' ? Colors.green :(remainingDays <= 0
-                                ? Colors.red
-                                : (taskOfProject.taskStatus.toUpperCase() ==
-                                        'NOT-STARTED'
-                                    ? Colors.grey
+                            color: taskOfProject.taskStatus.toUpperCase() ==
+                                    'COMPLETED'
+                                ? Colors.green
+                                : (remainingDays <= 0
+                                    ? Colors.red
                                     : (taskOfProject.taskStatus.toUpperCase() ==
-                                            'IN-PROGRESS'
-                                        ? Colors.blue
-                                        : Colors.green)))))),
+                                            'NOT-STARTED'
+                                        ? Colors.grey
+                                        : (taskOfProject.taskStatus
+                                                    .toUpperCase() ==
+                                                'IN-PROGRESS'
+                                            ? Colors.blue
+                                            : Colors.green)))))),
                 child: Column(
                   children: [
                     ListTile(
@@ -271,8 +275,12 @@ class _TaskViewState extends State<TaskView> {
                           alignment: MainAxisAlignment.start,
                           children: [
                             FlatButton(
-                              onPressed: () {},
                               child: const Text('EDIT'),
+                              onPressed: () {
+                                Get.bottomSheet(editTask(taskOfProject),
+                                    isScrollControlled: true,
+                                    ignoreSafeArea: false);
+                              },
                             ),
                           ],
                         ),
@@ -583,6 +591,227 @@ class _TaskViewState extends State<TaskView> {
       return true;
     }
     return false;
+  }
+
+  Widget editTask(TaskOfProject taskOfProject) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('New Subtask'),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () => Get.back(),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.restore),
+            tooltip: 'Restore fields',
+            onPressed: () {
+             //TODO: Implement restore fields feature.
+            },
+          )
+        ],
+      ),
+      resizeToAvoidBottomPadding: false,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 20, 20, 8),
+        child: Container(
+          child: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    controller: _subtaskName,
+                    validator: (taskNameVal) => taskNameVal.isEmpty
+                        ? "Subtask name cannot be empty"
+                        : null,
+                    onSaved: (taskNameVal) => _subtaskName.text = taskNameVal,
+                    decoration: InputDecoration(
+                        labelText: 'Subtask name',
+                        hintText: 'Meet the client.',
+                        prefixIcon: Icon(Icons.edit),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20))),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    controller: _subtaskDescription,
+                    validator: (taskNameVal) => taskNameVal.isEmpty
+                        ? "Subtask description cannot be empty"
+                        : null,
+                    onSaved: (_taskDescriptionVal) =>
+                        _subtaskDescription.text = _taskDescriptionVal,
+                    decoration: InputDecoration(
+                        labelText: 'Subtask description',
+                        hintText:
+                            'Collect the requirements from the client and refine them.',
+                        prefixIcon: Icon(Icons.description),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20))),
+                    maxLines: 5,
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text('Subtask dates limited to the main tasks date.'),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _subtaskStartDate,
+                          validator: (startDateVal) => startDateVal.isEmpty
+                              ? 'Start date cannot be empty'
+                              : null,
+                          onSaved: (startDateVal) => startDateVal.length >= 10
+                              ? _subtaskStartDate.text =
+                                  startDateVal.substring(0, 10)
+                              : _subtaskStartDate.clear(),
+                          readOnly: true,
+                          decoration: InputDecoration(
+                              labelText: 'Start date',
+                              hintText:
+                                  DateTime.now().toString().substring(0, 10),
+                              prefixIcon: Icon(Icons.calendar_today),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.horizontal(
+                                      left: Radius.circular(20)))),
+                          onTap: () async => pickDate(
+                              taskOfProject.startDate, taskOfProject.dueDate),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _subtaskDueDate,
+                          validator: (dueDateVal) => dueDateVal.isEmpty
+                              ? 'Due date cannot be empty'
+                              : null,
+                          onSaved: (dueDateVal) => dueDateVal.length >= 10
+                              ? _subtaskDueDate.text =
+                                  dueDateVal.substring(0, 10)
+                              : _subtaskDueDate.clear(),
+                          readOnly: true,
+                          decoration: InputDecoration(
+                              labelText: 'Due date',
+                              hintText:
+                                  DateTime.now().toString().substring(0, 10),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.horizontal(
+                                      right: Radius.circular(20)))),
+                          onTap: () async => pickDate(
+                              taskOfProject.startDate, taskOfProject.dueDate),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                    },
+                    child: Container(
+                      foregroundDecoration: BoxDecoration(
+                          border: Border.all(
+                              color: Get.theme.unselectedWidgetColor),
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    focusNode: AlwaysDisabledFocusNode(),
+                                    textAlignVertical: TextAlignVertical.center,
+                                    readOnly: true,
+                                    decoration: InputDecoration(
+                                        hintText: 'Subtask Priority',
+                                        prefixIcon: Icon(
+                                          Icons.assignment_late,
+                                        ),
+                                        border: InputBorder.none),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            RadioButtonGroup(
+                                labels: <String>["Low", "Medium", "High"],
+                                onSelected: (String selected) {
+                                  _subtaskPriority.text = selected;
+                                  print(_subtaskPriority.text);
+                                }),
+                            SizedBox(
+                              height: 10,
+                            ),
+                          ]),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ButtonTheme(
+                    minWidth: 20,
+                    height: 50.0,
+                    child: RaisedButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.horizontal(
+                              left: Radius.circular(30.0),
+                              right: Radius.circular(30.0))),
+                      onPressed: () async {
+                        formKey.currentState.save();
+                        if (formKey.currentState.validate()) {
+                          _subtaskStatus.text = 'Not-Started';
+                          ProjectCollection().createNewSubtask(
+                              projectController.project.projectID,
+                              taskOfProject.taskID,
+                              _subtaskName.text,
+                              _subtaskDescription.text,
+                              _subtaskStartDate.text,
+                              _subtaskDueDate.text,
+                              _subtaskPriority.text,
+                              _subtaskStatus.text);
+                        }
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          const Text('Add Subtask',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w300,
+                              )),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
