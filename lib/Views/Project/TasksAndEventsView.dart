@@ -5,8 +5,9 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/Project/CreateEventView.dart';
-import 'package:swe496/Views/Project/CreateTaskWidgetView.dart';
+import 'package:swe496/Views/Project/CreateTaskView.dart';
 import 'package:swe496/Views/Project/MembersView.dart';
+import 'package:swe496/Views/Project/TaskView.dart';
 import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/controllers/userController.dart';
 import 'package:swe496/utils/root.dart';
@@ -42,7 +43,6 @@ class _TasksAndEvents extends State<TasksAndEventsView>
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios,
-            size: 30,
           ),
           onPressed: () {
             Get.offAll(Root());
@@ -410,7 +410,9 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                     leading: Icon(Icons.assignment),
                     title: Text(snapshot.data.documents[index]['taskName']),
                     subtitle: Text('Details ...'),
-                    onTap: () async {},
+                    onTap: () async {
+                      Get.to(TaskView(taskID: snapshot.data.documents[index].documentID));
+                    },
                   );
                 });
           }

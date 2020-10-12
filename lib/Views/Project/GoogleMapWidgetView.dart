@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-
+//TODO: My location button is not working.
 class GoogleMapWidgetView extends StatefulWidget {
   @override
   _GoogleMapWidgetViewState createState() => _GoogleMapWidgetViewState();
@@ -28,11 +28,6 @@ class _GoogleMapWidgetViewState extends State<GoogleMapWidgetView> {
 
   LocationData _locationData;
 
-  @override
-  void initState() {
-    this.askLocationPermission();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,23 +69,5 @@ class _GoogleMapWidgetViewState extends State<GoogleMapWidgetView> {
     );
   }
 
-  askLocationPermission() async {
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
 
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _locationData = await location.getLocation();
-  }
 }

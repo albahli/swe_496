@@ -4,7 +4,7 @@ import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:get/get.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/controllers/projectController.dart';
-import 'CreateTaskWidgetView.dart';
+import 'CreateTaskView.dart';
 import 'GoogleMapWidgetView.dart';
 
 class CreateEventView extends StatefulWidget {

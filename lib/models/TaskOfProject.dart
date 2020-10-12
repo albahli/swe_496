@@ -12,7 +12,7 @@ class TaskOfProject {
   String isAssigned;
   String assignedBy;
   String assignedTo;
-  List<SubTask> subTask;
+  List<TaskOfProject> subtask;
   List<Message> message;
 
   TaskOfProject(
@@ -26,7 +26,7 @@ class TaskOfProject {
         this.isAssigned,
         this.assignedBy,
         this.assignedTo,
-        this.subTask,
+        this.subtask,
         this.message});
 
   TaskOfProject.fromJson(Map<String, dynamic> json) {
@@ -41,9 +41,9 @@ class TaskOfProject {
     assignedBy = json['assignedBy'];
     assignedTo = json['assignedTo'];
     if (json['subTask'] != null) {
-      subTask = new List<SubTask>();
+      subtask = new List<TaskOfProject>();
       json['subTask'].forEach((v) {
-        subTask.add(new SubTask.fromJson(Map<String,dynamic>.from(v)));
+        subtask.add(new TaskOfProject.fromJson(Map<String,dynamic>.from(v)));
       });
     }
     if (json['message'] != null) {
@@ -66,8 +66,8 @@ class TaskOfProject {
     data['isAssigned'] = this.isAssigned;
     data['assignedBy'] = this.assignedBy;
     data['assignedTo'] = this.assignedTo;
-    if (this.subTask != null) {
-      data['subTask'] = this.subTask.map((v) => v.toJson()).toList();
+    if (this.subtask != null) {
+      data['subTask'] = this.subtask.map((v) => v.toJson()).toList();
     }
     if (this.message != null) {
       data['message'] = this.message.map((v) => v.toJson()).toList();

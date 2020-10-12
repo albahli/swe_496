@@ -201,7 +201,8 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                                 onSelected: (String selected) {
                                   _taskPriority.text = selected;
                                   print(_taskPriority.text);
-                                }),
+                                },
+                            ),
                             SizedBox(
                               height: 10,
                             ),

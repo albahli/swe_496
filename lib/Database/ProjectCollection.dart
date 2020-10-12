@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import 'package:swe496/models/Chat.dart';
 import 'package:swe496/models/Event.dart';
 import 'package:swe496/models/Members.dart';
@@ -85,7 +86,7 @@ class ProjectCollection {
         Uuid().v1(); // Task ID, UuiD is package that generates random ID.
 
     // Creating a list of sub tasks for that task.
-    List<SubTask> subTasksList = new List();
+    List<TaskOfProject> subTasksList = new List();
 
     // Creating a list of messages/comment for that task.
     List<Message> messagesList = new List();
@@ -107,7 +108,7 @@ class ProjectCollection {
       // Storing only the user ID
       assignedBy: _taskAssignedBy,
       taskStatus: _taskStatus,
-      subTask: subTasksList,
+      subtask: subTasksList,
       message: messagesList,
     );
 
@@ -129,6 +130,60 @@ class ProjectCollection {
           .collection('tasks')
           .document(taskID)
           .setData(listOfTasksJson);
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> createNewSubtask(
+      String projectID,
+      String mainTaskID,
+      String _subtaskName,
+      String _subtaskDescription,
+      String _subtaskStartDate,
+      String _subtaskDueDate,
+      String _subtaskPriority,
+      String _subtaskStatus) async {
+    String subtaskID =
+        Uuid().v1(); // Task ID, UuiD is package that generates random ID.
+
+    // Creating the task object for the project
+    TaskOfProject newSubtaskOfProject = new TaskOfProject(
+      taskID: subtaskID,
+      taskName: _subtaskName,
+      taskDescription: _subtaskDescription,
+      startDate: _subtaskStartDate,
+      dueDate: _subtaskDueDate,
+      taskPriority: _subtaskPriority,
+      taskStatus: _subtaskStatus,
+      isAssigned: 'true',
+    );
+    // Convert the sub task object to JSON
+    var newSubtaskJSON = newSubtaskOfProject.toJson();
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(mainTaskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        //TODO: STOPPED HERE
+        await transaction.update(
+            documentReference,
+            ({
+              'subTask': FieldValue.arrayUnion([
+                newSubtaskJSON,
+              ]),
+            }));
+
+      });
+      Get.back();
+      Get.snackbar('Success', "Subtask '$_subtaskName' has been added successfully");
     } on Exception catch (e) {
       print(e);
     }
@@ -167,19 +222,39 @@ class ProjectCollection {
     }
   }
 
+  // To view the tasks in the "tasks & events" tab for the admin.
   Stream<QuerySnapshot> getTasksOfProject(String projectID, String assignedBy) {
-    return Firestore.instance
+    return _firestore
         .collection('projects')
         .document(projectID)
         .collection('tasks')
         .where('assignedBy', isEqualTo: assignedBy)
         .snapshots();
   }
+
   Stream<QuerySnapshot> getEventsOfProject(String projectID) {
-    return Firestore.instance
+    return _firestore
         .collection('projects')
         .document(projectID)
         .collection('events')
         .snapshots();
+  }
+
+  // To view the tasks in the "tasks & events" tab for the user.
+  Stream<List<TaskOfProject>> tasksOfProjectStream(
+      String projectID, String assignedTo) {
+    return _firestore
+        .collection('projects')
+        .document(projectID)
+        .collection('tasks')
+        .where('assignedTo', isEqualTo: assignedTo)
+        .snapshots()
+        .map((QuerySnapshot query) {
+      List<TaskOfProject> retVal = List();
+      query.documents.forEach((element) {
+        retVal.add(TaskOfProject.fromJson(element.data));
+      });
+      return retVal;
+    });
   }
 }
