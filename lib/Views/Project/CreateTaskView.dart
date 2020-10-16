@@ -59,12 +59,17 @@ class _CreateTaskViewState extends State<CreateTaskView> {
             icon: Icon(Icons.autorenew),
             tooltip: 'Clear fields',
             onPressed: () {
-              _taskName.clear();
-              _taskDescription.clear();
-              _taskStatus.clear();
-              _taskStartDate.clear();
-              _taskDueDate.clear();
-
+              if(this.mounted){
+                setState(() {
+                  _taskName.clear();
+                  _taskDescription.clear();
+                  _taskStatus.clear();
+                  _taskPriority.text = 'Low';
+                  _taskStartDate.clear();
+                  _taskDueDate.clear();
+                  _taskAssignedTo.clear();
+                });
+              }
             },
           )
         ],
@@ -84,8 +89,9 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                   ),
                   TextFormField(
                     controller: _taskName,
-                    validator: (taskNameVal) =>
-                        taskNameVal.isEmpty ? "Task name cannot be empty" : null,
+                    validator: (taskNameVal) => taskNameVal.isEmpty
+                        ? "Task name cannot be empty"
+                        : null,
                     onSaved: (taskNameVal) => _taskName.text = taskNameVal,
                     decoration: InputDecoration(
                         labelText: 'Task name',
@@ -170,8 +176,8 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                     },
                     child: Container(
                       foregroundDecoration: BoxDecoration(
-                          border:
-                              Border.all(color: Get.theme.unselectedWidgetColor),
+                          border: Border.all(
+                              color: Get.theme.unselectedWidgetColor),
                           borderRadius: BorderRadius.all(Radius.circular(20))),
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -196,13 +202,21 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                                 ),
                               ],
                             ),
-                            RadioButtonGroup(
+                            StatefulBuilder(builder:
+                                (BuildContext context, StateSetter setState
+                                    /*You can rename this!*/) {
+                              return RadioButtonGroup(
                                 labels: <String>["Low", "Medium", "High"],
+                                picked: _taskPriority.text,
                                 onSelected: (String selected) {
                                   _taskPriority.text = selected;
+                                  if(this.mounted){
+                                    setState(() {});
+                                  }
                                   print(_taskPriority.text);
                                 },
-                            ),
+                              );
+                            }),
                             SizedBox(
                               height: 10,
                             ),
@@ -211,15 +225,14 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                   ),
                   SizedBox(
                     height: 20,
-                  ),
-                  InkWell(
+                  ),  InkWell(
                     onTap: () {
                       FocusScope.of(context).requestFocus(new FocusNode());
                     },
                     child: Container(
                       foregroundDecoration: BoxDecoration(
-                          border:
-                              Border.all(color: Get.theme.unselectedWidgetColor),
+                          border: Border.all(
+                              color: Get.theme.unselectedWidgetColor),
                           borderRadius: BorderRadius.all(Radius.circular(20))),
                       child: StreamBuilder<QuerySnapshot>(
                           stream: UserProfileCollection().checkUserProjectsIDs(
@@ -236,11 +249,12 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                                   return Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Center(
-                                        child: Text("No members in the project")),
+                                        child:
+                                        Text("No members in the project")),
                                   );
                                 return SearchableDropdown.single(
                                   items:
-                                      snapshot.data.documents.toList().map((i) {
+                                  snapshot.data.documents.toList().map((i) {
                                     return (DropdownMenuItem(
                                       child: Text(i.data['userName']),
                                       value: i.data['userName'] +
@@ -253,11 +267,11 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                                     return (Row(children: [
                                       selected
                                           ? Icon(
-                                              Icons.radio_button_checked,
-                                            )
+                                        Icons.radio_button_checked,
+                                      )
                                           : Icon(
-                                              Icons.radio_button_unchecked,
-                                            ),
+                                        Icons.radio_button_unchecked,
+                                      ),
                                       SizedBox(width: 7),
                                       Expanded(
                                         child: item,
@@ -294,6 +308,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                           }),
                     ),
                   ),
+
                   SizedBox(
                     height: 20,
                   ),
@@ -362,8 +377,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
         _taskStartDate.text = picked[0].toString().substring(0, 10);
         _taskDueDate.text = picked[0].toString().substring(0, 10);
         return;
-      }
-      else if (!picked[1].isNullOrBlank) {
+      } else if (!picked[1].isNullOrBlank) {
         _taskStartDate.text = picked[1].toString().substring(0, 10);
         _taskDueDate.text = picked[1].toString().substring(0, 10);
         return;

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:swe496/controllers/TaskOfProjectController.dart';
 import 'package:swe496/models/Chat.dart';
 import 'package:swe496/models/Event.dart';
 import 'package:swe496/models/Members.dart';
@@ -172,7 +173,6 @@ class ProjectCollection {
         if (!snapshot.exists) {
           throw Exception("data does not exist!");
         }
-        //TODO: STOPPED HERE
         await transaction.update(
             documentReference,
             ({
@@ -180,13 +180,156 @@ class ProjectCollection {
                 newSubtaskJSON,
               ]),
             }));
-
       });
-      Get.back();
-      Get.snackbar('Success', "Subtask '$_subtaskName' has been added successfully");
     } on Exception catch (e) {
       print(e);
     }
+  }
+
+  Future<void> editTask(
+      String projectID,
+      String taskID,
+      String taskName,
+      String taskDescription,
+      String startDate,
+      String dueDate,
+      String taskPriority,
+      String assignedTo) async {
+    // Creating the task object for the project
+
+    List listOfUserNameAndID = assignedTo.split(',');
+
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        await transaction.update(
+            documentReference,
+            ({
+              "taskName": taskName,
+              "taskDescription": taskDescription,
+              "startDate": startDate,
+              "dueDate": dueDate,
+              "taskPriority": taskPriority,
+              "assignedTo": assignedTo.isEmpty ? '' : listOfUserNameAndID[1],
+              "isAssigned": assignedTo.isEmpty ? 'false' : 'true',
+              "taskStatus": 'Not-started'
+            }));
+      });
+      Get.back();
+      Get.snackbar('Success', "Task '$taskName' has been updated successfully");
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> deleteTask(
+    String projectID,
+    String taskID,
+  ) async {
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        await transaction.delete(documentReference);
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> deleteSubtask(
+    String projectID,
+    String taskID,
+    String subtaskID,
+    String subtaskName,
+    String subtaskDescription,
+    String startDate,
+    String dueDate,
+    String subtaskPriority,
+  ) async {
+    // Creating the task object for the project
+
+    TaskOfProject deletedSubtaskOfProject = new TaskOfProject(
+      taskID: subtaskID,
+      taskName: subtaskName,
+      taskDescription: subtaskDescription,
+      startDate: startDate,
+      dueDate: dueDate,
+      taskPriority: subtaskPriority,
+      taskStatus: 'Not-Started',
+      isAssigned: 'true',
+      assignedBy: null,
+      assignedTo: null,
+    );
+    // Convert the sub task object to JSON
+    var deletedSubtaskJSON = deletedSubtaskOfProject.toJson();
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        await transaction.update(
+          documentReference,
+          {
+            'subTask': FieldValue.arrayRemove([deletedSubtaskJSON])
+          },
+        );
+      });
+      Get.back();
+      Get.snackbar('Success', "Subtask '$subtaskName' has been deleted successfully");
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> editSubtask(
+      String projectID,
+      String taskID,
+      String subtaskID,
+      String subtaskName,
+      String subtaskDescription,
+      String startDate,
+      String dueDate,
+      String subtaskPriority,
+      String oldSubtaskName,
+      String oldSubtaskDescription,
+      String oldStartDate,
+      String oldDueDate,
+      String oldSubtaskPriority) async {
+    await deleteSubtask(projectID, taskID, subtaskID, oldSubtaskName,
+            oldSubtaskDescription, oldStartDate, oldDueDate, oldSubtaskPriority)
+        .then((value) async {
+      await createNewSubtask(projectID, taskID, subtaskName, subtaskDescription,
+          startDate, dueDate, subtaskPriority, 'Not-Started');
+    });
+
+    Get.back();
   }
 
   Future<void> createNewEvent(
@@ -223,26 +366,23 @@ class ProjectCollection {
   }
 
   // To view the tasks in the "tasks & events" tab for the admin.
-  Stream<QuerySnapshot> getTasksOfProject(String projectID, String assignedBy) {
+  Stream<List<TaskOfProject>> getTasksOfProjectAssignedByAdmin(String projectID, String assignedBy) {
     return _firestore
         .collection('projects')
         .document(projectID)
         .collection('tasks')
         .where('assignedBy', isEqualTo: assignedBy)
-        .snapshots();
+        .snapshots()
+        .map((QuerySnapshot query) {
+      List<TaskOfProject> retVal = List();
+      query.documents.forEach((element) {
+        retVal.add(TaskOfProject.fromJson(element.data));
+      });
+      return retVal;
+    });
   }
-
-  Stream<QuerySnapshot> getEventsOfProject(String projectID) {
-    return _firestore
-        .collection('projects')
-        .document(projectID)
-        .collection('events')
-        .snapshots();
-  }
-
-  // To view the tasks in the "tasks & events" tab for the user.
-  Stream<List<TaskOfProject>> tasksOfProjectStream(
-      String projectID, String assignedTo) {
+  // To view the tasks in the "tasks & events" tab for the assigned member.
+  Stream<List<TaskOfProject>> getTasksOfProjectAssignedToMember(String projectID, String assignedTo) {
     return _firestore
         .collection('projects')
         .document(projectID)
@@ -257,4 +397,37 @@ class ProjectCollection {
       return retVal;
     });
   }
+
+  Stream<List<Event>> getEventsOfProject(String projectID) {
+    return _firestore
+        .collection('projects')
+        .document(projectID)
+        .collection('events')
+        .snapshots().map((QuerySnapshot query) {
+      List<Event> retVal = List();
+      query.documents.forEach((element) {
+        retVal.add(Event.fromJson(element.data));
+      });
+      return retVal;
+    });
+  }
+
+  // To view the task details in TaskView.dart
+  Stream<List<TaskOfProject>> taskStream(
+      String projectID, String taskID) {
+    return _firestore
+        .collection('projects')
+        .document(projectID)
+        .collection('tasks')
+        .where('taskID', isEqualTo: taskID)
+        .snapshots()
+        .map((QuerySnapshot query) {
+      List<TaskOfProject> retVal = List();
+      query.documents.forEach((element) {
+        retVal.add(TaskOfProject.fromJson(element.data));
+      });
+      return retVal;
+    });
+  }
+
 }
