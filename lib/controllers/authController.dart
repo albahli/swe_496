@@ -93,7 +93,7 @@ class AuthController extends GetxController {
       print(Get.find<UserController>().user.userName);
     } catch (e) {
       Get.snackbar(
-        "Error22.", // title
+        "Error2.", // title
         e.toString(), // message
         icon: Icon(
           Icons.error_outline,
