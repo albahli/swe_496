@@ -61,7 +61,7 @@ class AuthController extends GetxController {
       Get.back();
     } catch (e) {
       Get.snackbar(
-        "Error1", // title
+        "Error22", // title
         e.message, // message
         icon: Icon(
           Icons.error_outline,
