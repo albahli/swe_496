@@ -73,6 +73,9 @@ class _TaskViewState extends State<TaskView> {
   // Task is assigned for a user
   TextEditingController _editedTaskAssignedTo = new TextEditingController();
 
+  // For comment text field
+  TextEditingController _commentController = new TextEditingController();
+
   ScrollController _scrollController = ScrollController();
 
   @override
@@ -167,41 +170,265 @@ class _TaskViewState extends State<TaskView> {
                           ),
                           Container(
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text('Comment section'),
+                                Center(
+                                    child: Text(
+                                  'Comments',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                )),
                                 Divider(
                                   thickness: 2,
                                 ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color:
-                                              Get.theme.unselectedWidgetColor),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(20))),
-                                  child: ListView.builder(
-                                    controller: _scrollController,
-                                    physics: ScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: 30,
-                                    itemBuilder: (_, index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Bubble(
-                                          margin: BubbleEdges.only(top: 10),
-                                          alignment: Alignment.topLeft,
-                                          nip: BubbleNip.leftBottom,
-                                          child: Text('Hi, developer!'),
-                                          padding: BubbleEdges.all(8),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                SizedBox(
+                                  height: 20,
                                 ),
-                                //TODO: STOPPED HERE
+                                Container(
+                                  child: taskOfProjectController
+                                                  .tasks[0].message.length ==
+                                              0 ||
+                                          taskOfProjectController
+                                              .tasks[0].message.isEmpty
+                                      ? Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Text(
+                                            'No comments',
+                                            style: TextStyle(
+                                              color: Get
+                                                  .theme.unselectedWidgetColor,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ))
+                                      : ListView.builder(
+                                          controller: _scrollController,
+                                          physics: ScrollPhysics(),
+                                          shrinkWrap: true,
+                                          itemCount: taskOfProjectController
+                                              .tasks[0].message.length,
+                                          itemBuilder: (_, index) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: taskOfProjectController
+                                                          .tasks[0]
+                                                          .message[index]
+                                                          .senderID ==
+                                                      userController.user.userID
+                                                  ? Bubble(
+                                                      margin: BubbleEdges.only(
+                                                          top: 10),
+                                                      color: Get.theme.primaryColorLight,
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      nip: BubbleNip.rightBottom,
+                                                      child: Column(
+                                                        children: [
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                '${taskOfProjectController.tasks[0].message[index].from}',
+                                                                style: TextStyle(
+                                                                    color: Get
+                                                                        .theme
+                                                                        .accentColor),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .left,
+                                                              ),
+                                                              Spacer(),
+                                                              Text(
+                                                                '${taskOfProjectController.tasks[0].message[index].time.toDate().toString().substring(0, 16)}',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Get
+                                                                      .theme
+                                                                      .unselectedWidgetColor,
+                                                                  fontSize: 10,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Row(
+                                                              children: [
+                                                                Text(
+                                                                    '${taskOfProjectController.tasks[0].message[index].contentOfMessage}', ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            children: [],
+                                                          )
+                                                        ],
+                                                      ),
+                                                      padding:
+                                                          BubbleEdges.all(8),
+                                                    )
+                                                  : Bubble(
+                                                      margin: BubbleEdges.only(
+                                                          top: 10),
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      nip: BubbleNip.leftBottom,
+                                                      child: Column(
+                                                        children: [
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                '${taskOfProjectController.tasks[0].message[index].from}',
+                                                                style: TextStyle(
+                                                                    color: Get
+                                                                        .theme
+                                                                        .accentColor),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .left,
+                                                              ),
+                                                              Spacer(),
+                                                              Text(
+                                                                '${taskOfProjectController.tasks[0].message[index].time.toDate().toString().substring(0, 16)}',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Get
+                                                                      .theme
+                                                                      .unselectedWidgetColor,
+                                                                  fontSize: 10,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Row(
+                                                              children: [
+                                                                Text(
+                                                                    '${taskOfProjectController.tasks[0].message[index].contentOfMessage}'),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            children: [],
+                                                          )
+                                                        ],
+                                                      ),
+                                                      padding:
+                                                          BubbleEdges.all(8),
+                                                    ),
+                                            );
+                                          },
+                                        ),
+                                ),
                               ],
                             ),
-                          )
+                          ),
+                          SizedBox(
+                            height: 100,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Column(
+                              children: [
+                                Divider(
+                                  thickness: 2,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Align(
+                            child: Container(
+                              alignment: Alignment.bottomCenter,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    bottom: 10, right: 3, left: 3),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Get.theme.cardColor,
+                                          borderRadius:
+                                              BorderRadius.circular(25.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                offset: Offset(0, 3),
+                                                blurRadius: 5,
+                                                color: Colors.grey)
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _commentController,
+                                                maxLines: null,
+                                                decoration: InputDecoration(
+                                                    hintText:
+                                                        "Add a comment...",
+                                                    contentPadding:
+                                                        const EdgeInsets.all(
+                                                            20.0),
+                                                    border: InputBorder.none),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                        padding: const EdgeInsets.only(left: 3),
+                                        child: FloatingActionButton(
+                                          heroTag: 'sendCommentByAdmin',
+                                          child: Icon(Icons.send),
+                                          onPressed: () {
+                                            _commentController.text.trim();
+                                            if (_commentController.text.isEmpty)
+                                              return;
+
+                                            ProjectCollection()
+                                                .addCommentToTask(
+                                                    projectController
+                                                        .project.projectID,
+                                                    taskOfProjectController
+                                                        .tasks[0].taskID,
+                                                    userController.user.userID,
+                                                    userController
+                                                        .user.userName,
+                                                    _commentController.text);
+                                            _commentController.clear();
+                                          },
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       );
                     }

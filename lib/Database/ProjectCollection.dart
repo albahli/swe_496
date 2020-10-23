@@ -499,10 +499,47 @@ class ProjectCollection {
         .document(eventID)
         .snapshots()
         .map((DocumentSnapshot documentSnapshot) {
-         if(documentSnapshot.data == null){
-           return null;
-         }
+      if (documentSnapshot.data == null) {
+        return null;
+      }
       return Event.fromJson(documentSnapshot.data);
     });
+  }
+
+  Future<void> addCommentToTask(String projectID, String taskID,
+      String senderID, String from, String contentOfMessage) async {
+
+    Message message = new Message(
+        messageID: Uuid().v1(),
+        senderID: senderID,
+        from: from,
+        contentOfMessage: contentOfMessage,
+        time: Timestamp.now());
+
+    var jsonMessage = message.toJson();
+
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        await transaction.update(
+            documentReference,
+            ({
+              'message': FieldValue.arrayUnion([
+                jsonMessage,
+              ]),
+            }));
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
   }
 }

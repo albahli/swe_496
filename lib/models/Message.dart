@@ -1,14 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Message {
   String messageID;
-  String messageFrom;
+  String senderID;
+  String from;
   String contentOfMessage;
-  String time;
+  Timestamp time;
 
-  Message({this.messageID, this.messageFrom, this.contentOfMessage, this.time});
+  Message({this.messageID, this.senderID, this.from, this.contentOfMessage, this.time});
 
   Message.fromJson(Map<String, dynamic> json) {
     messageID = json['messageID'];
-    messageFrom = json['messageFrom'];
+    senderID = json['senderID'];
+    from = json['from'];
     contentOfMessage = json['contentOfMessage'];
     time = json['time'];
   }
@@ -16,7 +20,8 @@ class Message {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['messageID'] = this.messageID;
-    data['messageFrom'] = this.messageFrom;
+    data['senderID'] = this.senderID;
+    data['from'] = this.from;
     data['contentOfMessage'] = this.contentOfMessage;
     data['time'] = this.time;
     return data;
