@@ -302,7 +302,8 @@ class ProjectCollection {
         );
       });
       Get.back();
-      Get.snackbar('Success', "Subtask '$subtaskName' has been deleted successfully");
+      Get.snackbar(
+          'Success', "Subtask '$subtaskName' has been deleted successfully");
     } on Exception catch (e) {
       print(e);
     }
@@ -365,8 +366,66 @@ class ProjectCollection {
     }
   }
 
+  Future<void> editEvent(
+      String projectID,
+      String eventID,
+      String eventName,
+      String eventDescription,
+      String startDate,
+      String endDate,
+      String location) async {
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('events')
+          .document(eventID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        await transaction.update(
+            documentReference,
+            ({
+              "eventName": eventName,
+              "eventDescription": eventDescription,
+              "eventStartDate": startDate,
+              "eventEndDate": endDate,
+              "eventLocation": location,
+            }));
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> deleteEvent(String projectID, String eventID) async {
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('events')
+          .document(eventID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        await transaction.delete(documentReference);
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
   // To view the tasks in the "tasks & events" tab for the admin.
-  Stream<List<TaskOfProject>> getTasksOfProjectAssignedByAdmin(String projectID, String assignedBy) {
+  Stream<List<TaskOfProject>> getTasksOfProjectAssignedByAdmin(
+      String projectID, String assignedBy) {
     return _firestore
         .collection('projects')
         .document(projectID)
@@ -381,8 +440,10 @@ class ProjectCollection {
       return retVal;
     });
   }
+
   // To view the tasks in the "tasks & events" tab for the assigned member.
-  Stream<List<TaskOfProject>> getTasksOfProjectAssignedToMember(String projectID, String assignedTo) {
+  Stream<List<TaskOfProject>> getTasksOfProjectAssignedToMember(
+      String projectID, String assignedTo) {
     return _firestore
         .collection('projects')
         .document(projectID)
@@ -403,7 +464,8 @@ class ProjectCollection {
         .collection('projects')
         .document(projectID)
         .collection('events')
-        .snapshots().map((QuerySnapshot query) {
+        .snapshots()
+        .map((QuerySnapshot query) {
       List<Event> retVal = List();
       query.documents.forEach((element) {
         retVal.add(Event.fromJson(element.data));
@@ -413,8 +475,7 @@ class ProjectCollection {
   }
 
   // To view the task details in TaskView.dart
-  Stream<List<TaskOfProject>> taskStream(
-      String projectID, String taskID) {
+  Stream<List<TaskOfProject>> taskStream(String projectID, String taskID) {
     return _firestore
         .collection('projects')
         .document(projectID)
@@ -430,4 +491,18 @@ class ProjectCollection {
     });
   }
 
+  Stream<Event> eventStream(String projectID, String eventID) {
+    return _firestore
+        .collection('projects')
+        .document(projectID)
+        .collection('events')
+        .document(eventID)
+        .snapshots()
+        .map((DocumentSnapshot documentSnapshot) {
+         if(documentSnapshot.data == null){
+           return null;
+         }
+      return Event.fromJson(documentSnapshot.data);
+    });
+  }
 }

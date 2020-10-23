@@ -6,12 +6,14 @@ import 'package:get/get.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/Project/CreateEventView.dart';
 import 'package:swe496/Views/Project/CreateTaskView.dart';
+import 'package:swe496/Views/Project/EventView.dart';
 import 'package:swe496/Views/Project/MembersView.dart';
 import 'package:swe496/Views/Project/TaskView.dart';
+import 'package:swe496/controllers/EventController.dart';
 import 'package:swe496/controllers/ListOfTasksOfProjectConrtoller.dart';
 import 'package:swe496/controllers/TaskOfProjectController.dart';
 import 'package:swe496/controllers/projectController.dart';
-import 'package:swe496/controllers/EventsController.dart';
+import 'package:swe496/controllers/ListOfEventsController.dart';
 import 'package:swe496/controllers/userController.dart';
 import 'package:swe496/models/Event.dart';
 import 'package:swe496/models/TaskOfProject.dart';
@@ -234,9 +236,9 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   Widget viewTimeLineOfTasksAndEvents() {
 //TODO: Fix the timeline model
     List<Event> eventList = new List<Event>();
-    GetX<EventController>(
-        init: Get.put<EventController>(EventController()),
-        builder: (EventController eventController) {
+    GetX<ListOfEventsController>(
+        init: Get.put<ListOfEventsController>(ListOfEventsController()),
+        builder: (ListOfEventsController eventController) {
           print('test1');
           if (eventController != null && eventController.events != null) {
             eventController.events.forEach((element) {
@@ -247,106 +249,113 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           return;
         });
     /*items.add();*/
-    EventController eventController = Get.put<EventController>(EventController());
-    ListOfTasksOfProjectController listOfTasksOfProjectController = Get.put<ListOfTasksOfProjectController>(ListOfTasksOfProjectController());
-    var newList = [...eventController.events, ...listOfTasksOfProjectController.tasks];
+    ListOfEventsController eventController =
+        Get.put<ListOfEventsController>(ListOfEventsController());
+    ListOfTasksOfProjectController listOfTasksOfProjectController =
+        Get.put<ListOfTasksOfProjectController>(
+            ListOfTasksOfProjectController());
+    var newList = [
+      ...eventController.events,
+      ...listOfTasksOfProjectController.tasks
+    ];
 
-    return Timeline(children: List<TimelineModel>.generate((newList.length), (index) {
-      if (newList[index] is Event) {
-        TimelineModel(
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: InkWell(
-                      onTap: () {},
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.grey),
-                        ),
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                              maxWidth: 300, minWidth: 200, minHeight: 200),
-                          child: Center(
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  'Event name:}',
-                                ),
-                                Text(
-                                  'Description: ${eventController.events[index].eventDescription} ',
-                                ),
-
-                                Text(
-                                  'Start date: ${eventController.events[index].eventStartDate}',
-                                ),
-                                Text(
-                                  'End date: ${eventController.events[index].eventEndDate}',
-                                ),
-                              ],
-                            ),
+    return Timeline(
+        children: List<TimelineModel>.generate((newList.length), (index) {
+          if (newList[index] is Event) {
+            TimelineModel(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: () {},
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey),
+                      ),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                            maxWidth: 300, minWidth: 200, minHeight: 200),
+                        child: Center(
+                          child: Column(
+                            children: <Widget>[
+                              Text(
+                                'Event name:}',
+                              ),
+                              Text(
+                                'Description: ${eventController.events[index].eventDescription} ',
+                              ),
+                              Text(
+                                'Start date: ${eventController.events[index].eventStartDate}',
+                              ),
+                              Text(
+                                'End date: ${eventController.events[index].eventEndDate}',
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  position: TimelineItemPosition.right,
-                  icon: Icon(
-                    Icons.assignment,
-                  ));
-      }
-      return TimelineModel(
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(color: Colors.grey),
                 ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxWidth: 300, minWidth: 200, minHeight: 200),
-                  child: Center(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'Task name: ',
+                position: TimelineItemPosition.right,
+                icon: Icon(
+                  Icons.assignment,
+                ));
+          }
+          return TimelineModel(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  onTap: () {},
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxWidth: 300, minWidth: 200, minHeight: 200),
+                      child: Center(
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              'Task name: ',
+                            ),
+                            Text(
+                              'Description: ',
+                            ),
+                            Text(
+                              'Status: ',
+                            ),
+                            Text(
+                              'Priority: ',
+                            ),
+                            Text(
+                              'Start date: ',
+                            ),
+                            Text(
+                              'End date: ',
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Description: ',
-                        ),
-                        Text(
-                          'Status: ',
-                        ),
-                        Text(
-                          'Priority: ',
-                        ),
-                        Text(
-                          'Start date: ',
-                        ),
-                        Text(
-                          'End date: ',
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-          position: TimelineItemPosition.right,
-          icon: Icon(
-            Icons.assignment,
-          ));
-    }), position: TimelinePosition.Center);
+              position: TimelineItemPosition.right,
+              icon: Icon(
+                Icons.assignment,
+              ));
+        }),
+        position: TimelinePosition.Center);
   }
 
   List<TimelineModel> timelineItems() {
     List<TimelineModel> items = [];
-    GetX<EventController>(
-        init: Get.put<EventController>(EventController()),
-        builder: (EventController eventController) {
+    GetX<ListOfEventsController>(
+        init: Get.put<ListOfEventsController>(ListOfEventsController()),
+        builder: (ListOfEventsController eventController) {
           if (eventController != null && eventController.events != null) {
             for (var event in eventController.events) {
               items.add(TimelineModel(
@@ -496,20 +505,25 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   }
 
   Widget getListOfEvents() {
-    return GetX<EventController>(
-        init: Get.put<EventController>(EventController()),
-        builder: (EventController eventController) {
-          if (eventController != null &&
-              eventController.events != null &&
-              eventController.events.isNotEmpty) {
+    return GetX<ListOfEventsController>(
+        init: Get.put<ListOfEventsController>(ListOfEventsController()),
+        builder: (ListOfEventsController listOfEventsController) {
+          if (listOfEventsController != null &&
+              listOfEventsController.events != null &&
+              listOfEventsController.events.isNotEmpty
+          && !listOfEventsController.events.isNullOrBlank ) {
             return ListView.builder(
-                itemCount: eventController.events.length,
+                itemCount: listOfEventsController.events.length,
                 itemBuilder: (context, index) {
                   return ListTile(
                     leading: Icon(Icons.event),
-                    title: Text(eventController.events[index].eventName),
+                    title: Text(listOfEventsController.events[index].eventName),
                     subtitle: Text('Details ...'),
-                    onTap: () async {},
+                    onTap: () async {
+                      Get.put<EventController>(EventController(
+                          eventID: listOfEventsController.events[index].eventID));
+                      Get.to(EventView());
+                    },
                   );
                 });
           }

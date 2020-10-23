@@ -1,10 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
@@ -15,6 +16,7 @@ import 'package:swe496/models/TaskOfProject.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
+import 'package:bubble/bubble.dart';
 
 class TaskView extends StatefulWidget {
   const TaskView({Key key, this.taskID}) : super(key: key);
@@ -70,6 +72,8 @@ class _TaskViewState extends State<TaskView> {
 
   // Task is assigned for a user
   TextEditingController _editedTaskAssignedTo = new TextEditingController();
+
+  ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +164,43 @@ class _TaskViewState extends State<TaskView> {
                           SizedBox(
                             width: 100,
                             height: 100,
+                          ),
+                          Container(
+                            child: Column(
+                              children: [
+                                Text('Comment section'),
+                                Divider(
+                                  thickness: 2,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color:
+                                              Get.theme.unselectedWidgetColor),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                  child: ListView.builder(
+                                    controller: _scrollController,
+                                    physics: ScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: 30,
+                                    itemBuilder: (_, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Bubble(
+                                          margin: BubbleEdges.only(top: 10),
+                                          alignment: Alignment.topLeft,
+                                          nip: BubbleNip.leftBottom,
+                                          child: Text('Hi, developer!'),
+                                          padding: BubbleEdges.all(8),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                //TODO: STOPPED HERE
+                              ],
+                            ),
                           )
                         ],
                       );
@@ -365,7 +406,11 @@ class _TaskViewState extends State<TaskView> {
                                               child: Column(
                                                 children: [
                                                   ListTile(
-                                                    title: Text('Delete task?'),
+                                                    title: mainTask
+                                                        ? Text(
+                                                            'Delete task? All subtasks will be deleted')
+                                                        : Text(
+                                                            'Delete subtask?'),
                                                     trailing: FlatButton(
                                                       child: const Text(
                                                         'DELETE',
@@ -373,8 +418,6 @@ class _TaskViewState extends State<TaskView> {
                                                             color: Colors.red),
                                                       ),
                                                       onPressed: () async {
-                                                        //TODO:STOPPED HERE, FIX THE GET.BACK WITH DELETE
-
                                                         if (mainTask) {
                                                           Get.back();
                                                           await ProjectCollection()
@@ -737,15 +780,16 @@ class _TaskViewState extends State<TaskView> {
   }
 
   void pickEditedSubtaskDate(String startDate, String dueDate) async {
-    var start = DateFormat('yyyy-M-d').parse(startDate);
     var due = DateFormat('yyyy-M-d').parse(dueDate);
-    DateTime _start = new DateTime.now();
+    DateTime _startDateFromToday = new DateTime.now();
+    var newStart = DateFormat('yyyy-M-d')
+        .parse(_startDateFromToday.toString().substring(0, 10));
 
     final List<DateTime> picked = await DateRagePicker.showDatePicker(
       context: context,
-      initialFirstDate: _start,
+      initialFirstDate: newStart,
       initialLastDate: due,
-      firstDate: _start,
+      firstDate: newStart,
       lastDate: due,
     );
     if (picked != null && picked.length == 1) {
@@ -761,7 +805,7 @@ class _TaskViewState extends State<TaskView> {
     }
 
     if (picked != null && picked.length == 2 && picked[0] != picked[1]) {
-      _start = picked[0];
+      newStart = picked[0];
       _editedSubtaskStartDate.text = picked[0].toString().substring(0, 10);
       due = picked[1];
       _editedSubtaskDueDate.text = picked[1].toString().substring(0, 10);

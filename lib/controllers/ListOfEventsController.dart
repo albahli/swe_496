@@ -2,10 +2,10 @@ import 'package:get/get.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/models/Event.dart';
-class EventController extends GetxController {
+class ListOfEventsController extends GetxController {
 
 
-  EventController();
+  ListOfEventsController();
 
   Rx<List<Event>> eventsList = Rx<List<Event>>();
 

@@ -13,7 +13,6 @@ class CreateEventView extends StatefulWidget {
 }
 
 class _CreateEventViewState extends State<CreateEventView> {
-
   ProjectController projectController = Get.find<ProjectController>();
   TextEditingController _eventName = new TextEditingController();
   TextEditingController _eventDescription = new TextEditingController();
@@ -65,8 +64,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                   ),
                   TextFormField(
                     controller: _eventName,
-                    validator: (eventNameVal) =>
-                    eventNameVal.isEmpty
+                    validator: (eventNameVal) => eventNameVal.isEmpty
                         ? "Event name cannot be empty"
                         : null,
                     onSaved: (eventNameVal) => _eventName.text = eventNameVal,
@@ -83,15 +81,15 @@ class _CreateEventViewState extends State<CreateEventView> {
                   TextFormField(
                     controller: _eventDescription,
                     validator: (eventDescriptionVal) =>
-                    eventDescriptionVal.isEmpty
-                        ? "Event description cannot be empty"
-                        : null,
+                        eventDescriptionVal.isEmpty
+                            ? "Event description cannot be empty"
+                            : null,
                     onSaved: (eventDescriptionVal) =>
-                    _eventDescription.text = eventDescriptionVal,
+                        _eventDescription.text = eventDescriptionVal,
                     decoration: InputDecoration(
                         labelText: 'Event description',
                         hintText:
-                        'We are going to meet at the Marriott hotel 8:30 PM in the conference room to discuss the future activities of our project.',
+                            'We are going to meet at the Marriott hotel 8:30 PM in the conference room to discuss the future activities of our project.',
                         prefixIcon: Icon(Icons.description),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20))),
@@ -107,20 +105,18 @@ class _CreateEventViewState extends State<CreateEventView> {
                       Expanded(
                         child: TextFormField(
                           controller: _eventStartDate,
-                          validator: (startDateVal) =>
-                          startDateVal.isEmpty
+                          validator: (startDateVal) => startDateVal.isEmpty
                               ? 'Start date cannot be empty'
                               : null,
-                          onSaved: (startDateVal) =>
-                          startDateVal.length >= 10
+                          onSaved: (startDateVal) => startDateVal.length >= 10
                               ? _eventStartDate.text =
-                              startDateVal.substring(0, 10)
+                                  startDateVal.substring(0, 10)
                               : _eventStartDate.clear(),
                           readOnly: true,
                           decoration: InputDecoration(
                               labelText: 'Start date',
                               hintText:
-                              DateTime.now().toString().substring(0, 10),
+                                  DateTime.now().toString().substring(0, 10),
                               prefixIcon: Icon(Icons.calendar_today),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.horizontal(
@@ -133,19 +129,17 @@ class _CreateEventViewState extends State<CreateEventView> {
                       Expanded(
                         child: TextFormField(
                           controller: _eventEndDate,
-                          validator: (dueDateVal) =>
-                          dueDateVal.isEmpty
+                          validator: (dueDateVal) => dueDateVal.isEmpty
                               ? 'End date cannot be empty'
                               : null,
-                          onSaved: (dueDateVal) =>
-                          dueDateVal.length >= 10
+                          onSaved: (dueDateVal) => dueDateVal.length >= 10
                               ? _eventEndDate.text = dueDateVal.substring(0, 10)
                               : _eventEndDate.clear(),
                           readOnly: true,
                           decoration: InputDecoration(
                               labelText: 'End date',
                               hintText:
-                              DateTime.now().toString().substring(0, 10),
+                                  DateTime.now().toString().substring(0, 10),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.horizontal(
                                       right: Radius.circular(20)))),
@@ -163,22 +157,24 @@ class _CreateEventViewState extends State<CreateEventView> {
                     children: [
                       Expanded(
                           child: TextFormField(
-                            controller: _eventLocation,
-                            focusNode: AlwaysDisabledFocusNode(),
-                            textAlignVertical: TextAlignVertical.center,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                                hintText: 'Event location',
-                                prefixIcon: Icon(
-                                  Icons.location_on,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20))),
-                            onTap: () async =>
-                            _eventLocation.text =
-                            await Get.to(GoogleMapWidgetView(),
-                                transition: Transition.downToUp),
-                          )),
+                        controller: _eventLocation,
+                        focusNode: AlwaysDisabledFocusNode(),
+                        textAlignVertical: TextAlignVertical.center,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                            hintText: 'Event location',
+                            prefixIcon: Icon(
+                              Icons.location_on,
+                            ),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20))),
+                        onTap: () async {
+                          _eventLocation.text = await Get.to(
+                              GoogleMapWidgetView(),
+                              transition: Transition.downToUp);
+
+                        },
+                      )),
                     ],
                   ),
                   SizedBox(
@@ -201,8 +197,12 @@ class _CreateEventViewState extends State<CreateEventView> {
                           print(_eventEndDate.text);
                           print(_eventLocation.text);
                           ProjectCollection().createNewEvent(
-                              projectController.project.projectID, _eventName.text,
-                              _eventDescription.text, _eventStartDate.text, _eventEndDate.text, _eventLocation.text);
+                              projectController.project.projectID,
+                              _eventName.text,
+                              _eventDescription.text,
+                              _eventStartDate.text,
+                              _eventEndDate.text,
+                              _eventLocation.text);
                         }
                       },
                       child: Row(

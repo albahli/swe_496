@@ -18,7 +18,7 @@ class _GoogleMapWidgetViewState extends State<GoogleMapWidgetView> {
   Completer<GoogleMapController> _googleMapController = Completer();
 
   Location location = new Location();
-  static const LatLng _center = const LatLng(24.7136, 46.6753);
+  static const LatLng _center = const LatLng(24.758989, 46.648260);
   String pickedLocation;
 
   bool _serviceEnabled;
