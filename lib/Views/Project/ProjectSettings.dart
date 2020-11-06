@@ -89,7 +89,7 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
                       decoration: InputDecoration(
                         labelText: 'Pinned message',
                         hintText: _projectController.project.pinnedMessage,
-                        prefixIcon: Icon(MdiIcons.pin),
+                        prefixIcon: Icon(IconData(58270, fontFamily: 'MaterialIcons')),
                       ),
                     ),
                     SizedBox(

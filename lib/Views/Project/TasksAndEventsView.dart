@@ -128,16 +128,16 @@ class _TasksAndEvents extends State<TasksAndEventsView>
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.inbox),
-          title: Text('Tasks & Events'),
+          icon: Icon(IconData(61545, fontFamily: 'MaterialIcons')),
+          label: 'Tasks & Events',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.chat),
-          title: Text('Chat'),
+          label: 'Chat',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.group_work),
-          title: Text('Members'),
+          label: 'Members',
         ),
       ],
       currentIndex: barIndex,
