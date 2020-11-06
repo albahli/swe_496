@@ -234,6 +234,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   }
 
   Widget viewTimeLineOfTasksAndEvents() {
+
     // Load the List of events into memory
     ListOfEventsController eventController =
         Get.put<ListOfEventsController>(ListOfEventsController());
