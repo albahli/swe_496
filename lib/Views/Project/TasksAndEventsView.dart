@@ -41,7 +41,6 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   void initState() {
     super.initState();
     this.tabController = new TabController(length: 1, vsync: this);
-
   }
 
   @override
@@ -234,7 +233,6 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   }
 
   Widget viewTimeLineOfTasksAndEvents() {
-
     // Load the List of events into memory
     ListOfEventsController eventController =
         Get.put<ListOfEventsController>(ListOfEventsController());
@@ -251,87 +249,95 @@ class _TasksAndEvents extends State<TasksAndEventsView>
     ];
 
     // Sort the tasks and events based on due date
-    timeLineListOfTasksAndEvents..sort((a,b){
-
-      if(a is TaskOfProject && b is Event) {
-        return a.dueDate.compareTo(b.eventEndDate);
-      }
-
-      else if(a is TaskOfProject && b is TaskOfProject) {
-        return a.dueDate.compareTo(b.dueDate);
-      }
-
-      else if(a is Event && b is TaskOfProject) {
-        return a.eventEndDate.compareTo(b.dueDate);
-      }
-
-      else if(a is Event && b is Event) {
-        return a.eventEndDate.compareTo(b.eventEndDate);
-      }
-      return -1;
-    });
+    timeLineListOfTasksAndEvents
+      ..sort((a, b) {
+        if (a is TaskOfProject && b is Event) {
+          return a.dueDate.compareTo(b.eventEndDate);
+        } else if (a is TaskOfProject && b is TaskOfProject) {
+          return a.dueDate.compareTo(b.dueDate);
+        } else if (a is Event && b is TaskOfProject) {
+          return a.eventEndDate.compareTo(b.dueDate);
+        } else if (a is Event && b is Event) {
+          return a.eventEndDate.compareTo(b.eventEndDate);
+        }
+        return -1;
+      });
 
     return Timeline(
-        children: List<TimelineModel>.generate((timeLineListOfTasksAndEvents.length), (index) {
+        children: List<TimelineModel>.generate(
+            (timeLineListOfTasksAndEvents.length), (index) {
           if (timeLineListOfTasksAndEvents[index] is Event) {
-           return TimelineModel(
+            return TimelineModel(
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
                     onTap: () async {
                       Get.put<EventController>(EventController(
-                          eventID: (timeLineListOfTasksAndEvents[index] as Event).eventID));
+                          eventID:
+                              (timeLineListOfTasksAndEvents[index] as Event)
+                                  .eventID));
                       Get.to(EventView(), preventDuplicates: false);
                     },
-                    child: Column(
-                      children: [
-                        Text(
-                          '${(timeLineListOfTasksAndEvents[index] as Event).eventName}',
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: Colors.grey),
-                          ),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(minWidth: 200, minHeight: 200),
-                            child: Center(
-                              child: Column(
-                                children: <Widget>[
-                                  Text(
-                                    '${(timeLineListOfTasksAndEvents[index] as Event).eventName}',
-                                  ),
-                                  Text(
-                                    '${(timeLineListOfTasksAndEvents[index] as Event).eventDescription}',
-                                  ),
-                                  Text(
-                                    'Start Date: ${(timeLineListOfTasksAndEvents[index] as Event).eventStartDate}',
-                                  ),
-                                  Text(
-                                    'End date: ${(timeLineListOfTasksAndEvents[index] as Event).eventEndDate}',
-                                  ),
-                                ],
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey),
+                      ),
+                      child: ConstrainedBox(
+                        constraints:
+                            BoxConstraints(minWidth: 1000, minHeight: 150),
+                        child: Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                '${(timeLineListOfTasksAndEvents[index] as Event).eventName}',
+                                style: Get.textTheme.headline6,
                               ),
                             ),
-                          ),
+                            Divider(
+                              thickness: 1,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                '${(timeLineListOfTasksAndEvents[index] as Event).eventDescription}',
+                                style: Get.textTheme.bodyText1,
+                              ),
+                            ),
+                            Divider(
+                              thickness: 1,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'End date ${(timeLineListOfTasksAndEvents[index] as Event).eventEndDate}',
+                                style: Get.textTheme.caption,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-                position: index % 2 == 0 ? TimelineItemPosition.right : TimelineItemPosition.left,
+                iconBackground: Get.theme.primaryColor,
+                position: index % 2 == 0
+                    ? TimelineItemPosition.right
+                    : TimelineItemPosition.left,
                 icon: Icon(
                   Icons.event,
+                  color: Get.theme.canvasColor,
                 ));
-          }
-          else if (timeLineListOfTasksAndEvents[index] is TaskOfProject) {
+          } else if (timeLineListOfTasksAndEvents[index] is TaskOfProject) {
             return TimelineModel(
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
                     onTap: () async {
                       Get.put<TaskOfProjectController>(TaskOfProjectController(
-                          taskID: (timeLineListOfTasksAndEvents[index] as TaskOfProject)
+                          taskID: (timeLineListOfTasksAndEvents[index]
+                                  as TaskOfProject)
                               .taskID));
                       Get.to(TaskView(), preventDuplicates: false);
                     },
@@ -343,30 +349,45 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                             border: Border.all(color: Colors.grey),
                           ),
                           child: ConstrainedBox(
-                            constraints: BoxConstraints(minWidth: 200, minHeight: 200),
-                            child: Center(
-                              child: Column(
-                                children: <Widget>[
-                                  Text(
-                                    '${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
-                                        .taskName}', style: Get.textTheme.headline6,
+                            constraints:
+                                BoxConstraints(minWidth: 1000, minHeight: 150),
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    '${(timeLineListOfTasksAndEvents[index] as TaskOfProject).taskName}',
+                                    style: Get.textTheme.headline6,
                                   ),
-                                  Text(
-                                    'Status: ${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
-                                        .taskStatus}',
+                                ),
+                                Divider(
+                                  thickness: 1,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Status: ${(timeLineListOfTasksAndEvents[index] as TaskOfProject).taskStatus}',
+                                    style: Get.textTheme.bodyText2,
                                   ),
-                                  Text(
-                                    '${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
-                                        .taskPriority} Priority',
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    '${(timeLineListOfTasksAndEvents[index] as TaskOfProject).taskPriority} Priority',
+                                    style: Get.textTheme.bodyText1,
                                   ),
-                                  Text(
-                                    '${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
-                                        .startDate} to ${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
-                                        .dueDate}',
+                                ),
+                                Divider(
+                                  thickness: 1,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Due date ${(timeLineListOfTasksAndEvents[index] as TaskOfProject).dueDate}',
                                     style: Get.textTheme.caption,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -374,15 +395,18 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                     ),
                   ),
                 ),
-                position:  index % 2 == 0 ? TimelineItemPosition.right : TimelineItemPosition.left,
+                position: index % 2 == 0
+                    ? TimelineItemPosition.right
+                    : TimelineItemPosition.left,
+                iconBackground: Get.theme.primaryColor,
                 icon: Icon(
                   Icons.assignment,
+                  color: Get.theme.canvasColor,
                 ));
           }
 
-        return null;
+          return null;
         }),
-
         position: TimelinePosition.Center);
   }
 
@@ -413,7 +437,6 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           if (listOfTasksOfProjectController != null &&
               listOfTasksOfProjectController.tasks != null &&
               listOfTasksOfProjectController.tasks.isNotEmpty) {
-
             return ListView.builder(
                 itemCount: listOfTasksOfProjectController.tasks.length,
                 itemBuilder: (context, index) {
@@ -444,8 +467,8 @@ class _TasksAndEvents extends State<TasksAndEventsView>
         builder: (ListOfEventsController listOfEventsController) {
           if (listOfEventsController != null &&
               listOfEventsController.events != null &&
-              listOfEventsController.events.isNotEmpty
-          && !listOfEventsController.events.isNullOrBlank ) {
+              listOfEventsController.events.isNotEmpty &&
+              !listOfEventsController.events.isNullOrBlank) {
             return ListView.builder(
                 itemCount: listOfEventsController.events.length,
                 itemBuilder: (context, index) {
@@ -455,7 +478,8 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                     subtitle: Text('Details ...'),
                     onTap: () async {
                       Get.put<EventController>(EventController(
-                          eventID: listOfEventsController.events[index].eventID));
+                          eventID:
+                              listOfEventsController.events[index].eventID));
                       Get.to(EventView());
                     },
                   );
