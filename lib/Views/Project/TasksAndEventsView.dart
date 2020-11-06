@@ -8,6 +8,7 @@ import 'package:swe496/Views/Project/CreateEventView.dart';
 import 'package:swe496/Views/Project/CreateTaskView.dart';
 import 'package:swe496/Views/Project/EventView.dart';
 import 'package:swe496/Views/Project/MembersView.dart';
+import 'package:swe496/Views/Project/ProjectSettings.dart';
 import 'package:swe496/Views/Project/TaskView.dart';
 import 'package:swe496/controllers/EventController.dart';
 import 'package:swe496/controllers/ListOfTasksOfProjectConrtoller.dart';
@@ -40,6 +41,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   void initState() {
     super.initState();
     this.tabController = new TabController(length: 1, vsync: this);
+
   }
 
   @override
@@ -53,7 +55,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           ),
           onPressed: () {
             Get.offAll(Root());
-            projectController.clear();
+            Get.delete<ProjectController>();
             tabController.dispose();
             print("back to 'Root' from 'TaskAndEventsView'");
           },
@@ -63,9 +65,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
-            onPressed: () {
-              // Open project settings page
-            },
+            onPressed: () => Get.to(ProjectSettingsView()),
           )
         ],
       ),
@@ -234,223 +234,155 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   }
 
   Widget viewTimeLineOfTasksAndEvents() {
-//TODO: Fix the timeline model
-    List<Event> eventList = new List<Event>();
-    GetX<ListOfEventsController>(
-        init: Get.put<ListOfEventsController>(ListOfEventsController()),
-        builder: (ListOfEventsController eventController) {
-          print('test1');
-          if (eventController != null && eventController.events != null) {
-            eventController.events.forEach((element) {
-              eventList.add(element);
-            });
-          }
-          //  }
-          return;
-        });
-    /*items.add();*/
+    // Load the List of events into memory
     ListOfEventsController eventController =
         Get.put<ListOfEventsController>(ListOfEventsController());
+
+    // Load the List of tasks into memory
     ListOfTasksOfProjectController listOfTasksOfProjectController =
         Get.put<ListOfTasksOfProjectController>(
             ListOfTasksOfProjectController());
-    var newList = [
+
+    // Merge the Tasks and events list
+    var timeLineListOfTasksAndEvents = [
       ...eventController.events,
       ...listOfTasksOfProjectController.tasks
     ];
 
+    // Sort the tasks and events based on due date
+    timeLineListOfTasksAndEvents..sort((a,b){
+
+      if(a is TaskOfProject && b is Event) {
+        return a.dueDate.compareTo(b.eventEndDate);
+      }
+
+      else if(a is TaskOfProject && b is TaskOfProject) {
+        return a.dueDate.compareTo(b.dueDate);
+      }
+
+      else if(a is Event && b is TaskOfProject) {
+        return a.eventEndDate.compareTo(b.dueDate);
+      }
+
+      else if(a is Event && b is Event) {
+        return a.eventEndDate.compareTo(b.eventEndDate);
+      }
+      return -1;
+    });
+
     return Timeline(
-        children: List<TimelineModel>.generate((newList.length), (index) {
-          if (newList[index] is Event) {
-            TimelineModel(
+        children: List<TimelineModel>.generate((timeLineListOfTasksAndEvents.length), (index) {
+          if (timeLineListOfTasksAndEvents[index] is Event) {
+           return TimelineModel(
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                            maxWidth: 300, minWidth: 200, minHeight: 200),
-                        child: Center(
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                'Event name:}',
+                    onTap: () async {
+                      Get.put<EventController>(EventController(
+                          eventID: (timeLineListOfTasksAndEvents[index] as Event).eventID));
+                      Get.to(EventView(), preventDuplicates: false);
+                    },
+                    child: Column(
+                      children: [
+                        Text(
+                          '${(timeLineListOfTasksAndEvents[index] as Event).eventName}',
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minWidth: 200, minHeight: 200),
+                            child: Center(
+                              child: Column(
+                                children: <Widget>[
+                                  Text(
+                                    '${(timeLineListOfTasksAndEvents[index] as Event).eventName}',
+                                  ),
+                                  Text(
+                                    '${(timeLineListOfTasksAndEvents[index] as Event).eventDescription}',
+                                  ),
+                                  Text(
+                                    'Start Date: ${(timeLineListOfTasksAndEvents[index] as Event).eventStartDate}',
+                                  ),
+                                  Text(
+                                    'End date: ${(timeLineListOfTasksAndEvents[index] as Event).eventEndDate}',
+                                  ),
+                                ],
                               ),
-                              Text(
-                                'Description: ${eventController.events[index].eventDescription} ',
-                              ),
-                              Text(
-                                'Start date: ${eventController.events[index].eventStartDate}',
-                              ),
-                              Text(
-                                'End date: ${eventController.events[index].eventEndDate}',
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-                position: TimelineItemPosition.right,
+                position: index % 2 == 0 ? TimelineItemPosition.right : TimelineItemPosition.left,
+                icon: Icon(
+                  Icons.event,
+                ));
+          }
+          else if (timeLineListOfTasksAndEvents[index] is TaskOfProject) {
+            return TimelineModel(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: () async {
+                      Get.put<TaskOfProjectController>(TaskOfProjectController(
+                          taskID: (timeLineListOfTasksAndEvents[index] as TaskOfProject)
+                              .taskID));
+                      Get.to(TaskView(), preventDuplicates: false);
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minWidth: 200, minHeight: 200),
+                            child: Center(
+                              child: Column(
+                                children: <Widget>[
+                                  Text(
+                                    '${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
+                                        .taskName}', style: Get.textTheme.headline6,
+                                  ),
+                                  Text(
+                                    'Status: ${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
+                                        .taskStatus}',
+                                  ),
+                                  Text(
+                                    '${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
+                                        .taskPriority} Priority',
+                                  ),
+                                  Text(
+                                    '${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
+                                        .startDate} to ${(timeLineListOfTasksAndEvents[index] as TaskOfProject)
+                                        .dueDate}',
+                                    style: Get.textTheme.caption,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                position:  index % 2 == 0 ? TimelineItemPosition.right : TimelineItemPosition.left,
                 icon: Icon(
                   Icons.assignment,
                 ));
           }
-          return TimelineModel(
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InkWell(
-                  onTap: () {},
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxWidth: 300, minWidth: 200, minHeight: 200),
-                      child: Center(
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              'Task name: ',
-                            ),
-                            Text(
-                              'Description: ',
-                            ),
-                            Text(
-                              'Status: ',
-                            ),
-                            Text(
-                              'Priority: ',
-                            ),
-                            Text(
-                              'Start date: ',
-                            ),
-                            Text(
-                              'End date: ',
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              position: TimelineItemPosition.right,
-              icon: Icon(
-                Icons.assignment,
-              ));
-        }),
-        position: TimelinePosition.Center);
-  }
 
-  List<TimelineModel> timelineItems() {
-    List<TimelineModel> items = [];
-    GetX<ListOfEventsController>(
-        init: Get.put<ListOfEventsController>(ListOfEventsController()),
-        builder: (ListOfEventsController eventController) {
-          if (eventController != null && eventController.events != null) {
-            for (var event in eventController.events) {
-              items.add(TimelineModel(
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: InkWell(
-                      onTap: () {},
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(spreadRadius: 0.5),
-                          ],
-                        ),
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                              maxWidth: 300, minWidth: 200, minHeight: 200),
-                          child: Center(
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  'Event name: ${event.eventName}',
-                                ),
-                                Text(
-                                  'Description: ${event.eventDescription}',
-                                ),
-                                Text(
-                                  'Start date: ${event.eventStartDate} ',
-                                ),
-                                Text(
-                                  'End date:${event.eventEndDate} ',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  position: TimelineItemPosition.left,
-                  isFirst: true,
-                  icon: Icon(
-                    Icons.event,
-                  )));
-            }
-          }
-          //  }
-          return;
-        });
-    /*items.add(TimelineModel(
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: InkWell(
-            onTap: () {},
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey),
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxWidth: 300, minWidth: 200, minHeight: 200),
-                child: Center(
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        'Task name: ',
-                      ),
-                      Text(
-                        'Description: ',
-                      ),
-                      Text(
-                        'Status: ',
-                      ),
-                      Text(
-                        'Priority: ',
-                      ),
-                      Text(
-                        'Start date: ',
-                      ),
-                      Text(
-                        'End date: ',
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        position: TimelineItemPosition.right,
-        icon: Icon(
-          Icons.assignment,
-        )));*/
-    return items;
+        return null;
+        }),
+
+        position: TimelinePosition.Center);
   }
 
   Widget tasksTab() {
@@ -480,6 +412,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           if (listOfTasksOfProjectController != null &&
               listOfTasksOfProjectController.tasks != null &&
               listOfTasksOfProjectController.tasks.isNotEmpty) {
+
             return ListView.builder(
                 itemCount: listOfTasksOfProjectController.tasks.length,
                 itemBuilder: (context, index) {

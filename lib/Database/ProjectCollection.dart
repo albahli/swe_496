@@ -136,6 +136,31 @@ class ProjectCollection {
     }
   }
 
+  Stream<List<Project>> projectsListStream(String userID) {
+    return Firestore.instance
+        .collection('projects')
+        .where('membersIDs', arrayContains: userID)
+        .snapshots().map((QuerySnapshot query) {
+      List<Project> retVal = List();
+      query.documents.forEach((element) {
+        retVal.add(Project.fromJson(element.data));
+      });
+      return retVal;
+    });
+  }
+  Stream<Project> projectStream(String projectID) {
+    return _firestore
+        .collection('projects')
+        .document(projectID)
+        .snapshots()
+        .map((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.data == null) {
+        return null;
+      }
+      return Project.fromJson(documentSnapshot.data);
+    });
+  }
+
   Future<void> createNewSubtask(
       String projectID,
       String mainTaskID,
@@ -508,7 +533,6 @@ class ProjectCollection {
 
   Future<void> addCommentToTask(String projectID, String taskID,
       String senderID, String from, String contentOfMessage) async {
-
     Message message = new Message(
         messageID: Uuid().v1(),
         senderID: senderID,
@@ -536,6 +560,30 @@ class ProjectCollection {
               'message': FieldValue.arrayUnion([
                 jsonMessage,
               ]),
+            }));
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> updateProjectSettings(String projectID, String projectName,
+      String pinnedMessage, bool joiningLinkStatus) async {
+    try {
+      DocumentReference documentReference =
+          _firestore.collection('projects').document(projectID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        await transaction.update(
+            documentReference,
+            ({
+              'projectName': projectName,
+              'pinnedMessage': pinnedMessage,
+              'isJoiningLinkEnabled': joiningLinkStatus
             }));
       });
     } on Exception catch (e) {

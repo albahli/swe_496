@@ -407,8 +407,11 @@ class _TaskViewState extends State<TaskView> {
                                           heroTag: 'sendCommentByAdmin',
                                           child: Icon(Icons.send),
                                           onPressed: () {
+                                            print("here '${_commentController.text}'");
                                             _commentController.text.trim();
-                                            if (_commentController.text.isEmpty)
+                                            print("here '${_commentController.text}'");
+
+                                            if (_commentController.text.isNull )
                                               return;
 
                                             ProjectCollection()

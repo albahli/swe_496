@@ -7,7 +7,7 @@ class Message {
   String contentOfMessage;
   Timestamp time;
 
-  Message({this.messageID, this.senderID, this.from, this.contentOfMessage, this.time});
+  Message({this.messageID, this.senderID, this.contentOfMessage, this.time, this.from});
 
   Message.fromJson(Map<String, dynamic> json) {
     messageID = json['messageID'];

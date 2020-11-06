@@ -7,6 +7,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/friendsView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
+import 'package:swe496/controllers/ListOfProjectsContoller.dart';
 import 'package:swe496/controllers/authController.dart';
 import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/controllers/userController.dart';
@@ -15,7 +16,6 @@ import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
 class GroupProjectsView extends StatefulWidget {
-
   @override
   _GroupProjectsViewState createState() => _GroupProjectsViewState();
 }
@@ -95,7 +95,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           child: Column(
             children: <Widget>[
               _searchBar(),
-              Expanded(child: getListOfProjects()),
+              getListOfProjects(),
             ],
           ),
         ),
@@ -116,56 +116,37 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   }
 
   Widget getListOfProjects() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('projects')
-          .where('membersIDs', arrayContains: userController.user.userID)
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text(snapshot.error.toString());
-        }
+    return Expanded(
+      child: GetX<ListOfProjectsController>(
+          init: Get.put<ListOfProjectsController>(ListOfProjectsController()),
+          builder: (ListOfProjectsController listOfProjectsController) {
+            if (listOfProjectsController != null &&
+                listOfProjectsController.projects != null &&
+                !listOfProjectsController.projects.isNullOrBlank &&
+                !listOfProjectsController.projects.isNull) {
+              return ListView.builder(
+                  itemCount: listOfProjectsController.projects.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      leading: Icon(Icons.supervised_user_circle),
+                      title: Text(
+                          listOfProjectsController.projects[index].projectName),
+                      subtitle: Text('Details ...'),
+                      onTap: () async {
 
-        if (snapshot.connectionState == ConnectionState.active) {
-          if (snapshot.hasData && snapshot.data != null) {
-            if (snapshot.data.documents.length == 0)
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text("You don't have any projects")),
-              );
-
-            return ListView.builder(
-                itemCount: snapshot.data.documents.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: Icon(Icons.supervised_user_circle),
-                    title: Text(snapshot.data.documents[index]['projectName']),
-                    subtitle: Text('Details ...'),
-                    onTap: () async {
-                      Get.put<ProjectController>(ProjectController());
-                      ProjectController projectController =
-                          Get.find<ProjectController>();
-                      projectController.project = Project.fromJson(
-                          new Map<String, dynamic>.from(
-                              snapshot.data.documents[index].data));
-                      Get.to(
-                          TasksAndEventsView(),
-                          transition: Transition.rightToLeft,
-                          duration: Duration(milliseconds: 300));
-                    },
-                  );
-                });
-          }
-        }
-        return Container(
-          child: Center(
-            child: CircularProgressIndicator(
-              semanticsLabel: 'Loading',
-              strokeWidth: 4,
-            ),
-          ),
-        );
-      },
+                        Get.put<ProjectController>(ProjectController(projectID: listOfProjectsController.projects[index].projectID));
+                        Get.to(TasksAndEventsView(),
+                            transition: Transition.rightToLeft,
+                            duration: Duration(milliseconds: 300));
+                      },
+                    );
+                  });
+            }
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(child: Text("You don't have any projects")),
+            );
+          }),
     );
   }
 
