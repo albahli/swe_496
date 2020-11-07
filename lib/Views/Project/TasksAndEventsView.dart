@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +34,7 @@ class TasksAndEventsView extends StatefulWidget {
 class _TasksAndEvents extends State<TasksAndEventsView>
     with TickerProviderStateMixin {
   int barIndex = 0; // Current page index in bottom navigation bar
-  ProjectController projectController = Get.find<ProjectController>();
+  ProjectController projectController;
   UserController userController = Get.find<UserController>();
   TabController
       tabController; // Top bar navigation between the tasks and events
@@ -40,11 +42,37 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   @override
   void initState() {
     super.initState();
+    projectController = Get.find<ProjectController>();
     this.tabController = new TabController(length: 1, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (projectController.isNullOrBlank ||
+        projectController.project.isNullOrBlank) {
+      projectController = Get.find<ProjectController>();
+    }
+
+    if (projectController.isNullOrBlank ||
+        projectController.project.isNullOrBlank) {
+      return Scaffold(
+        resizeToAvoidBottomPadding: false,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+            ),
+            onPressed: () {
+              Get.offAll(Root());
+              Get.delete<ProjectController>();
+              tabController.dispose();
+              print("back to 'Root' from 'TaskAndEventsView'");
+            },
+          ),
+        ),
+        body: Center(child: Text('Something went wrong !'),),
+      );
+    }
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(

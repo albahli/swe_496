@@ -15,7 +15,7 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
   ProjectController _projectController = Get.find<ProjectController>();
   TextEditingController _editedProjectNameController =
       new TextEditingController();
-  TextEditingController _editedPinnedMessageContoller =
+  TextEditingController _editedPinnedMessageController =
       new TextEditingController();
   bool _isJoiningLinkEnabled;
 
@@ -26,7 +26,7 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
   void initState() {
     super.initState();
     _editedProjectNameController.text = _projectController.project.projectName;
-    _editedPinnedMessageContoller.text =
+    _editedPinnedMessageController.text =
         _projectController.project.pinnedMessage;
     _isJoiningLinkEnabled = _projectController.project.isJoiningLinkEnabled;
   }
@@ -54,7 +54,7 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
               setState(() {
                 _editedProjectNameController.text =
                     _projectController.project.projectName;
-                _editedPinnedMessageContoller.text =
+                _editedPinnedMessageController.text =
                     _projectController.project.pinnedMessage;
                 _isJoiningLinkEnabled =
                     _projectController.project.isJoiningLinkEnabled;
@@ -85,7 +85,7 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
                               : null,
                     ),
                     TextFormField(
-                      controller: _editedPinnedMessageContoller,
+                      controller: _editedPinnedMessageController,
                       decoration: InputDecoration(
                         labelText: 'Pinned message',
                         hintText: _projectController.project.pinnedMessage,
@@ -143,7 +143,7 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
                             ProjectCollection().updateProjectSettings(
                                 _projectController.project.projectID,
                                 _editedProjectNameController.text,
-                                _editedPinnedMessageContoller.text,
+                                _editedPinnedMessageController.text,
                                 _isJoiningLinkEnabled);
                           },
                         ),

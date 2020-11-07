@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -11,7 +13,6 @@ import 'package:swe496/controllers/ListOfProjectsContoller.dart';
 import 'package:swe496/controllers/authController.dart';
 import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/controllers/userController.dart';
-import 'package:swe496/models/Project.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
@@ -133,11 +134,14 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                           listOfProjectsController.projects[index].projectName),
                       subtitle: Text('Details ...'),
                       onTap: () async {
-
                         Get.put<ProjectController>(ProjectController(projectID: listOfProjectsController.projects[index].projectID));
-                        Get.to(TasksAndEventsView(),
-                            transition: Transition.rightToLeft,
-                            duration: Duration(milliseconds: 300));
+                       // sleep(Duration(milliseconds:600));
+                        ProjectController projectController = Get.find<ProjectController>();
+                        if(projectController.initialized) {
+                          Get.to(TasksAndEventsView(),
+                              transition: Transition.rightToLeft,
+                              duration: Duration(milliseconds: 300));
+                        }
                       },
                     );
                   });
