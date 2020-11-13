@@ -34,7 +34,7 @@ class TasksAndEventsView extends StatefulWidget {
 class _TasksAndEvents extends State<TasksAndEventsView>
     with TickerProviderStateMixin {
   int barIndex = 0; // Current page index in bottom navigation bar
-  ProjectController projectController;
+  ProjectController projectController = Get.find<ProjectController>();
   UserController userController = Get.find<UserController>();
   TabController
       tabController; // Top bar navigation between the tasks and events
@@ -42,7 +42,10 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   @override
   void initState() {
     super.initState();
-    projectController = Get.find<ProjectController>();
+        () async {
+      await Future.delayed(Duration.zero);
+      projectController = Get.find<ProjectController>();
+    }();
     this.tabController = new TabController(length: 1, vsync: this);
   }
 

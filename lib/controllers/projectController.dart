@@ -20,6 +20,8 @@ class ProjectController extends GetxController {
     _project.bindStream(ProjectCollection().projectStream(projectID));//stream coming from firebase
   }
 
+
+
   void clear() {
     _project.value = Project();
   }

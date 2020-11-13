@@ -117,6 +117,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   }
 
   Widget getListOfProjects() {
+
     return Expanded(
       child: GetX<ListOfProjectsController>(
           init: Get.put<ListOfProjectsController>(ListOfProjectsController()),
@@ -124,7 +125,8 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             if (listOfProjectsController != null &&
                 listOfProjectsController.projects != null &&
                 !listOfProjectsController.projects.isNullOrBlank &&
-                !listOfProjectsController.projects.isNull) {
+                !listOfProjectsController.projects.isNull &&
+                listOfProjectsController.projects.length != 0) {
               return ListView.builder(
                   itemCount: listOfProjectsController.projects.length,
                   itemBuilder: (context, index) {
@@ -134,10 +136,13 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                           listOfProjectsController.projects[index].projectName),
                       subtitle: Text('Details ...'),
                       onTap: () async {
-                        Get.put<ProjectController>(ProjectController(projectID: listOfProjectsController.projects[index].projectID));
-                       // sleep(Duration(milliseconds:600));
-                        ProjectController projectController = Get.find<ProjectController>();
-                        if(projectController.initialized) {
+                        Get.put<ProjectController>(ProjectController(
+                            projectID: listOfProjectsController
+                                .projects[index].projectID));
+                        // sleep(Duration(milliseconds:600));
+                        ProjectController projectController =
+                            Get.find<ProjectController>();
+                        if (projectController.initialized) {
                           Get.to(TasksAndEventsView(),
                               transition: Transition.rightToLeft,
                               duration: Duration(milliseconds: 300));
