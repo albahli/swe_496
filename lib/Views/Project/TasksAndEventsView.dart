@@ -64,7 +64,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
             ),
             onPressed: () {
               Get.offAll(Root());
-              Get.delete<ProjectController>();
+          //    Get.delete<ProjectController>();
               tabController.dispose();
               print("back to 'Root' from 'TaskAndEventsView'");
             },
