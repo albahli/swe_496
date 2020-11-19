@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
+import 'package:swe496/Views/Project/ProjectSettings.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
 import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/controllers/userController.dart';
@@ -32,11 +33,10 @@ class _MembersViewState extends State<MembersView> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios,
-            size: 30,
           ),
           onPressed: () {
             Get.offAll(Root());
-            projectController.clear();
+
             print("back to 'Root' from 'Members View'");
           },
         ),
@@ -46,7 +46,7 @@ class _MembersViewState extends State<MembersView> {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              // Open project settings page
+              Get.to(ProjectSettingsView());
             },
           )
         ],

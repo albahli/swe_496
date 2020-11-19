@@ -183,7 +183,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           else if (barIndex == 1)
             return;
           else if (barIndex == 2)
-            Get.off(MembersView(), transition: Transition.noTransition);
+            Get.to(MembersView(), transition: Transition.noTransition);
         });
         print(index);
       },
