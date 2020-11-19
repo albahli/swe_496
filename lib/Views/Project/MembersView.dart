@@ -36,7 +36,7 @@ class _MembersViewState extends State<MembersView> {
           ),
           onPressed: () {
             Get.offAll(Root());
-
+             Get.delete<ProjectController>(); //TODO: Check this cause error or not
             print("back to 'Root' from 'Members View'");
           },
         ),
