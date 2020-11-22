@@ -1,5 +1,4 @@
 import 'Message.dart';
-import 'SubTask.dart';
 
 class TaskOfProject {
   String taskID;
@@ -14,7 +13,6 @@ class TaskOfProject {
   String assignedTo;
   List<TaskOfProject> subtask;
   List<Message> message;
-
   TaskOfProject(
       {this.taskID,
         this.taskName,

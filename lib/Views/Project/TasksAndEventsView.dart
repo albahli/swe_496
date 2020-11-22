@@ -58,6 +58,8 @@ class _TasksAndEvents extends State<TasksAndEventsView>
 
     if (projectController.isNullOrBlank ||
         projectController.project.isNullOrBlank) {
+      Get.back();
+      print('Handled Error.');
       return Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(

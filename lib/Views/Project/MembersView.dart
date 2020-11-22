@@ -161,7 +161,7 @@ class _MembersViewState extends State<MembersView> {
                     leading: Icon(Icons.account_circle),
                     title: Text(mappedMembersList[index].memberUID),
                     subtitle:
-                        Text(mappedMembersList[index].isAdmin ? 'Admin' : ''),
+                        Text(mappedMembersList[index].isAdmin ? 'Leader' : ''),
                     onTap: () {
                       showModalBottomSheet(
                           context: context,
@@ -177,11 +177,11 @@ class _MembersViewState extends State<MembersView> {
                                   Divider(),
                                   mappedMembersList[index].isAdmin
                                       ? new ListTile(
-                                          title: new Text('Dismiss As Admin'),
+                                          title: new Text('Dismiss As Leader'),
                                           onTap: () => {},
                                         )
                                       : new ListTile(
-                                          title: new Text('Promote As Admin'),
+                                          title: new Text('Promote As Leader'),
                                           onTap: () => {},
                                         ),
                                   new ListTile(
