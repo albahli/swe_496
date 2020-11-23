@@ -251,7 +251,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             size: 25,
           ),
           label: 'Join Project',
-          onTap: () => print('SECOND CHILD'),
+          onTap: () => print('SECOND CHILD') ,
         ),
         SpeedDialChild(
           child: Icon(
