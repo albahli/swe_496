@@ -196,7 +196,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           else if (barIndex == 1)
             return;
           else if (barIndex == 2)
-            Get.off(FriendsView(), transition: Transition.noTransition);
+            Get.to(FriendsView(), transition: Transition.noTransition);
         });
 
         print(index);

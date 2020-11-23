@@ -219,15 +219,15 @@ class _AccountSettingsState extends State<AccountSettings> {
             children: <Widget>[
              TextFormField(
                     validator: (value) => 
-                    value.isEmpty ? "name can't be empty" : null,
+                    value.isEmpty ? "Name can't be empty" : null,
                     controller: _name,
                     onSaved: (nameVal) =>
                         _name.text = nameVal,
                     decoration: InputDecoration(
                       icon: Icon(Icons.edit),
                       focusedBorder: UnderlineInputBorder(),
-                      hintText: 'enter new name',
-                      labelText: 'mohammed',
+                      hintText: 'Enter new name',
+                      labelText: 'Mohammad',
                     ),
                   ),
              
@@ -262,6 +262,7 @@ class _AccountSettingsState extends State<AccountSettings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
           leading:IconButton(
             icon:Icon(Icons.arrow_back),
@@ -270,7 +271,6 @@ class _AccountSettingsState extends State<AccountSettings> {
             },
           ),
           title: Text('Account settings'),
-          backgroundColor: Colors.red[600]
       ),
       body:Column(
         children: <Widget>[
