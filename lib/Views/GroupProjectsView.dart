@@ -258,7 +258,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             Icons.add,
             size: 25,
           ),
-          label: 'New Project',
+          label: 'New Project ',
           onTap: () => alertCreateProjectForm(context),
         ),
       ],
