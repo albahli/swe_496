@@ -1,8 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:get/get.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Views/SignIn.dart';
+
+import '../Database/UserProfileCollection.dart';
+import '../controllers/authController.dart';
+import '../controllers/userController.dart';
 
 class FriendsView extends StatefulWidget {
   @override
@@ -12,6 +18,12 @@ class FriendsView extends StatefulWidget {
 class _FriendsViewState extends State<FriendsView> {
 
   int barIndex = 2; // Currently we are at 2 for bottom navigation tabs
+  AuthController authController = Get.find<AuthController>();
+  UserController userController = Get.find<UserController>();
+
+  final formKey = GlobalKey<FormState>();
+  final TextEditingController _friendUsernameController =TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +118,103 @@ class _FriendsViewState extends State<FriendsView> {
     );
   }
 
+void alertAddFriend() {
+     Alert(
+        context: context,
+        title: "Edit",
+        content: Form(
+                  key: formKey,
+                  child: Column(
+            children: <Widget>[
+             TextFormField(
+                    validator: (value) => 
+                    value.isEmpty ? "username can't be empty" : null,
+                    controller: _friendUsernameController,
+                    onSaved: (val) =>
+                        _friendUsernameController.text = val,
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.edit),
+                      focusedBorder: UnderlineInputBorder(),
+                      hintText: 'enter Friend username',
+                      
+                    ),
+                  ),
+             
+            ],
+          ),
+        ),
+        buttons: [
+          DialogButton(
+            onPressed: () async{
+              formKey.currentState.save();
+              if (formKey.currentState.validate()) {
+                try{
+                  await UserProfileCollection().addFriend(_friendUsernameController.text,userController.user);
+                   _friendUsernameController.clear();
+                   Navigator.pop(context);
+                }catch(e){
+                  print("error");
+                }
+              }
+              
+
+            },
+            child: Text(
+              "submit",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ]).show();
+  }
+
+
+  Widget getListOfFriends() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance
+          .collection('userProfile')
+          .where('friendsIDs', arrayContains: userController.user.userID)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text(snapshot.error.toString());
+        }
+
+        if (snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.hasData && snapshot.data != null) {
+            if (snapshot.data.documents.length == 0)
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: Text("You don't have any friends")),
+              );
+
+            return ListView.builder(
+                itemCount: snapshot.data.documents.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Icon(Icons.supervised_user_circle),
+                    title: Text(snapshot.data.documents[index]['userName']),
+                    subtitle: Text('Details .......'),
+                    onTap: () {
+                     
+                      
+                    },
+                  );
+                });
+          }
+        }
+        return Container(
+          child: Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: 'Loading',
+              strokeWidth: 4,
+            ),
+          ),
+        );
+      },
+    );
+  } 
+
   Widget bottomCustomNavigationBar() {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
@@ -178,7 +287,10 @@ class _FriendsViewState extends State<FriendsView> {
           backgroundColor: Colors.red,
           label: 'Join Project',
           labelStyle: TextStyle(fontSize: 16.0),
-          onTap: () => print('SECOND CHILD'),
+          onTap: () { 
+            print('SECOND CHILD');
+            alertAddFriend();
+          }
         ),
       ],
     );

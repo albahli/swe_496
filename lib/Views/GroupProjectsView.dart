@@ -16,6 +16,8 @@ import 'package:swe496/controllers/userController.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
+import 'AccountSettings.dart';
+
 class GroupProjectsView extends StatefulWidget {
   @override
   _GroupProjectsViewState createState() => _GroupProjectsViewState();
@@ -69,7 +71,9 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                   Icons.person,
                 ),
                 content: Text("My Profile"),
-                onClick: () {}),
+                onClick: () {
+                  Get.to(AccountSettings());
+                }),
             MLMenuItem(
               leading: Icon(
                 Icons.settings,

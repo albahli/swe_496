@@ -140,4 +140,25 @@ class AuthController extends GetxController {
       print(e);
     }
   }
+
+  Future<void> updateEmail(String email) async{
+    try{
+     var firebaseUser = await _auth.currentUser();
+     await firebaseUser.updateEmail(email);
+    }catch(e){
+      print(e.toString());
+    }
+  }
+
+  Future<void> updatePassword(String password) async{
+    try{
+     var firebaseUser = await _auth.currentUser();
+     await firebaseUser.updatePassword(password);
+    }catch(e){
+      print(e.toString());
+    }
+  }
 }
+
+
+
