@@ -110,6 +110,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                    _newEmail.clear();
                    Navigator.pop(context);
                 }catch(e){
+                  Get.snackbar('Error', 'error');
                   print("error");
                 }
               }

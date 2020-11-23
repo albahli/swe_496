@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
@@ -146,7 +143,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                         // sleep(Duration(milliseconds:600));
                         ProjectController projectController =
                             Get.find<ProjectController>();
-                        if (projectController.initialized) {
+                         if (projectController.initialized) {
                           Get.to(TasksAndEventsView(),
                               transition: Transition.rightToLeft,
                               duration: Duration(milliseconds: 300));
@@ -169,19 +166,19 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.people),
-          title: Text('Groups'),
+          label: 'Groups',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment_turned_in),
-          title: Text('Tasks'),
+          label: 'Tasks',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.contacts),
-          title: Text('Friends'),
+          label: 'Friends',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.message),
-          title: Text('Messages'),
+          label: 'Messages',
         ),
       ],
       currentIndex: barIndex,

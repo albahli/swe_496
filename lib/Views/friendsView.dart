@@ -214,19 +214,19 @@ class _FriendsViewState extends State<FriendsView> {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.people),
-          title: Text('Groups'),
+          label: 'Groups',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment_turned_in),
-          title: Text('Tasks'),
+          label: 'Tasks',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.contacts),
-          title: Text('Friends'),
+          label: 'Friends',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.message),
-          title: Text('Messages'),
+          label: 'Messages',
         ),
       ],
       currentIndex: barIndex,
