@@ -1,13 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:get/get.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
-import 'package:swe496/controllers/authController.dart';
-import 'package:swe496/controllers/userController.dart';
 import 'package:password/password.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:swe496/controllers/UserControllers/authController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
 
 
 
@@ -27,13 +26,13 @@ class _AccountSettingsState extends State<AccountSettings> {
 
    File _image;
    final formKeyEmail = GlobalKey<FormState>();
-   final formKeypassword = GlobalKey<FormState>();
+   final formKeyPassword = GlobalKey<FormState>();
   final TextEditingController _newEmail =TextEditingController();
   final TextEditingController _name =TextEditingController();
 
-  final TextEditingController _currentpassword = TextEditingController();
-  final TextEditingController _newpassword =TextEditingController(); 
-  final TextEditingController _confirmNewpassword =TextEditingController();  
+  final TextEditingController _currentPassword = TextEditingController();
+  final TextEditingController _newPassword =TextEditingController();
+  final TextEditingController _confirmNewPassword =TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();   
 
   
@@ -130,15 +129,15 @@ class _AccountSettingsState extends State<AccountSettings> {
         context: context,
         title: "Edit",
         content: Form(
-                  key: formKeypassword,
+                  key: formKeyPassword,
                   child: Column(
             children: <Widget>[
                TextFormField(
                     validator: (value) =>
                         value.isEmpty ? "password can't be empty" : null,
-                    controller: _currentpassword,
+                    controller: _currentPassword,
                     onSaved: (currentpassVal) =>
-                        _currentpassword.text = currentpassVal,
+                        _currentPassword.text = currentpassVal,
                     decoration: InputDecoration(
                       icon: Icon(Icons.account_circle),
                       focusedBorder: UnderlineInputBorder(),
@@ -150,9 +149,9 @@ class _AccountSettingsState extends State<AccountSettings> {
                TextFormField(
                     validator: (value) =>
                         value.isEmpty ? "password can't be empty" : null,
-                    controller: _newpassword,
+                    controller: _newPassword,
                     onSaved: (newpassVal) =>
-                        _newpassword.text = newpassVal,
+                        _newPassword.text = newpassVal,
                     decoration: InputDecoration(
                       icon: Icon(Icons.account_circle),
                       focusedBorder: UnderlineInputBorder(),
@@ -164,9 +163,9 @@ class _AccountSettingsState extends State<AccountSettings> {
               TextFormField(
                     validator: (value) =>
                         value.isEmpty ? "password can't be empty" : null,
-                    controller: _confirmNewpassword,
+                    controller: _confirmNewPassword,
                     onSaved: (confirmpassVal) =>
-                        _confirmNewpassword.text = confirmpassVal,
+                        _confirmNewPassword.text = confirmpassVal,
                     decoration: InputDecoration(
                       icon: Icon(Icons.account_circle),
                       focusedBorder: UnderlineInputBorder(),
@@ -182,14 +181,14 @@ class _AccountSettingsState extends State<AccountSettings> {
           DialogButton(
             onPressed: () async {
               
-              formKeypassword.currentState.save();
-              if(formKeypassword.currentState.validate() && _newpassword.text==_confirmNewpassword.text && Password.verify(_currentpassword.text, userController.user.password)){
+              formKeyPassword.currentState.save();
+              if(formKeyPassword.currentState.validate() && _newPassword.text==_confirmNewPassword.text && Password.verify(_currentPassword.text, userController.user.password)){
                 try{
-                await UserProfileCollection().updatepassword(_newpassword.text,userController.user);
-                await AuthController().updatePassword(_newpassword.text);
-                _currentpassword.clear(); 
-                _newpassword.clear(); 
-                _confirmNewpassword.clear();
+                await UserProfileCollection().updatepassword(_newPassword.text,userController.user);
+                await AuthController().updatePassword(_newPassword.text);
+                _currentPassword.clear();
+                _newPassword.clear();
+                _confirmNewPassword.clear();
                 Navigator.pop(context);
                 }catch(e){
                   print(e.toString());

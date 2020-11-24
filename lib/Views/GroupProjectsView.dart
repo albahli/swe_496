@@ -6,10 +6,10 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/friendsView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
-import 'package:swe496/controllers/ListOfProjectsContoller.dart';
-import 'package:swe496/controllers/authController.dart';
-import 'package:swe496/controllers/projectController.dart';
-import 'package:swe496/controllers/userController.dart';
+import 'package:swe496/controllers/ProjectControllers/ListOfProjectsContoller.dart';
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
+import 'package:swe496/controllers/UserControllers/authController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
@@ -135,7 +135,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                       leading: Icon(Icons.supervised_user_circle),
                       title: Text(
                           listOfProjectsController.projects[index].projectName),
-                      subtitle: Text('Details ...'),
+                      subtitle: Text('Details...'),
                       onTap: () async {
                         Get.put<ProjectController>(ProjectController(
                             projectID: listOfProjectsController

@@ -6,9 +6,9 @@ import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
-import 'package:swe496/controllers/projectController.dart';
-import 'package:swe496/controllers/userController.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
 
 class CreateTaskView extends StatefulWidget {
   @override
@@ -336,6 +336,8 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                               _taskAssignedTo.text,
                               _taskAssignedBy.text,
                               _taskStatus.text);
+                          Get.back();
+                          Get.snackbar('Success !', "Task '${_taskName.text} has been created successfully.'");
                         }
                       },
                       child: Row(

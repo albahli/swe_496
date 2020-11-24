@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
-import 'package:swe496/Views/Project/ProjectSettings.dart';
+import 'package:swe496/Views/Project/ProjectSettingsView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
-import 'package:swe496/controllers/projectController.dart';
-import 'package:swe496/controllers/userController.dart';
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:swe496/models/Members.dart';
 import 'package:swe496/utils/root.dart';
 
@@ -87,16 +87,16 @@ class _MembersViewState extends State<MembersView> {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.assignment_turned_in),
-          title: Text('Tasks & Events'),
+          icon: Icon(IconData(61545, fontFamily: 'MaterialIcons')),
+          label: 'Tasks & Events',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.chat),
-          title: Text('Chat'),
+          label: 'Chat',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.group_work),
-          title: Text('Members'),
+          label: 'Members',
         ),
       ],
       currentIndex: barIndex,

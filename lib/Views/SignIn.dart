@@ -4,8 +4,8 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Views/SignUp.dart';
 import 'package:flutter/services.dart';
 import 'package:swe496/LoadingScreens/loading.dart';
-import 'package:swe496/controllers/authController.dart';
 import 'package:swe496/Database/Validators.dart';
+import 'package:swe496/controllers/UserControllers/authController.dart';
 
 class SignIn extends GetWidget<AuthController> {
   final formKey = GlobalKey<FormState>(); // for login

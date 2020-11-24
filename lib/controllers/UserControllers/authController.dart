@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:swe496/Views/GroupProjectsView.dart';
-import 'package:swe496/controllers/userController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:swe496/models/User.dart';
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';

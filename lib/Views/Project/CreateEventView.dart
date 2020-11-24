@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:get/get.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
-import 'package:swe496/controllers/projectController.dart';
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
 import 'CreateTaskView.dart';
 import 'GoogleMapWidgetView.dart';
 
@@ -203,6 +203,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                               _eventStartDate.text,
                               _eventEndDate.text,
                               _eventLocation.text);
+                          Get.back();
+                          Get.snackbar('Success !', "Event '${_eventName.text} has been created successfully.'");
                         }
                       },
                       child: Row(

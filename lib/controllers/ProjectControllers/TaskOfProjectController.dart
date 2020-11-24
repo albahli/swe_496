@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
-import 'package:swe496/controllers/projectController.dart';
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
 import 'package:swe496/models/TaskOfProject.dart';
 
 class TaskOfProjectController extends GetxController {

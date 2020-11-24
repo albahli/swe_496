@@ -1,23 +1,20 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
-import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/Project/CreateEventView.dart';
 import 'package:swe496/Views/Project/CreateTaskView.dart';
 import 'package:swe496/Views/Project/EventView.dart';
 import 'package:swe496/Views/Project/MembersView.dart';
-import 'package:swe496/Views/Project/ProjectSettings.dart';
+import 'package:swe496/Views/Project/ProjectSettingsView.dart';
 import 'package:swe496/Views/Project/TaskView.dart';
-import 'package:swe496/controllers/EventController.dart';
-import 'package:swe496/controllers/ListOfTasksOfProjectConrtoller.dart';
-import 'package:swe496/controllers/TaskOfProjectController.dart';
-import 'package:swe496/controllers/projectController.dart';
-import 'package:swe496/controllers/ListOfEventsController.dart';
-import 'package:swe496/controllers/userController.dart';
+import 'package:swe496/controllers/ProjectControllers/EventController.dart';
+import 'package:swe496/controllers/ProjectControllers/ListOfEventsController.dart';
+import 'package:swe496/controllers/ProjectControllers/ListOfTasksOfProjectConrtoller.dart';
+import 'package:swe496/controllers/ProjectControllers/TaskOfProjectController.dart';
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
+
 import 'package:swe496/models/Event.dart';
 import 'package:swe496/models/TaskOfProject.dart';
 import 'package:swe496/utils/root.dart';
@@ -55,7 +52,6 @@ class _TasksAndEvents extends State<TasksAndEventsView>
         projectController.project.isNullOrBlank) {
       projectController = Get.find<ProjectController>();
     }
-
     if (projectController.isNullOrBlank ||
         projectController.project.isNullOrBlank) {
       Get.back();

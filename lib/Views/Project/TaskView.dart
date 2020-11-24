@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +7,9 @@ import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
-import 'package:swe496/controllers/TaskOfProjectController.dart';
-import 'package:swe496/controllers/projectController.dart';
-import 'package:swe496/controllers/userController.dart';
+import 'package:swe496/controllers/ProjectControllers/TaskOfProjectController.dart';
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:swe496/models/TaskOfProject.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';

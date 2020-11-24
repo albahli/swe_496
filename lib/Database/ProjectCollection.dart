@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:swe496/controllers/TaskOfProjectController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
+import 'package:swe496/models/Activity.dart';
 import 'package:swe496/models/Chat.dart';
 import 'package:swe496/models/Event.dart';
 import 'package:swe496/models/Members.dart';
 import 'package:swe496/models/Message.dart';
 import 'package:swe496/models/Project.dart';
-import 'package:swe496/models/SubTask.dart';
 import 'package:swe496/models/TaskOfProject.dart';
 import 'package:swe496/models/User.dart';
 import 'package:uuid/uuid.dart';
@@ -83,6 +83,10 @@ class ProjectCollection {
       String _taskAssignedTo,
       String _taskAssignedBy,
       String _taskStatus) async {
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, "Created new task '$_taskName'");
+
     String taskID =
         Uuid().v1(); // Task ID, UuiD is package that generates random ID.
 
@@ -140,7 +144,8 @@ class ProjectCollection {
     return Firestore.instance
         .collection('projects')
         .where('membersIDs', arrayContains: userID)
-        .snapshots().map((QuerySnapshot query) {
+        .snapshots()
+        .map((QuerySnapshot query) {
       List<Project> retVal = List();
       query.documents.forEach((element) {
         retVal.add(Project.fromJson(element.data));
@@ -148,6 +153,7 @@ class ProjectCollection {
       return retVal;
     });
   }
+
   Stream<Project> projectStream(String projectID) {
     return _firestore
         .collection('projects')
@@ -170,6 +176,10 @@ class ProjectCollection {
       String _subtaskDueDate,
       String _subtaskPriority,
       String _subtaskStatus) async {
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, "Created new subtask '$_subtaskName'");
+
     String subtaskID =
         Uuid().v1(); // Task ID, UuiD is package that generates random ID.
 
@@ -220,7 +230,9 @@ class ProjectCollection {
       String dueDate,
       String taskPriority,
       String assignedTo) async {
-    // Creating the task object for the project
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, "Updated a task '$taskName'");
 
     List listOfUserNameAndID = assignedTo.split(',');
 
@@ -260,6 +272,10 @@ class ProjectCollection {
     String projectID,
     String taskID,
   ) async {
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, "Deleted a task");
+
     try {
       DocumentReference documentReference = _firestore
           .collection('projects')
@@ -290,6 +306,10 @@ class ProjectCollection {
     String dueDate,
     String subtaskPriority,
   ) async {
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, "Deleted a subtask '$subtaskName'");
+
     // Creating the task object for the project
 
     TaskOfProject deletedSubtaskOfProject = new TaskOfProject(
@@ -348,6 +368,10 @@ class ProjectCollection {
       String oldStartDate,
       String oldDueDate,
       String oldSubtaskPriority) async {
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, "Updated a subtask '$subtaskName'");
+
     await deleteSubtask(projectID, taskID, subtaskID, oldSubtaskName,
             oldSubtaskDescription, oldStartDate, oldDueDate, oldSubtaskPriority)
         .then((value) async {
@@ -365,6 +389,10 @@ class ProjectCollection {
       String startDate,
       String endDate,
       String location) async {
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, "Created new event '$eventName'");
+
     String eventID =
         Uuid().v1(); // Event ID, UuiD is package that generates random ID.
 
@@ -399,6 +427,10 @@ class ProjectCollection {
       String startDate,
       String endDate,
       String location) async {
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, "Updated an event '$eventName'");
+
     try {
       DocumentReference documentReference = _firestore
           .collection('projects')
@@ -428,6 +460,10 @@ class ProjectCollection {
   }
 
   Future<void> deleteEvent(String projectID, String eventID) async {
+
+    // Record this action in the activity log of the project
+    insertIntoActivityLog(projectID, 'Deleted an event');
+
     try {
       DocumentReference documentReference = _firestore
           .collection('projects')
@@ -533,6 +569,9 @@ class ProjectCollection {
 
   Future<void> addCommentToTask(String projectID, String taskID,
       String senderID, String from, String contentOfMessage) async {
+
+    insertIntoActivityLog(projectID, 'Added comment to task');
+
     Message message = new Message(
         messageID: Uuid().v1(),
         senderID: senderID,
@@ -585,6 +624,67 @@ class ProjectCollection {
               'pinnedMessage': pinnedMessage,
               'isJoiningLinkEnabled': joiningLinkStatus
             }));
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> insertIntoActivityLog(
+      String projectID, String typeOfAction) async {
+    String activityID =
+        Uuid().v1(); // Activity ID, UuiD is package that generates random ID.
+
+    Activity activity = new Activity(
+      activityID: activityID,
+      typeOfAction: typeOfAction,
+      doneBy: Get.find<UserController>().user.userName,
+      date: Timestamp.now()
+    );
+
+    // Convert the activity object to JSON
+
+    var activityJSON = activity.toJson();
+
+
+    try {
+      return await _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('activityLog')
+          .document(activityID)
+          .setData(activityJSON);
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Stream<List<Activity>> streamActivityLogOfProject(String projectID) {
+    return _firestore
+        .collection('projects')
+        .document(projectID)
+        .collection('activityLog')
+        .snapshots()
+        .map((QuerySnapshot query) {
+      List<Activity> retVal = List();
+      query.documents.forEach((element) {
+        retVal.add(Activity.fromJson(element.data));
+      });
+      return retVal;
+    });
+  }
+
+  Future<void> deleteProject(String projectID) async {
+    try {
+      DocumentReference documentReference =
+          _firestore.collection('projects').document(projectID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        await transaction.delete(documentReference);
       });
     } on Exception catch (e) {
       print(e);

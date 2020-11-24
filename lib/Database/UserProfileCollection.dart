@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:password/password.dart';
 import 'package:swe496/models/User.dart';
 
-import 'package:uuid/uuid.dart';
-
 class UserProfileCollection {
   final Firestore _firestore = Firestore.instance;
 

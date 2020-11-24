@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
-import 'package:swe496/controllers/authController.dart';
+import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/models/Project.dart';
 
 class ListOfProjectsController extends GetxController {

@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:get/get.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/Views/SignIn.dart';
 import 'package:swe496/utils/root.dart';
 import '../Database/UserProfileCollection.dart';
-import '../controllers/authController.dart';
-import '../controllers/userController.dart';
+import '../controllers/UserControllers/authController.dart';
+import '../controllers/UserControllers/userController.dart';
 import 'AccountSettings.dart';
 
 class FriendsView extends StatefulWidget {

@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:swe496/Views/GroupProjectsView.dart';
-import 'package:swe496/controllers/authController.dart';
 import 'package:swe496/Views/SignIn.dart';
-import 'package:swe496/controllers/userController.dart';
-
+import 'package:swe496/controllers/UserControllers/authController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
 class Root extends GetWidget<AuthController> {
   @override
   Widget build(BuildContext context) {

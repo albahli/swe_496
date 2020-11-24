@@ -7,10 +7,8 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
-import 'package:swe496/Views/Project/CreateTaskView.dart';
-import 'package:swe496/Views/Project/MembersView.dart';
-import 'package:swe496/controllers/EventController.dart';
-import 'package:swe496/controllers/projectController.dart';
+import 'package:swe496/controllers/ProjectControllers/EventController.dart';
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
 import 'package:uuid/uuid.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 
