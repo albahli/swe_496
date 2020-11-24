@@ -97,6 +97,7 @@ class _FriendsViewState extends State<FriendsView> {
           child: Column(
             children: <Widget>[
               _searchBar(),
+              getListOfFriends(),
             ],
           ),
         ),
