@@ -11,7 +11,6 @@ import 'package:swe496/controllers/ProjectControllers/EventController.dart';
 import 'package:swe496/controllers/ProjectControllers/projectController.dart';
 import 'package:uuid/uuid.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
-
 import 'GoogleMapWidgetView.dart';
 
 class EventView extends StatefulWidget {

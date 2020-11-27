@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
+import 'package:search_choices/search_choices.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
 import 'package:swe496/controllers/ProjectControllers/TaskOfProjectController.dart';
@@ -1338,7 +1338,7 @@ class _TaskViewState extends State<TaskView> {
                                         );
                                       return Column(
                                         children: [
-                                          SearchableDropdown.single(
+                                          SearchChoices.single(
                                             items: snapshot.data.documents
                                                 .toList()
                                                 .map((i) {
@@ -1367,6 +1367,7 @@ class _TaskViewState extends State<TaskView> {
                                                 ),
                                               ]));
                                             },
+                                            underline: SizedBox(),
                                             isCaseSensitiveSearch: false,
                                             displayClearIcon: true,
                                             value: _editedTaskAssignedTo.text,

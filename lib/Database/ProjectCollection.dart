@@ -8,27 +8,41 @@ import 'package:swe496/models/Members.dart';
 import 'package:swe496/models/Message.dart';
 import 'package:swe496/models/Project.dart';
 import 'package:swe496/models/TaskOfProject.dart';
-import 'package:swe496/models/User.dart';
 import 'package:uuid/uuid.dart';
 
 class ProjectCollection {
   final Firestore _firestore = Firestore.instance;
 
-  Future<void> createNewProject(String projectName, User user) async {
+  Future<void> createNewProject(
+      String projectName, List<String> membersToBeAdded) async {
     String projectID =
         Uuid().v1(); // Project ID, UuiD is package that generates random ID.
 
+    UserController userController = Get.find<UserController>();
     // Add the creator of the project to the members list and assign him as admin.
     var member = Member(
-      memberUID: user.userID,
+      memberUID: userController.user.userID,
       isAdmin: true,
     );
     List<Member> membersList = new List();
     membersList.add(member);
 
+    // Add the rest members of the project to the members list.
+
+    membersToBeAdded.forEach((memberUID) {
+      var member = Member(
+        memberUID: memberUID,
+        isAdmin: false, // Not admins
+      );
+      membersList.add(member);
+    });
+
     // Save his ID in the membersUIDs list
     List<String> membersIDs = new List();
-    membersIDs.add(user.userID);
+    membersIDs.add(userController.user.userID);
+
+    // Save the id of the other members
+    membersIDs.addAll(membersToBeAdded);
 
     List<TaskOfProject> listOfTasks = new List();
     // Create chat for the new project
@@ -49,16 +63,19 @@ class ProjectCollection {
     );
 
     // Add the new project ID to the user's project list.
-    user.userProjectsIDs.add(projectID);
+    userController.user.userProjectsIDs.add(projectID);
     try {
       // Convert the project object to be a JSON.
-      var jsonUser = user.toJson();
+      var jsonUser = userController.user.toJson();
 
       // Send the user JSON data to the fire base.
       await Firestore.instance
           .collection('userProfile')
-          .document(user.userID)
+          .document(userController.user.userID)
           .setData(jsonUser);
+
+      // Add the project to other members.
+      addProjectIDInMembersProfile(projectID, membersIDs);
 
       // Convert the project object to be a JSON.
       var jsonProject = newProject.toJson();
@@ -73,6 +90,213 @@ class ProjectCollection {
     }
   }
 
+  Future<void> addProjectIDInMembersProfile(
+      String projectID, List<String> membersIDs) async {
+    try {
+      for (int i = 0; i < membersIDs.length; i++) {
+        await Firestore.instance
+            .collection('userProfile')
+            .document(membersIDs[i])
+            .updateData(({
+              'userProjectsIDs': FieldValue.arrayUnion([projectID]),
+            }));
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future<void> addNewMembersToProject(
+      String projectID, List<String> membersToBeAdded) async {
+
+    List<Member> membersList = new List();
+
+    // Add the rest members of the project to the members list.
+
+    membersToBeAdded.forEach((memberUID) {
+      var member = Member(
+        memberUID: memberUID,
+        isAdmin: false, // Not admins
+      );
+      membersList.add(member);
+    });
+
+    // Save the id of the other members
+    List<String> membersIDs = new List();
+    membersIDs.addAll(membersToBeAdded);
+
+    try {
+      DocumentReference documentReference =
+      _firestore.collection('projects').document(projectID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        for(int i=0; i<membersList.length; i++){
+          await transaction.update(
+            documentReference,
+            {
+              'members': FieldValue.arrayUnion([membersList[i].toJson()])
+            },
+          );
+         await addProjectToUserProfile(projectID, membersList[i].memberUID);
+        }
+        await transaction.update(
+          documentReference,
+          {
+            'membersIDs': FieldValue.arrayUnion(membersIDs)
+          },
+        );
+
+      });
+
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> addProjectToUserProfile(String projectID, String memberID) async{
+
+
+    try {
+      DocumentReference documentReference =
+      _firestore.collection('userProfile').document(memberID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        await transaction.update(
+          documentReference,
+          {
+            'userProjectsIDs': FieldValue.arrayUnion([projectID])
+          },
+        );
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+
+  }
+
+  Future<void> removeMemberFromProject(
+      String projectID, String memberID, bool isAdmin) async {
+
+    var memberToBeRemoved =
+    new Member(isAdmin: isAdmin, memberUID: memberID);
+
+    // Convert the member object to JSON
+    var oldMemberJson = memberToBeRemoved.toJson();
+
+    removeProjectFromUserProfile(projectID, memberID);
+
+    try {
+      DocumentReference documentReference =
+      _firestore.collection('projects').document(projectID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        await transaction.update(
+          documentReference,
+          {
+            'members': FieldValue.arrayRemove([oldMemberJson])
+          },
+        );
+
+        await transaction.update(
+          documentReference,
+          {
+            'membersIDs': FieldValue.arrayRemove([memberID])
+          },
+        );
+
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+
+  }
+
+  Future<void> removeProjectFromUserProfile(String projectID, String memberID) async{
+
+
+    try {
+      DocumentReference documentReference =
+      _firestore.collection('userProfile').document(memberID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        await transaction.update(
+          documentReference,
+          {
+            'userProjectsIDs': FieldValue.arrayRemove([projectID])
+          },
+        );
+
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+
+  }
+
+  Future<void> changeMemberRole(
+      String projectID, String memberID, bool isCurrentMemberIsAdmin) async {
+    // Creating the old member object for the project
+
+    var oldMemberState =
+        new Member(isAdmin: isCurrentMemberIsAdmin, memberUID: memberID);
+
+    // Convert the old member object to JSON
+    var oldMemberJson = oldMemberState.toJson();
+
+    var newMemberState =
+        new Member(isAdmin: !isCurrentMemberIsAdmin, memberUID: memberID);
+
+    // Convert the new member object to JSON
+    var newMemberJson = newMemberState.toJson();
+
+    try {
+      DocumentReference documentReference =
+          _firestore.collection('projects').document(projectID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+
+        await transaction.update(
+          documentReference,
+          {
+            'members': FieldValue.arrayRemove([oldMemberJson])
+          },
+        );
+
+        await transaction.update(
+          documentReference,
+          {
+            'members': FieldValue.arrayUnion([newMemberJson])
+          },
+        );
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> createNewTask(
       String projectID,
       String _taskName,
@@ -83,7 +307,6 @@ class ProjectCollection {
       String _taskAssignedTo,
       String _taskAssignedBy,
       String _taskStatus) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Created new task '$_taskName'");
 
@@ -176,7 +399,6 @@ class ProjectCollection {
       String _subtaskDueDate,
       String _subtaskPriority,
       String _subtaskStatus) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Created new subtask '$_subtaskName'");
 
@@ -230,7 +452,6 @@ class ProjectCollection {
       String dueDate,
       String taskPriority,
       String assignedTo) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Updated a task '$taskName'");
 
@@ -272,7 +493,6 @@ class ProjectCollection {
     String projectID,
     String taskID,
   ) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Deleted a task");
 
@@ -306,7 +526,6 @@ class ProjectCollection {
     String dueDate,
     String subtaskPriority,
   ) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Deleted a subtask '$subtaskName'");
 
@@ -368,7 +587,6 @@ class ProjectCollection {
       String oldStartDate,
       String oldDueDate,
       String oldSubtaskPriority) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Updated a subtask '$subtaskName'");
 
@@ -389,7 +607,6 @@ class ProjectCollection {
       String startDate,
       String endDate,
       String location) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Created new event '$eventName'");
 
@@ -427,7 +644,6 @@ class ProjectCollection {
       String startDate,
       String endDate,
       String location) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Updated an event '$eventName'");
 
@@ -460,7 +676,6 @@ class ProjectCollection {
   }
 
   Future<void> deleteEvent(String projectID, String eventID) async {
-
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, 'Deleted an event');
 
@@ -569,7 +784,6 @@ class ProjectCollection {
 
   Future<void> addCommentToTask(String projectID, String taskID,
       String senderID, String from, String contentOfMessage) async {
-
     insertIntoActivityLog(projectID, 'Added comment to task');
 
     Message message = new Message(
@@ -636,16 +850,14 @@ class ProjectCollection {
         Uuid().v1(); // Activity ID, UuiD is package that generates random ID.
 
     Activity activity = new Activity(
-      activityID: activityID,
-      typeOfAction: typeOfAction,
-      doneBy: Get.find<UserController>().user.userName,
-      date: Timestamp.now()
-    );
+        activityID: activityID,
+        typeOfAction: typeOfAction,
+        doneBy: Get.find<UserController>().user.userName,
+        date: Timestamp.now());
 
     // Convert the activity object to JSON
 
     var activityJSON = activity.toJson();
-
 
     try {
       return await _firestore

@@ -14,7 +14,6 @@ import 'package:swe496/controllers/ProjectControllers/ListOfTasksOfProjectConrto
 import 'package:swe496/controllers/ProjectControllers/TaskOfProjectController.dart';
 import 'package:swe496/controllers/ProjectControllers/projectController.dart';
 import 'package:swe496/controllers/UserControllers/userController.dart';
-
 import 'package:swe496/models/Event.dart';
 import 'package:swe496/models/TaskOfProject.dart';
 import 'package:swe496/utils/root.dart';

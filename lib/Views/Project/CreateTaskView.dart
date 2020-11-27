@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
+import 'package:search_choices/search_choices.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
@@ -252,7 +252,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                                         child:
                                         Text("No members in the project")),
                                   );
-                                return SearchableDropdown.single(
+                                return SearchChoices.single(
                                   items:
                                   snapshot.data.documents.toList().map((i) {
                                     return (DropdownMenuItem(
@@ -278,6 +278,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                                       ),
                                     ]));
                                   },
+                                  underline: SizedBox(),
                                   isCaseSensitiveSearch: false,
                                   displayClearIcon: true,
                                   value: _taskAssignedTo.text,

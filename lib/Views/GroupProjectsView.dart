@@ -3,7 +3,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/Database/ProjectCollection.dart';
+import 'package:swe496/Views/Project/CreateProjectView.dart';
 import 'package:swe496/Views/friendsView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
 import 'package:swe496/controllers/ProjectControllers/ListOfProjectsContoller.dart';
@@ -12,7 +12,6 @@ import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
-
 import 'AccountSettings.dart';
 
 class GroupProjectsView extends StatefulWidget {
@@ -260,7 +259,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             size: 25,
           ),
           label: 'New Project ',
-          onTap: () => alertCreateProjectForm(context),
+          onTap: () =>  Get.to(CreateProjectView())//alertCreateProjectForm(context),
         ),
       ],
     );
@@ -459,8 +458,8 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
               formKey.currentState.save();
               if (formKey.currentState.validate()) {
                 try {
-                  ProjectCollection().createNewProject(
-                      _newProjectNameController.text, userController.user);
+                //  ProjectCollection().createNewProject(
+                  //    _newProjectNameController.text, userController.user);
                   Get.back();
                   // Display success message
                   Get.snackbar(
