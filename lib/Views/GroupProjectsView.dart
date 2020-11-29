@@ -204,6 +204,8 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 25.0),
+      marginRight: 14,
+      marginBottom: 16,
       // this is ignored if animatedIcon is non null
       // child: Icon(Icons.add),
       // If true user is forced to close dial manually

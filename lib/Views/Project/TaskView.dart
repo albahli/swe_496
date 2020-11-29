@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:group_button/group_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,6 +30,9 @@ class _TaskViewState extends State<TaskView> {
 
   ProjectController projectController = Get.find<ProjectController>();
   UserController userController = Get.find<UserController>();
+
+  bool isAdmin = true;
+  List<bool> isSelected = [true, false, false];
 
   // Below attributes for creating new subtask
   final addSubTaskFormKey = GlobalKey<FormState>();
@@ -78,6 +82,14 @@ class _TaskViewState extends State<TaskView> {
 
   @override
   Widget build(BuildContext context) {
+    projectController.project.members.forEach((member) {
+      if (member.memberUID == userController.user.userID && !member.isAdmin) {
+        setState(() {
+          isAdmin = false;
+        });
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Task Details'),
@@ -101,9 +113,14 @@ class _TaskViewState extends State<TaskView> {
                     if (taskOfProjectController != null &&
                         taskOfProjectController.tasks != null &&
                         taskOfProjectController.tasks.isNotEmpty) {
+                      // Sort the tasks and events based on due date
+                      taskOfProjectController.tasks[0].subtask.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+
+
                       return Column(
                         children: [
-                          taskCard(taskOfProjectController.tasks[0], true),
+                          taskCard(
+                              taskOfProjectController.tasks[0], true, false),
                           taskOfProjectController.tasks[0].subtask.length == 0
                               ? SizedBox()
                               : subtasksTitle(),
@@ -117,7 +134,13 @@ class _TaskViewState extends State<TaskView> {
                               return taskCard(
                                   taskOfProjectController
                                       .tasks[0].subtask[index],
-                                  false);
+                                  false,
+                                  (index ==
+                                          taskOfProjectController
+                                                  .tasks[0].subtask.length -
+                                              1
+                                      ? true
+                                      : false));
                             },
                           ),
                           SizedBox(
@@ -128,18 +151,20 @@ class _TaskViewState extends State<TaskView> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Spacer(),
-                              FloatingActionButton(
-                                child: Icon(Icons.add),
-                                tooltip: 'Add Subtask',
-                                onPressed: () {
-                                  Get.bottomSheet(
-                                    createSubTaskView(
-                                        taskOfProjectController.tasks[0]),
-                                    isScrollControlled: true,
-                                    ignoreSafeArea: false,
-                                  );
-                                },
-                              ),
+                              isAdmin
+                                  ? FloatingActionButton(
+                                      child: Icon(Icons.add),
+                                      tooltip: 'Add Subtask',
+                                      onPressed: () {
+                                        Get.bottomSheet(
+                                          createSubTaskView(
+                                              taskOfProjectController.tasks[0]),
+                                          isScrollControlled: true,
+                                          ignoreSafeArea: false,
+                                        );
+                                      },
+                                    )
+                                  : SizedBox(),
                               Spacer(),
                               Expanded(
                                 child: Container(
@@ -219,10 +244,12 @@ class _TaskViewState extends State<TaskView> {
                                                   ? Bubble(
                                                       margin: BubbleEdges.only(
                                                           top: 10),
-                                                      color: Get.theme.primaryColorLight,
+                                                      color: Get.theme
+                                                          .primaryColorLight,
                                                       alignment:
                                                           Alignment.topRight,
-                                                      nip: BubbleNip.rightBottom,
+                                                      nip:
+                                                          BubbleNip.rightBottom,
                                                       child: Column(
                                                         children: [
                                                           Row(
@@ -265,8 +292,11 @@ class _TaskViewState extends State<TaskView> {
                                                                     .all(8.0),
                                                             child: Row(
                                                               children: [
-                                                                Text(
-                                                                    '${taskOfProjectController.tasks[0].message[index].contentOfMessage}', ),
+                                                                Flexible(
+                                                                  child: Text(
+                                                                    '${taskOfProjectController.tasks[0].message[index].contentOfMessage}',
+                                                                  ),
+                                                                ),
                                                               ],
                                                             ),
                                                           ),
@@ -326,8 +356,10 @@ class _TaskViewState extends State<TaskView> {
                                                                     .all(8.0),
                                                             child: Row(
                                                               children: [
-                                                                Text(
-                                                                    '${taskOfProjectController.tasks[0].message[index].contentOfMessage}'),
+                                                                Flexible(
+                                                                  child: Text(
+                                                                      '${taskOfProjectController.tasks[0].message[index].contentOfMessage}'),
+                                                                ),
                                                               ],
                                                             ),
                                                           ),
@@ -405,11 +437,13 @@ class _TaskViewState extends State<TaskView> {
                                           heroTag: 'sendCommentByAdmin',
                                           child: Icon(Icons.send),
                                           onPressed: () {
-                                            print("here '${_commentController.text}'");
+                                            print(
+                                                "here '${_commentController.text}'");
                                             _commentController.text.trim();
-                                            print("here '${_commentController.text}'");
+                                            print(
+                                                "here '${_commentController.text}'");
 
-                                            if (_commentController.text.isNull )
+                                            if (_commentController.text.isNull)
                                               return;
 
                                             ProjectCollection()
@@ -483,7 +517,7 @@ class _TaskViewState extends State<TaskView> {
     );
   }
 
-  Widget taskCard(TaskOfProject taskOfProject, bool mainTask) {
+  Widget taskCard(TaskOfProject taskOfProject, bool mainTask, bool last) {
     if (mainTask) {
       _mainTaskDueDate.text = taskOfProject.dueDate;
       _mainTaskID.text = taskOfProject.taskID;
@@ -610,89 +644,196 @@ class _TaskViewState extends State<TaskView> {
                         ButtonBar(
                           alignment: MainAxisAlignment.start,
                           children: [
-                            FlatButton(
-                              child: const Text('EDIT'),
-                              onPressed: () {
-                                Get.bottomSheet(
-                                    editTask(taskOfProject, mainTask),
-                                    isScrollControlled: true,
-                                    ignoreSafeArea: false);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () async {
-                                showModalBottomSheet(
-                                    context: context,
-                                    builder: (BuildContext bc) {
-                                      return Wrap(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              color: Get.theme.canvasColor,
-                                              child: Column(
-                                                children: [
-                                                  ListTile(
-                                                    title: mainTask
-                                                        ? Text(
-                                                            'Delete task? All subtasks will be deleted')
-                                                        : Text(
-                                                            'Delete subtask?'),
-                                                    trailing: FlatButton(
-                                                      child: const Text(
-                                                        'DELETE',
-                                                        style: TextStyle(
-                                                            color: Colors.red),
-                                                      ),
-                                                      onPressed: () async {
-                                                        if (mainTask) {
-                                                          Get.back();
-                                                          await ProjectCollection()
-                                                              .deleteTask(
+                            isAdmin
+                                ? FlatButton(
+                                    child: const Text('EDIT'),
+                                    onPressed: () {
+                                      Get.bottomSheet(
+                                          editTask(taskOfProject, mainTask),
+                                          isScrollControlled: true,
+                                          ignoreSafeArea: false);
+                                    },
+                                  )
+                                : SizedBox(),
+                            isAdmin
+                                ? IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () async {
+                                      showModalBottomSheet(
+                                          context: context,
+                                          builder: (BuildContext bc) {
+                                            return Wrap(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Container(
+                                                    color:
+                                                        Get.theme.canvasColor,
+                                                    child: Column(
+                                                      children: [
+                                                        ListTile(
+                                                          title: mainTask
+                                                              ? Text(
+                                                                  'Delete task? All subtasks will be deleted')
+                                                              : Text(
+                                                                  'Delete subtask?'),
+                                                          trailing: FlatButton(
+                                                            child: const Text(
+                                                              'DELETE',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
+                                                            onPressed:
+                                                                () async {
+                                                              if (mainTask) {
+                                                                Get.back();
+                                                                await ProjectCollection().deleteTask(
+                                                                    projectController
+                                                                        .project
+                                                                        .projectID,
+                                                                    _mainTaskID
+                                                                        .text);
+                                                                Get.snackbar(
+                                                                    'Success',
+                                                                    "task has been deleted successfully");
+                                                                Get.back();
+                                                                return;
+                                                              }
+                                                              print(taskOfProject.taskName);
+                                                              print(taskOfProject.taskDescription);
+                                                              print(taskOfProject.taskStatus);
+                                                              await ProjectCollection().deleteSubtask(
                                                                   projectController
                                                                       .project
                                                                       .projectID,
                                                                   _mainTaskID
-                                                                      .text);
-                                                          Get.snackbar(
-                                                              'Success',
-                                                              "task has been deleted successfully");
-                                                          Get.back();
-                                                          return;
-                                                        }
-
-                                                        await ProjectCollection()
-                                                            .deleteSubtask(
-                                                                projectController
-                                                                    .project
-                                                                    .projectID,
-                                                                _mainTaskID
-                                                                    .text,
-                                                                taskOfProject
-                                                                    .taskID,
-                                                                taskOfProject
-                                                                    .taskName,
-                                                                taskOfProject
-                                                                    .taskDescription,
-                                                                taskOfProject
-                                                                    .startDate,
-                                                                taskOfProject
-                                                                    .dueDate,
-                                                                taskOfProject
-                                                                    .taskPriority);
-                                                      },
+                                                                      .text,
+                                                                  taskOfProject
+                                                                      .taskID,
+                                                                  taskOfProject
+                                                                      .taskName,
+                                                                  taskOfProject
+                                                                      .taskDescription,
+                                                                  taskOfProject
+                                                                      .startDate,
+                                                                  taskOfProject
+                                                                      .dueDate,
+                                                                  taskOfProject
+                                                                      .taskPriority,
+                                                              taskOfProject.taskStatus
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    });
-                              },
-                            )
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                    },
+                                  )
+                                : GroupButton(
+                                    spacing: 10,
+                                    isRadio: true,
+                                    direction: Axis.horizontal,
+                                    onSelected: (index, isSelected) {
+                                      if (index == 0) {
+                                        if (mainTask) {
+                                          return ProjectCollection()
+                                              .changeMainTaskStatus(
+                                                  projectController.projectID,
+                                                  taskOfProject.taskID,
+                                                  'Completed');
+                                        } else {
+                                          ProjectCollection()
+                                              .changeSubtaskStatus(
+                                              projectController.projectID,
+                                              _mainTaskID.text.trim(),
+                                              taskOfProject.taskID.trim(),
+                                              taskOfProject.taskName,
+                                              taskOfProject.taskDescription,
+                                              taskOfProject.startDate,
+                                              taskOfProject.dueDate,
+                                              taskOfProject.taskPriority,
+                                              taskOfProject.taskStatus,
+                                              'Completed');
+                                        }
+                                      } else if (index == 1) {
+                                        if (mainTask) {
+                                          return ProjectCollection()
+                                              .changeMainTaskStatus(
+                                                  projectController.projectID,
+                                                  taskOfProject.taskID,
+                                                  'In-progress');
+                                        } else {
+                                          ProjectCollection()
+                                              .changeSubtaskStatus(
+                                              projectController.projectID,
+                                              _mainTaskID.text.trim(),
+                                              taskOfProject.taskID.trim(),
+                                              taskOfProject.taskName,
+                                              taskOfProject.taskDescription,
+                                              taskOfProject.startDate,
+                                              taskOfProject.dueDate,
+                                              taskOfProject.taskPriority,
+                                              taskOfProject.taskStatus,
+                                              'In-progress');
+                                        }
+                                      } else {
+                                        if (mainTask) {
+                                          return ProjectCollection()
+                                              .changeMainTaskStatus(
+                                                  projectController.projectID,
+                                                  taskOfProject.taskID,
+                                                  'Not-Started');
+                                        } else {
+                                          ProjectCollection()
+                                              .changeSubtaskStatus(
+                                              projectController.projectID,
+                                              _mainTaskID.text.trim(),
+                                              taskOfProject.taskID.trim(),
+                                              taskOfProject.taskName,
+                                              taskOfProject.taskDescription,
+                                              taskOfProject.startDate,
+                                              taskOfProject.dueDate,
+                                              taskOfProject.taskPriority,
+                                              taskOfProject.taskStatus,
+                                              'Not-Started');
+                                        }
+                                      }
+                                    },
+                                    buttons: [
+                                      "Completed",
+                                      "In-progress",
+                                      "Not-Started",
+                                    ],
+                                    selectedButtons: ["${taskOfProject.taskStatus}"],
+                                    selectedTextStyle: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
+                                      color: Get.textTheme.caption.color,
+                                    ),
+                                    unselectedTextStyle: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
+                                      color: Colors.grey[600],
+                                    ),
+                                    selectedColor: Get.theme.canvasColor,
+                                    unselectedColor: Colors.grey[300],
+                                    selectedBorderColor: Get.theme.primaryColor,
+                                    unselectedBorderColor: Colors.grey[500],
+                                    borderRadius: BorderRadius.circular(2.0),
+                                    selectedShadow: <BoxShadow>[
+                                      BoxShadow(color: Colors.transparent)
+                                    ],
+                                    unselectedShadow: <BoxShadow>[
+                                      BoxShadow(color: Colors.transparent)
+                                    ],
+                                  )
                           ],
                         ),
                       ],
@@ -708,13 +849,23 @@ class _TaskViewState extends State<TaskView> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Spacer(),
-            Dash(
-              direction: Axis.vertical,
-              dashGap: 5,
-              length: 50,
-              dashLength: 5,
-              dashColor: Get.theme.unselectedWidgetColor,
-            ),
+            isAdmin
+                ? Dash(
+                    direction: Axis.vertical,
+                    dashGap: 5,
+                    length: 50,
+                    dashLength: 5,
+                    dashColor: Get.theme.unselectedWidgetColor,
+                  )
+                : (last
+                    ? SizedBox()
+                    : Dash(
+                        direction: Axis.vertical,
+                        dashGap: 5,
+                        length: 50,
+                        dashLength: 5,
+                        dashColor: Get.theme.unselectedWidgetColor,
+                      )),
             Spacer(),
             Expanded(
               child: Container(
@@ -1440,7 +1591,9 @@ class _TaskViewState extends State<TaskView> {
                                   taskOfProject.taskDescription.trim(),
                                   taskOfProject.startDate.trim(),
                                   taskOfProject.dueDate.trim(),
-                                  taskOfProject.taskPriority.trim());
+                                  taskOfProject.taskPriority.trim(),
+                            taskOfProject.taskStatus
+                          );
                         }
                       },
                       child: Row(

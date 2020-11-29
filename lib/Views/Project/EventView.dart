@@ -9,6 +9,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/controllers/ProjectControllers/EventController.dart';
 import 'package:swe496/controllers/ProjectControllers/projectController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:uuid/uuid.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'GoogleMapWidgetView.dart';
@@ -28,7 +29,8 @@ class _EventViewState extends State<EventView> {
   LatLng latLng;
   Set<Marker> markersSet;
   GoogleMapController  _mapController;
-
+  UserController userController = Get.find<UserController>();
+  bool isAdmin = true;
   // Below attributes used for editing the events info
   final eventFormKey = GlobalKey<FormState>();
   TextEditingController editedEventName = new TextEditingController();
@@ -42,6 +44,14 @@ class _EventViewState extends State<EventView> {
 
   @override
   Widget build(BuildContext context) {
+
+    projectController.project.members.forEach((member) {
+      if (member.memberUID == userController.user.userID && !member.isAdmin) {
+        setState(() {
+          isAdmin = false;
+        });
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         title: Text('Event Details'),
@@ -59,6 +69,7 @@ class _EventViewState extends State<EventView> {
             !eventController.event.isNullOrBlank &&
             !eventController.event.isNull
         ) {
+
           // Splitting the event's location into Lat and Lng.
           if (eventController.event.eventLocation.isNotEmpty ||
               !eventController.event.eventLocation.isNullOrBlank) {
@@ -167,7 +178,7 @@ class _EventViewState extends State<EventView> {
                     ),
                   ),
                   Divider(thickness: 1,),
-                  ButtonBar(
+                 isAdmin ? ButtonBar(
                     children: [
                       FlatButton(
                         child: const Text('EDIT'),
@@ -222,7 +233,7 @@ class _EventViewState extends State<EventView> {
                         },
                       )
                     ],
-                  ),
+                  ) : SizedBox(),
                 ],
               ),
             ),

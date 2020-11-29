@@ -25,11 +25,20 @@ class _MembersViewState extends State<MembersView> {
   ProjectController projectController = Get.find<ProjectController>();
   UserController userController = Get.find<UserController>();
 
-  List <String> members = new List();
+  List<String> members = new List();
   List<int> selectedItems = [];
+  bool isAdmin = true;
 
   @override
   Widget build(BuildContext context) {
+    projectController.project.members.forEach((member) {
+      if (member.memberUID == userController.user.userID && !member.isAdmin) {
+        setState(() {
+          isAdmin = false;
+        });
+      }
+    });
+
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       // still not working in landscape mode
@@ -40,20 +49,21 @@ class _MembersViewState extends State<MembersView> {
           ),
           onPressed: () {
             Get.offAll(Root());
-            Get.delete<
-                ProjectController>();
+            Get.delete<ProjectController>();
             print("back to 'Root' from 'Members View'");
           },
         ),
         title: Text(projectController.project.projectName),
         centerTitle: true,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Get.to(ProjectSettingsView());
-            },
-          )
+          isAdmin
+              ? IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Get.to(ProjectSettingsView());
+                  },
+                )
+              : SizedBox()
         ],
       ),
       body: Container(
@@ -66,10 +76,12 @@ class _MembersViewState extends State<MembersView> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.person_add),
-          onPressed: () => Get.bottomSheet(addFriendsToGroup(),
-              isScrollControlled: true, ignoreSafeArea: false)),
+      floatingActionButton: isAdmin
+          ? FloatingActionButton(
+              child: Icon(Icons.person_add),
+              onPressed: () => Get.bottomSheet(addFriendsToGroup(),
+                  isScrollControlled: true, ignoreSafeArea: false))
+          : SizedBox(),
       bottomNavigationBar: bottomCustomNavigationBar(),
     );
   }
@@ -159,8 +171,6 @@ class _MembersViewState extends State<MembersView> {
             return ListView.builder(
                 itemCount: mappedMembersList.length,
                 itemBuilder: (context, index) {
-                  //TODO: Modify the members list view to show the username and the role. check the below comment, if the current id of the user == member id then the he can't do anything such as (promote as admin, remove from project ...)
-                  //userController.user.userID == userIDs[index]
                   return ListTile(
                     leading: Icon(Icons.account_circle),
                     title: Text(mappedMembersList[index].memberUID),
@@ -169,7 +179,7 @@ class _MembersViewState extends State<MembersView> {
                     onTap: userController.user.userName ==
                             mappedMembersList[index].memberUID
                         ? null
-                        : () {
+                        : ( isAdmin ? () {
                             showModalBottomSheet(
                                 context: context,
                                 builder: (BuildContext bc) {
@@ -238,7 +248,8 @@ class _MembersViewState extends State<MembersView> {
                                     ),
                                   );
                                 });
-                          },
+                          } : () => null
+                          ),
                   );
                 });
           }
@@ -256,7 +267,6 @@ class _MembersViewState extends State<MembersView> {
   }
 
   addFriendsToGroup() {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Add new members'),
@@ -267,7 +277,7 @@ class _MembersViewState extends State<MembersView> {
         ),
       ),
       body: Container(
-        child:   InkWell(
+        child: InkWell(
           onTap: () {
             FocusScope.of(context).requestFocus(new FocusNode());
           },
@@ -280,7 +290,7 @@ class _MembersViewState extends State<MembersView> {
                       stream: Firestore.instance
                           .collection('userProfile')
                           .where('friendsIDs',
-                          arrayContains: userController.user.userID)
+                              arrayContains: userController.user.userID)
                           .snapshots(),
                       builder:
                           (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -294,12 +304,11 @@ class _MembersViewState extends State<MembersView> {
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Center(
-                                    child:
-                                    Text("Start adding friends to join this project!")),
+                                    child: Text(
+                                        "Start adding friends to join this project!")),
                               );
                             return SearchChoices.multiple(
-                              items:
-                              snapshot.data.documents.toList().map((i) {
+                              items: snapshot.data.documents.toList().map((i) {
                                 return (DropdownMenuItem(
                                   child: Text(i.data['userName']),
                                   value: i.data['userName'] +
@@ -321,7 +330,7 @@ class _MembersViewState extends State<MembersView> {
                               },
                               displayItem: (item, selected) {
                                 var newMember =
-                                item.value.toString().split(',')[1];
+                                    item.value.toString().split(',')[1];
 
                                 if (selected && members.isEmpty) {
                                   members.add(newMember);
@@ -333,25 +342,31 @@ class _MembersViewState extends State<MembersView> {
                                   members.remove(newMember);
                                 }
 
-                                for(int i = 0; i< projectController.project.members.length; i++){
-                                  if(projectController.project.members[i].memberUID == newMember){
+                                for (int i = 0;
+                                    i <
+                                        projectController
+                                            .project.members.length;
+                                    i++) {
+                                  if (projectController
+                                          .project.members[i].memberUID ==
+                                      newMember) {
                                     return SizedBox();
                                   }
                                 }
 
-                                if(userController.user.userID == newMember)
+                                if (userController.user.userID == newMember)
                                   return SizedBox();
 
                                 return (Row(children: [
                                   selected
                                       ? Icon(
-                                    Icons.check,
-                                    color: Colors.green,
-                                  )
+                                          Icons.check,
+                                          color: Colors.green,
+                                        )
                                       : Icon(
-                                    Icons.check_box_outline_blank,
-                                    color: Colors.grey,
-                                  ),
+                                          Icons.check_box_outline_blank,
+                                          color: Colors.grey,
+                                        ),
                                   SizedBox(width: 7),
                                   Expanded(
                                     child: item,
@@ -359,7 +374,7 @@ class _MembersViewState extends State<MembersView> {
                                 ]));
                               },
                               validator: (selectedItemsForValidator) {
-                                if (selectedItemsForValidator.length <1) {
+                                if (selectedItemsForValidator.length < 1) {
                                   return ("Must select at least 1");
                                 }
                                 return (null);
@@ -367,8 +382,7 @@ class _MembersViewState extends State<MembersView> {
                               selectedValueWidgetFn: (memberItem) {
                                 return (Card(
                                     shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(10),
                                       side: BorderSide(
                                         width: 0.5,
                                       ),
@@ -376,9 +390,8 @@ class _MembersViewState extends State<MembersView> {
                                     margin: EdgeInsets.all(5),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8),
-                                      child: Text(memberItem
-                                          .toString()
-                                          .split(',')[0]),
+                                      child: Text(
+                                          memberItem.toString().split(',')[0]),
                                     )));
                               },
                               doneButton: (selectedItemsDone, doneContext) {
@@ -421,11 +434,13 @@ class _MembersViewState extends State<MembersView> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Icon(Icons.arrow_drop_down_circle),
                               ),
-                              label: members.length > 1 ? "Selected Members" : 'Select Members',
+                              label: members.length > 1
+                                  ? "Selected Members"
+                                  : 'Select Members',
                               underline: Container(
                                 height: 1.0,
-                                decoration: BoxDecoration(
-                                    border: Border.all(width: 1)),
+                                decoration:
+                                    BoxDecoration(border: Border.all(width: 1)),
                               ),
                               isCaseSensitiveSearch: false,
                               iconDisabledColor: Colors.red,
@@ -452,20 +467,20 @@ class _MembersViewState extends State<MembersView> {
                         borderRadius: BorderRadius.horizontal(
                             left: Radius.circular(30.0),
                             right: Radius.circular(30.0))),
-
                     onPressed: () async {
-
-                      if(members.length == 0 || members.isEmpty){
+                      if (members.length == 0 || members.isEmpty) {
                         return;
                       }
-                        print('now');
-                        print('members length: ' + members.length.toString());
-                        members.forEach((element) {
-                          print("submitted: " + element.toString());
-                        });
-                        ProjectCollection().addNewMembersToProject(projectController.projectID, members);
-                        Get.back();
-                        Get.snackbar('Success ','New members has been added successfully.');
+                      print('now');
+                      print('members length: ' + members.length.toString());
+                      members.forEach((element) {
+                        print("submitted: " + element.toString());
+                      });
+                      ProjectCollection().addNewMembersToProject(
+                          projectController.projectID, members);
+                      Get.back();
+                      Get.snackbar('Success ',
+                          'New members has been added successfully.');
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

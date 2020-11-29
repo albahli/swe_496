@@ -35,10 +35,11 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   TabController
       tabController; // Top bar navigation between the tasks and events
 
+  bool isAdmin = true;
   @override
   void initState() {
     super.initState();
-        () async {
+    () async {
       await Future.delayed(Duration.zero);
       projectController = Get.find<ProjectController>();
     }();
@@ -64,15 +65,25 @@ class _TasksAndEvents extends State<TasksAndEventsView>
             ),
             onPressed: () {
               Get.offAll(Root());
-          //    Get.delete<ProjectController>();
+              //    Get.delete<ProjectController>();
               tabController.dispose();
               print("back to 'Root' from 'TaskAndEventsView'");
             },
           ),
         ),
-        body: Center(child: Text('Something went wrong !'),),
+        body: Center(
+          child: Text('Something went wrong !'),
+        ),
       );
     }
+
+    projectController.project.members.forEach((member) {
+      if (member.memberUID == userController.user.userID && !member.isAdmin) {
+        setState(() {
+          isAdmin = false;
+        });
+      }
+    });
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
@@ -90,10 +101,12 @@ class _TasksAndEvents extends State<TasksAndEventsView>
         title: Text(projectController.project.projectName),
         centerTitle: true,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () => Get.to(ProjectSettingsView()),
-          )
+          isAdmin
+              ? IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () => Get.to(ProjectSettingsView()),
+                )
+              : SizedBox()
         ],
       ),
       body: TabBarView(
@@ -132,7 +145,28 @@ class _TasksAndEvents extends State<TasksAndEventsView>
         ],
       ),
       bottomNavigationBar: bottomCustomNavigationBar(),
-      floatingActionButton: floatingButtons(),
+      floatingActionButton: isAdmin
+          ? floatingButtons()
+          : FloatingActionButton(child: Icon(Icons.timeline), onPressed: () => Get.bottomSheet(
+        Container(
+          child: Column(
+            children: [
+              AppBar(
+                title: Text('Timeline'),
+                centerTitle: true,
+                leading: IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () => Get.back(),
+                ),
+              ),
+              Expanded(child: viewTimeLineOfTasksAndEvents()),
+            ],
+          ),
+        ),
+        backgroundColor: Get.theme.canvasColor,
+        isScrollControlled: true,
+        ignoreSafeArea: false,
+      )),
     );
   }
 
@@ -190,6 +224,8 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   Widget floatingButtons() {
     return SpeedDial(
       // both default to 16
+      marginRight: 14,
+      marginBottom: 16,
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 25.0),
       // this is ignored if animatedIcon is non null
