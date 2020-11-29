@@ -202,88 +202,86 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
             ),
             Form(
               key: formDeletingKey,
-              child: Padding(
-                padding: const EdgeInsets.all(2),
-                child: Card(
-                  shape: new RoundedRectangleBorder(
-                side: new BorderSide(color: Colors.red, width: 1.0),
-                  borderRadius: BorderRadius.circular(4.0)),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Icon(IconData(57642, fontFamily: 'MaterialIcons'),
-                                color: Get.textTheme.caption.color),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Delete Project',
-                                style: Get.textTheme.bodyText2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'The project with all the tasks, events and members will be erased completely and cannot be restored.',
-                          style: Get.textTheme.caption,
-                        ),
-                      ),
-                      ButtonBar(
+              child: Card(
+                shadowColor: Colors.transparent,
+                shape: new RoundedRectangleBorder(
+              side: new BorderSide(color: Colors.red, width: 1.0),
+                borderRadius: BorderRadius.circular(4.0)),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
                         children: [
-                          FlatButton(
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.red),
+                          Icon(IconData(57642, fontFamily: 'MaterialIcons'),
+                              color: Get.textTheme.caption.color),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Delete Project',
+                              style: Get.textTheme.bodyText2,
                             ),
-                            onPressed: () {
-                              showModalBottomSheet(
-                                  context: context,
-                                  builder: (BuildContext bc) {
-                                    return Wrap(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Container(
-                                            color: Get.theme.canvasColor,
-                                            child: Column(
-                                              children: [
-                                                ListTile(
-                                                  title: Text('Delete Project?'),
-                                                  trailing: FlatButton(
-                                                    child: const Text(
-                                                      'DELETE',
-                                                      style: TextStyle(
-                                                          color: Colors.red),
-                                                    ),
-                                                    onPressed: () async {
-                                                      Get.offAll(Root());
-                                                      await ProjectCollection()
-                                                          .deleteProject(
-                                                          _projectController
-                                                              .projectID);
-                                                      Get.delete<
-                                                          ProjectController>();
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            },
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'The project with all the tasks, events and members will be erased completely and cannot be restored.',
+                        style: Get.textTheme.caption,
+                      ),
+                    ),
+                    ButtonBar(
+                      children: [
+                        FlatButton(
+                          child: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                          onPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext bc) {
+                                  return Wrap(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          color: Get.theme.canvasColor,
+                                          child: Column(
+                                            children: [
+                                              ListTile(
+                                                title: Text('Delete Project?'),
+                                                trailing: FlatButton(
+                                                  child: const Text(
+                                                    'DELETE',
+                                                    style: TextStyle(
+                                                        color: Colors.red),
+                                                  ),
+                                                  onPressed: () async {
+                                                    Get.offAll(Root());
+                                                    await ProjectCollection()
+                                                        .deleteProject(
+                                                        _projectController
+                                                            .projectID);
+                                                    Get.delete<
+                                                        ProjectController>();
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
