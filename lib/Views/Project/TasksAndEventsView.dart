@@ -36,6 +36,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
       tabController; // Top bar navigation between the tasks and events
 
   bool isAdmin = true;
+
   @override
   void initState() {
     super.initState();
@@ -104,6 +105,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           isAdmin
               ? IconButton(
                   icon: Icon(Icons.settings),
+                  tooltip: 'Project Settings',
                   onPressed: () => Get.to(ProjectSettingsView()),
                 )
               : SizedBox()
@@ -147,26 +149,28 @@ class _TasksAndEvents extends State<TasksAndEventsView>
       bottomNavigationBar: bottomCustomNavigationBar(),
       floatingActionButton: isAdmin
           ? floatingButtons()
-          : FloatingActionButton(child: Icon(Icons.timeline), onPressed: () => Get.bottomSheet(
-        Container(
-          child: Column(
-            children: [
-              AppBar(
-                title: Text('Timeline'),
-                centerTitle: true,
-                leading: IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () => Get.back(),
-                ),
-              ),
-              Expanded(child: viewTimeLineOfTasksAndEvents()),
-            ],
-          ),
-        ),
-        backgroundColor: Get.theme.canvasColor,
-        isScrollControlled: true,
-        ignoreSafeArea: false,
-      )),
+          : FloatingActionButton(
+              child: Icon(Icons.timeline),
+              onPressed: () => Get.bottomSheet(
+                    Container(
+                      child: Column(
+                        children: [
+                          AppBar(
+                            title: Text('Timeline'),
+                            centerTitle: true,
+                            leading: IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () => Get.back(),
+                            ),
+                          ),
+                          Expanded(child: viewTimeLineOfTasksAndEvents()),
+                        ],
+                      ),
+                    ),
+                    backgroundColor: Get.theme.canvasColor,
+                    isScrollControlled: true,
+                    ignoreSafeArea: false,
+                  )),
     );
   }
 

@@ -59,6 +59,7 @@ class _MembersViewState extends State<MembersView> {
           isAdmin
               ? IconButton(
                   icon: Icon(Icons.settings),
+                  tooltip: 'Project Settings',
                   onPressed: () {
                     Get.to(ProjectSettingsView());
                   },

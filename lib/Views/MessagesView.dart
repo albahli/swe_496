@@ -1,21 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/GroupProjectsView.dart';
 import 'package:swe496/Views/Messages.dart';
 import 'package:swe496/Views/friendsView.dart';
-
 import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
-import 'package:timeline_list/timeline.dart';
-import 'package:timeline_list/timeline_model.dart';
-//Asjdsds@gmail.com  pass: Aa@1234
-class MessagesView extends StatefulWidget {
+import 'package:swe496/utils/root.dart';
 
+class MessagesView extends StatefulWidget {
   @override
   _MessagesViewState createState() => _MessagesViewState();
 }
@@ -31,76 +25,77 @@ class _MessagesViewState extends State<MessagesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        // still not working in landscape mode
-        appBar: AppBar(
-          title: const Text('Chats'),
-          centerTitle: true,
-          actions: <Widget>[],
-        ),
-        drawer: MultiLevelDrawer(
-          header: Container(
-            // Header for Drawer
-            height: MediaQuery.of(context).size.height * 0.25,
-            child: Center(
-                child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.account_circle,
-                    size: 90,
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  userController.user.userName == null
-                      ? Text('NULL ??')
-                      : Text('${userController.user.userName}'),
-                ],
-              ),
-            )),
-          ),
-          children: [
-            // Child Elements for Each Drawer Item
-            MLMenuItem(
-                leading: Icon(
-                  Icons.person,
+      resizeToAvoidBottomPadding: false,
+      // still not working in landscape mode
+      appBar: AppBar(
+        title: const Text('Chats'),
+        centerTitle: true,
+        actions: <Widget>[],
+      ),
+      drawer: MultiLevelDrawer(
+        header: Container(
+          // Header for Drawer
+          height: MediaQuery.of(context).size.height * 0.25,
+          child: Center(
+              child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.account_circle,
+                  size: 90,
                 ),
-                content: Text("My Profile"),
-                onClick: () {}),
-            MLMenuItem(
-              leading: Icon(
-                Icons.settings,
-              ),
-              content: Text("Settings"),
-              onClick: () {},
+                SizedBox(
+                  height: 10,
+                ),
+                userController.user.userName == null
+                    ? Text('NULL ??')
+                    : Text('${userController.user.userName}'),
+              ],
             ),
-            MLMenuItem(
-                leading: Icon(
-                  Icons.power_settings_new,
-                ),
-                content: Text(
-                  "Log out",
-                ),
-                onClick: () async {
-                  authController.signOut();
-                  print("Signed Out");
-                }),
+          )),
+        ),
+        children: [
+          // Child Elements for Each Drawer Item
+          MLMenuItem(
+              leading: Icon(
+                Icons.person,
+              ),
+              content: Text("My Profile"),
+              onClick: () {}),
+          MLMenuItem(
+            leading: Icon(
+              Icons.settings,
+            ),
+            content: Text("Settings"),
+            onClick: () {},
+          ),
+          MLMenuItem(
+              leading: Icon(
+                Icons.power_settings_new,
+              ),
+              content: Text(
+                "Log out",
+              ),
+              onClick: () async {
+                authController.signOut();
+                Get.offAll(Root());
+                print("Signed Out");
+              }),
+        ],
+      ),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          children: <Widget>[
+            _searchBar(),
+            Expanded(child: getListOfChats()),
           ],
         ),
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            children: <Widget>[
-              _searchBar(),
-              Expanded(child: getListOfChats()),
-            ],
-          ),
-        ),
-        bottomNavigationBar: bottomCustomNavigationBar(),
-        floatingActionButton: floatingButtons(context));
+      ),
+      bottomNavigationBar: bottomCustomNavigationBar(),
+    );
   }
 
   _searchBar() {
@@ -114,16 +109,17 @@ class _MessagesViewState extends State<MessagesView> {
       ),
     );
   }
+
   // split the chat name if for private chats given a name = username1#username2
-  String chatNameSpliter(String name  , String chattype){
-    if(chattype == 'group'){
+  String chatNameSpliter(String name, String chattype) {
+    if (chattype == 'group') {
       return name;
-    }
-    else {
+    } else {
       List<String> array = name.split('#');
       String finalname = '';
-       array.forEach((element) {
-        if(element.toString() != userController.user.userName && element.toString() != '#'){
+      array.forEach((element) {
+        if (element.toString() != userController.user.userName &&
+            element.toString() != '#') {
           finalname = element.toString();
         }
       });
@@ -147,20 +143,33 @@ class _MessagesViewState extends State<MessagesView> {
             if (snapshot.data.documents.length == 0)
               return Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text("You Don't Have Any Messages At This Moment")),
+                child: Center(
+                    child: Text("You Don't Have Any Messages At This Moment")),
               );
 
             return ListView.builder(
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    
-                    leading: Image.asset(snapshot.data.documents[index]['type']=='group'?'lib/assets/groupimage.png':'lib/assets/personimage.png'),
-                    title: Text( chatNameSpliter(snapshot.data.documents[index]['GroupName'], snapshot.data.documents[index]['type'] )),
-                    subtitle: Text(snapshot.data.documents[index]['LastMsg'] , softWrap: false,),
+                    leading: Image.asset(
+                        snapshot.data.documents[index]['type'] == 'group'
+                            ? 'lib/assets/groupimage.png'
+                            : 'lib/assets/personimage.png'),
+                    title: Text(chatNameSpliter(
+                        snapshot.data.documents[index]['GroupName'],
+                        snapshot.data.documents[index]['type'])),
+                    subtitle: Text(
+                      snapshot.data.documents[index]['LastMsg'],
+                      softWrap: false,
+                    ),
                     onTap: () async {
-                       Get.to(new chat(snapshot.data.documents[index].documentID , snapshot.data.documents[index]['GroupName'] , snapshot.data.documents[index]['type'] ),  transition: Transition.downToUp);
-                     /* Get.put<ProjectController>(ProjectController());
+                      Get.to(
+                          new chat(
+                              snapshot.data.documents[index].documentID,
+                              snapshot.data.documents[index]['GroupName'],
+                              snapshot.data.documents[index]['type']),
+                          transition: Transition.downToUp);
+                      /* Get.put<ProjectController>(ProjectController());
                       ProjectController projectController =
                           Get.find<ProjectController>();
                       projectController.project = Project.fromJson(
@@ -172,7 +181,6 @@ class _MessagesViewState extends State<MessagesView> {
                           duration: Duration(milliseconds: 300));
                           */
                     },
-                    
                   );
                 });
           }
@@ -218,306 +226,16 @@ class _MessagesViewState extends State<MessagesView> {
           barIndex = index;
 
           if (barIndex == 0) // Do nothing, stay in the same page
-            Get.off(GroupProjectsView() , transition: Transition.noTransition);
+            Get.off(GroupProjectsView(), transition: Transition.noTransition);
           else if (barIndex == 1)
             return;
           else if (barIndex == 2)
-            Get.off(FriendsView(), transition: Transition.noTransition);
-          else if (barIndex ==3)
-            return;
+            Get.to(FriendsView(), transition: Transition.noTransition);
+          else if (barIndex == 3) return;
         });
 
         print(index);
       },
     );
-  }
-
-  Widget floatingButtons(BuildContext context) {
-    return SpeedDial(
-      animatedIcon: AnimatedIcons.menu_close,
-      animatedIconTheme: IconThemeData(size: 25.0),
-      // this is ignored if animatedIcon is non null
-      // child: Icon(Icons.add),
-      // If true user is forced to close dial manually
-      // by tapping main button and overlay is not rendered.
-      closeManually: false,
-      curve: Curves.bounceIn,
-      overlayOpacity: 0.5,
-      onOpen: () => print('OPENING MENU'),
-      onClose: () => print('MENU CLOSED'),
-      tooltip: 'Menu',
-      heroTag: '',
-      elevation: 8.0,
-      shape: CircleBorder(),
-      children: [
-        SpeedDialChild(
-          child: Icon(
-            Icons.calendar_today,
-            size: 25,
-          ),
-          label: 'Upcoming',
-          onTap: () => Get.bottomSheet(
-            Container(
-              child: Column(
-                children: [
-                  AppBar(
-                    title: Text('Timeline'),
-                    centerTitle: true,
-                    leading: IconButton(
-                      icon: Icon(Icons.close),
-                      onPressed: () => Get.back(),
-                    ),
-                  ),
-                  Expanded(child: viewTimeLineOfTasksAndEvents()),
-                ],
-              ),
-            ),
-            backgroundColor: Get.theme.canvasColor,
-            isScrollControlled: true,
-            ignoreSafeArea: false,
-          ),
-        ),
-        SpeedDialChild(
-          child: Icon(
-            Icons.group_add,
-            size: 25,
-          ),
-          label: 'Join Project',
-          onTap: () => print('SECOND CHILD'),
-        ),
-        SpeedDialChild(
-          child: Icon(
-            Icons.add,
-            size: 25,
-          ),
-          label: 'New Project',
-          onTap: () => alertCreateProjectForm(context),
-        ),
-      ],
-    );
-  }
-
-  Widget viewTimeLineOfTasksAndEvents() {
-    List<TimelineModel> items = [
-      TimelineModel(
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(spreadRadius: 0.5),
-                  ],
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxWidth: 300, minWidth: 200, minHeight: 200),
-                  child: Center(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'Task name: ',
-                        ),
-                        Text(
-                          'Description: ',
-                        ),
-                        Text(
-                          'Status: ',
-                        ),
-                        Text(
-                          'Priority: ',
-                        ),
-                        Text(
-                          'Start date: ',
-                        ),
-                        Text(
-                          'End date: ',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          position: TimelineItemPosition.right,
-          isFirst: true,
-          icon: Icon(
-            Icons.assignment,
-          )),
-      TimelineModel(
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(spreadRadius: 0.5),
-                  ],
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxWidth: 300, minWidth: 200, minHeight: 200),
-                  child: Center(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'Event name: ',
-                        ),
-                        Text(
-                          'Description: ',
-                        ),
-                        Text(
-                          'Location: (optional) ',
-                        ),
-                        Text(
-                          'Date: ',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          position: TimelineItemPosition.left,
-          isFirst: true,
-          icon: Icon(
-            Icons.event,
-          )),
-      TimelineModel(
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(spreadRadius: 0.5),
-                  ],
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxWidth: 300, minWidth: 200, minHeight: 200),
-                  child: Center(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          'Task name: ',
-                        ),
-                        Text(
-                          'Description: ',
-                        ),
-                        Text(
-                          'Status: ',
-                        ),
-                        Text(
-                          'Priority: ',
-                        ),
-                        Text(
-                          'Start date: ',
-                        ),
-                        Text(
-                          'End date: ',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          position: TimelineItemPosition.right,
-          isFirst: true,
-          icon: Icon(
-            Icons.assignment,
-          )),
-    ];
-
-    return Timeline(children: items, position: TimelinePosition.Center);
-  }
-
-  void alertCreateProjectForm(BuildContext context) {
-    Alert(
-        context: context,
-        title: 'Create New Project',
-        closeFunction: () => null,
-        style: AlertStyle(
-            animationType: AnimationType.fromBottom,
-            animationDuration: Duration(milliseconds: 300),
-            descStyle: TextStyle(
-              fontSize: 12,
-            )),
-        content: Theme(
-          data: Get.theme,
-          child: Form(
-            key: formKey,
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  validator: (value) =>
-                      value.isEmpty ? "Project name can't be empty" : null,
-                  controller: _newProjectNameController,
-                  onSaved: (projectNameVal) =>
-                      _newProjectNameController.text = projectNameVal,
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.edit),
-                    focusedBorder: UnderlineInputBorder(),
-                    hintText: 'Graduation Project',
-                    labelText: 'Project Name',
-                  ),
-                ),
-                CheckboxListTile(
-                  title: Text("title text"),
-                  value: false,
-                  onChanged: (newValue) {},
-                  controlAffinity:
-                      ListTileControlAffinity.leading, //  <-- leading Checkbox
-                )
-              ],
-            ),
-          ),
-        ),
-        buttons: [
-          DialogButton(
-            radius: BorderRadius.circular(30),
-            onPressed: () async {
-              formKey.currentState.save();
-              if (formKey.currentState.validate()) {
-                try {
-                  ProjectCollection().createNewProject(
-                      _newProjectNameController.text, userController.user);
-                  Get.back();
-                  // Display success message
-                  Get.snackbar(
-                    "Success !", // title
-                    "Project '${_newProjectNameController.text}' has been created successfully.",
-                    // message
-                    icon: Icon(
-                      Icons.check_circle_outline,
-                    ),
-                    shouldIconPulse: true,
-                    borderWidth: 1,
-                    barBlur: 20,
-                    isDismissible: true,
-                    duration: Duration(seconds: 5),
-                  );
-                  _newProjectNameController.clear();
-                } catch (e) {
-                  print(e.message);
-                }
-              }
-            },
-            child: Text(
-              "Submit",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-            ),
-          )
-        ]).show();
   }
 }

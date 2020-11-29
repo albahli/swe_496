@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:swe496/Views/MessagesView.dart';
 import 'package:swe496/utils/root.dart';
 import '../Database/UserProfileCollection.dart';
 import '../controllers/UserControllers/authController.dart';
@@ -121,7 +122,7 @@ class _FriendsViewState extends State<FriendsView> {
   void alertAddFriend() {
     Alert(
         context: context,
-        title: "Edit",
+        title: "Add New Friend",
         content: Form(
           key: formKey,
           child: Column(
@@ -237,12 +238,14 @@ class _FriendsViewState extends State<FriendsView> {
 
           barIndex = index;
 
-          if (barIndex == 0) // Do nothing, stay in the same page
+          if (barIndex == 0)
             Get.to(Root());
-          else if (barIndex == 1)
+          else if (barIndex == 1)// Do nothing, stay in the same page
             return;
           else if (barIndex == 2) // Do nothing, stay in the same page
-            return;
+           return;
+          else if (barIndex == 3) // Do nothing, stay in the same page
+            Get.to(MessagesView());
         });
         print(index);
       },
