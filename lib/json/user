@@ -1,4 +1,4 @@
-{
+{    
   "userID": "uid example",
   "userName": "userName",
   "email": "example@gmail.com",
@@ -11,5 +11,8 @@
   ],
   "friendsIDs": [
     "uid example"
+  ]
+    "userChatsIDs": [
+    "chat ids example"
   ]
 }

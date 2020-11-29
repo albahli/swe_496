@@ -1,32 +1,32 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/Views/Project/CreateProjectView.dart';
+import 'package:swe496/Database/ProjectCollection.dart';
+import 'package:swe496/Views/GroupProjectsView.dart';
+import 'package:swe496/Views/Messages.dart';
 import 'package:swe496/Views/friendsView.dart';
-import 'package:swe496/Views/MessagesView.dart';
-import 'package:swe496/Views/Project/TasksAndEventsView.dart';
-import 'package:swe496/controllers/ProjectControllers/ListOfProjectsContoller.dart';
-import 'package:swe496/controllers/ProjectControllers/projectController.dart';
-import 'package:swe496/controllers/UserControllers/authController.dart';
+
 import 'package:swe496/controllers/UserControllers/userController.dart';
+import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
-import 'AccountSettings.dart';
+//Asjdsds@gmail.com  pass: Aa@1234
+class MessagesView extends StatefulWidget {
 
-class GroupProjectsView extends StatefulWidget {
   @override
-  _GroupProjectsViewState createState() => _GroupProjectsViewState();
+  _MessagesViewState createState() => _MessagesViewState();
 }
 
-class _GroupProjectsViewState extends State<GroupProjectsView> {
+class _MessagesViewState extends State<MessagesView> {
   AuthController authController = Get.find<AuthController>();
   UserController userController = Get.find<UserController>();
   final formKey = GlobalKey<FormState>();
   final TextEditingController _newProjectNameController =
       TextEditingController();
-  int barIndex = 0;
+  int barIndex = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
         resizeToAvoidBottomPadding: false,
         // still not working in landscape mode
         appBar: AppBar(
-          title: const Text('Group Projects'),
+          title: const Text('Chats'),
           centerTitle: true,
           actions: <Widget>[],
         ),
@@ -55,7 +55,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                     height: 10,
                   ),
                   userController.user.userName == null
-                      ? Text('NULL ?')
+                      ? Text('NULL ??')
                       : Text('${userController.user.userName}'),
                 ],
               ),
@@ -68,9 +68,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                   Icons.person,
                 ),
                 content: Text("My Profile"),
-                onClick: () {
-                  Get.to(AccountSettings());
-                }),
+                onClick: () {}),
             MLMenuItem(
               leading: Icon(
                 Icons.settings,
@@ -97,7 +95,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           child: Column(
             children: <Widget>[
               _searchBar(),
-              getListOfProjects(),
+              Expanded(child: getListOfChats()),
             ],
           ),
         ),
@@ -116,47 +114,78 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
       ),
     );
   }
+  // split the chat name if for private chats given a name = username1#username2
+  String chatNameSpliter(String name  , String chattype){
+    if(chattype == 'group'){
+      return name;
+    }
+    else {
+      List<String> array = name.split('#');
+      String finalname = '';
+       array.forEach((element) {
+        if(element.toString() != userController.user.userName && element.toString() != '#'){
+          finalname = element.toString();
+        }
+      });
+      return finalname;
+    }
+  }
 
-  Widget getListOfProjects() {
+  Widget getListOfChats() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance
+          .collection('Chats')
+          .where('membersIDs', arrayContains: userController.user.userID)
+          .snapshots(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text(snapshot.error.toString());
+        }
 
-    return Expanded(
-      child: GetX<ListOfProjectsController>(
-          init: Get.put<ListOfProjectsController>(ListOfProjectsController()),
-          builder: (ListOfProjectsController listOfProjectsController) {
-            if (listOfProjectsController != null &&
-                listOfProjectsController.projects != null &&
-                !listOfProjectsController.projects.isNullOrBlank &&
-                !listOfProjectsController.projects.isNull &&
-                listOfProjectsController.projects.length != 0) {
-              return ListView.builder(
-                  itemCount: listOfProjectsController.projects.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: Icon(Icons.supervised_user_circle),
-                      title: Text(
-                          listOfProjectsController.projects[index].projectName),
-                      subtitle: Text('Details...'),
-                      onTap: () async {
-                        Get.put<ProjectController>(ProjectController(
-                            projectID: listOfProjectsController
-                                .projects[index].projectID));
-                        // sleep(Duration(milliseconds:600));
-                        ProjectController projectController =
-                            Get.find<ProjectController>();
-                         if (projectController.initialized) {
-                          Get.to(TasksAndEventsView(),
-                              transition: Transition.rightToLeft,
-                              duration: Duration(milliseconds: 300));
-                        }
-                      },
-                    );
-                  });
-            }
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(child: Text("You don't have any projects")),
-            );
-          }),
+        if (snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.hasData && snapshot.data != null) {
+            if (snapshot.data.documents.length == 0)
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: Text("You Don't Have Any Messages At This Moment")),
+              );
+
+            return ListView.builder(
+                itemCount: snapshot.data.documents.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    
+                    leading: Image.asset(snapshot.data.documents[index]['type']=='group'?'lib/assets/groupimage.png':'lib/assets/personimage.png'),
+                    title: Text( chatNameSpliter(snapshot.data.documents[index]['GroupName'], snapshot.data.documents[index]['type'] )),
+                    subtitle: Text(snapshot.data.documents[index]['LastMsg'] , softWrap: false,),
+                    onTap: () async {
+                       Get.to(new chat(snapshot.data.documents[index].documentID , snapshot.data.documents[index]['GroupName'] , snapshot.data.documents[index]['type'] ),  transition: Transition.downToUp);
+                     /* Get.put<ProjectController>(ProjectController());
+                      ProjectController projectController =
+                          Get.find<ProjectController>();
+                      projectController.project = Project.fromJson(
+                          new Map<String, dynamic>.from(
+                              snapshot.data.documents[index].data));
+                      Get.to(
+                          TasksAndEventsView(),
+                          transition: Transition.rightToLeft,
+                          duration: Duration(milliseconds: 300));
+                          */
+                    },
+                    
+                  );
+                });
+          }
+        }
+        return Container(
+          child: Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: 'Loading',
+              strokeWidth: 4,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -166,19 +195,19 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.people),
-          label: 'Groups',
+          title: Text('Groups'),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment_turned_in),
-          label: 'Tasks',
+          title: Text('Tasks'),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.contacts),
-          label: 'Friends',
+          title: Text('Friends'),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.message),
-          label: 'Messages',
+          title: Text('Messages'),
         ),
       ],
       currentIndex: barIndex,
@@ -189,13 +218,13 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           barIndex = index;
 
           if (barIndex == 0) // Do nothing, stay in the same page
-            return;
+            Get.off(GroupProjectsView() , transition: Transition.noTransition);
           else if (barIndex == 1)
             return;
           else if (barIndex == 2)
             Get.off(FriendsView(), transition: Transition.noTransition);
           else if (barIndex ==3)
-            Get.off(MessagesView(), transition: Transition.noTransition);
+            return;
         });
 
         print(index);
@@ -207,8 +236,6 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 25.0),
-      marginRight: 14,
-      marginBottom: 16,
       // this is ignored if animatedIcon is non null
       // child: Icon(Icons.add),
       // If true user is forced to close dial manually
@@ -256,15 +283,15 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             size: 25,
           ),
           label: 'Join Project',
-          onTap: () => print('SECOND CHILD')  ,
+          onTap: () => print('SECOND CHILD'),
         ),
         SpeedDialChild(
           child: Icon(
             Icons.add,
             size: 25,
           ),
-          label: 'New Project ',
-          onTap: () =>  Get.to(CreateProjectView())//alertCreateProjectForm(context),
+          label: 'New Project',
+          onTap: () => alertCreateProjectForm(context),
         ),
       ],
     );
@@ -463,8 +490,8 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
               formKey.currentState.save();
               if (formKey.currentState.validate()) {
                 try {
-                //  ProjectCollection().createNewProject(
-                  //    _newProjectNameController.text, userController.user);
+                  ProjectCollection().createNewProject(
+                      _newProjectNameController.text, userController.user);
                   Get.back();
                   // Display success message
                   Get.snackbar(

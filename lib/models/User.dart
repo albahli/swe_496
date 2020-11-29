@@ -8,6 +8,7 @@ class User {
   String userAvatar;
   List<String> userProjectsIDs;
   List<String> friendsIDs;
+  List<String> userChatsIDs;
 
   User(
       {this.userID,
@@ -18,7 +19,8 @@ class User {
       this.birthDate,
       this.userAvatar,
       this.userProjectsIDs,
-      this.friendsIDs});
+      this.friendsIDs,
+      this.userChatsIDs});
 
   User.fromJson(Map<String, dynamic> json) {
     userID = json['userID'];
@@ -30,6 +32,7 @@ class User {
     userAvatar = json['UserAvatar'];
     userProjectsIDs = List.of(json['userProjectsIDs'].cast<String>());
     friendsIDs = List.of(json['friendsIDs'].cast<String>());
+    userChatsIDs = List.of(json['userChatsIDs'].cast<String>());
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +46,7 @@ class User {
     data['UserAvatar'] = this.userAvatar;
     data['userProjectsIDs'] = this.userProjectsIDs;
     data['friendsIDs'] = this.friendsIDs;
+    data['userChatsIDs'] = this.userChatsIDs;
     return data;
   }
 }
