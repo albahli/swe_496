@@ -84,12 +84,10 @@ class AuthController extends GetxController {
           email: email.trim(), password: password.trim());
 
       // Getting user document form firebase
-      DocumentSnapshot userDoc =
-          await UserProfileCollection().getUser(firebaseUser.uid);
-      print(userDoc.data);
 
       // Converting the json data to user object
-      Get.find<UserController>().user = User.fromJson(userDoc.data);
+      Get.find<UserController>().user =
+          await UserProfileCollection().getUser(firebaseUser.uid);
       print(Get.find<UserController>().user.userName);
     } catch (e) {
       Get.snackbar(
@@ -109,7 +107,7 @@ class AuthController extends GetxController {
     }
   }
 
-  void signOut() async {
+  Future<void> signOut() async {
     try {
       await _auth.signOut();
       Get.find<UserController>().clear();
@@ -135,7 +133,8 @@ class AuthController extends GetxController {
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
       Get.back();
-      Get.snackbar('Successful', 'An email sent to you containing a link to reset your password.');
+      Get.snackbar('Successful',
+          'An email sent to you containing a link to reset your password.');
     } catch (e) {
       print(e);
     }

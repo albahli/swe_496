@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:swe496/Database/private_folder_collection.dart';
 import 'package:swe496/models/User.dart';
 
 import 'package:uuid/uuid.dart';
+
+import '../models/User.dart';
 
 class UserProfileCollection {
   final Firestore _firestore = Firestore.instance;
@@ -12,6 +15,10 @@ class UserProfileCollection {
           .collection('userProfile')
           .document(user.userID)
           .setData(user.toJson());
+
+      // Create the default category of the private folder
+      await PrivateFolderCollection()
+          .createCategory(user.userID, 'Tasks List:');
       return true;
     } catch (e) {
       print(e);
@@ -19,11 +26,12 @@ class UserProfileCollection {
     }
   }
 
-  Future<DocumentSnapshot> getUser(String uid) async {
+  Future<User> getUser(String uid) async {
     try {
-      DocumentSnapshot userDoc = await _firestore.collection('userProfile').document(uid).get();
+      DocumentSnapshot userDoc =
+          await _firestore.collection('userProfile').document(uid).get();
 
-      return userDoc;
+      return User.fromJson(userDoc.data);
     } catch (e) {
       print(e);
       rethrow;
@@ -50,11 +58,10 @@ class UserProfileCollection {
     return userNameIsTaken;
   }
 
-  Stream<QuerySnapshot> checkUserProjectsIDs(String projectID){
+  Stream<QuerySnapshot> checkUserProjectsIDs(String projectID) {
     return Firestore.instance
         .collection('userProfile')
-        .where('userProjectsIDs',
-        arrayContains: projectID)
+        .where('userProjectsIDs', arrayContains: projectID)
         .snapshots();
   }
 }

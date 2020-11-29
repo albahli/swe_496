@@ -4,7 +4,11 @@ class SubTask {
   String subTaskDescription;
   String subTaskStatus;
 
-  SubTask({this.subTaskID, this.subTaskName, this.subTaskDescription, this.subTaskStatus});
+  SubTask(
+      {this.subTaskID,
+      this.subTaskName,
+      this.subTaskDescription,
+      this.subTaskStatus});
 
   SubTask.fromJson(Map<String, dynamic> json) {
     subTaskID = json['subTaskID'];

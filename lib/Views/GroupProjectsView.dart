@@ -9,12 +9,14 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/friendsView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
+import 'package:swe496/Views/private_folder_views/personal_folder_view.dart';
 import 'package:swe496/controllers/ListOfProjectsContoller.dart';
 import 'package:swe496/controllers/authController.dart';
 import 'package:swe496/controllers/projectController.dart';
 import 'package:swe496/controllers/userController.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
+import 'the_drawer.dart';
 
 class GroupProjectsView extends StatefulWidget {
   @override
@@ -39,57 +41,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           centerTitle: true,
           actions: <Widget>[],
         ),
-        drawer: MultiLevelDrawer(
-          header: Container(
-            // Header for Drawer
-            height: MediaQuery.of(context).size.height * 0.25,
-            child: Center(
-                child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.account_circle,
-                    size: 90,
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  userController.user.userName == null
-                      ? Text('NULL ?')
-                      : Text('${userController.user.userName}'),
-                ],
-              ),
-            )),
-          ),
-          children: [
-            // Child Elements for Each Drawer Item
-            MLMenuItem(
-                leading: Icon(
-                  Icons.person,
-                ),
-                content: Text("My Profile"),
-                onClick: () {}),
-            MLMenuItem(
-              leading: Icon(
-                Icons.settings,
-              ),
-              content: Text("Settings"),
-              onClick: () {},
-            ),
-            MLMenuItem(
-                leading: Icon(
-                  Icons.power_settings_new,
-                ),
-                content: Text(
-                  "Log out",
-                ),
-                onClick: () async {
-                  authController.signOut();
-                  print("Signed Out");
-                }),
-          ],
-        ),
+        drawer: TheDrawer(authController: authController),
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
@@ -117,7 +69,6 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   }
 
   Widget getListOfProjects() {
-
     return Expanded(
       child: GetX<ListOfProjectsController>(
           init: Get.put<ListOfProjectsController>(ListOfProjectsController()),
@@ -190,7 +141,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           if (barIndex == 0) // Do nothing, stay in the same page
             return;
           else if (barIndex == 1)
-            return;
+            Get.to(PrivateFolderView());
           else if (barIndex == 2)
             Get.off(FriendsView(), transition: Transition.noTransition);
         });

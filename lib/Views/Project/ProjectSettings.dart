@@ -89,7 +89,8 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
                       decoration: InputDecoration(
                         labelText: 'Pinned message',
                         hintText: _projectController.project.pinnedMessage,
-                        prefixIcon: Icon(IconData(58270, fontFamily: 'MaterialIcons')),
+                        prefixIcon:
+                            Icon(IconData(58270, fontFamily: 'MaterialIcons')),
                       ),
                     ),
                     SizedBox(
@@ -98,6 +99,9 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
                     Row(
                       children: [
                         IconButton(
+                          onPressed: () {
+                            // TODO: Generate the sharable link
+                          },
                           icon: Icon(Icons.link),
                         ),
                         Text('Joining link enabled'),

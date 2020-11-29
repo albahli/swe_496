@@ -140,7 +140,8 @@ class ProjectCollection {
     return Firestore.instance
         .collection('projects')
         .where('membersIDs', arrayContains: userID)
-        .snapshots().map((QuerySnapshot query) {
+        .snapshots()
+        .map((QuerySnapshot query) {
       List<Project> retVal = List();
       query.documents.forEach((element) {
         retVal.add(Project.fromJson(element.data));
@@ -148,6 +149,7 @@ class ProjectCollection {
       return retVal;
     });
   }
+
   Stream<Project> projectStream(String projectID) {
     return _firestore
         .collection('projects')
@@ -457,13 +459,17 @@ class ProjectCollection {
         .collection('tasks')
         .where('assignedBy', isEqualTo: assignedBy)
         .snapshots()
-        .map((QuerySnapshot query) {
-      List<TaskOfProject> retVal = List();
-      query.documents.forEach((element) {
-        retVal.add(TaskOfProject.fromJson(element.data));
-      });
-      return retVal;
-    });
+        .map(
+      (QuerySnapshot query) {
+        List<TaskOfProject> retVal = List();
+        query.documents.forEach(
+          (element) {
+            retVal.add(TaskOfProject.fromJson(element.data));
+          },
+        );
+        return retVal;
+      },
+    );
   }
 
   // To view the tasks in the "tasks & events" tab for the assigned member.
