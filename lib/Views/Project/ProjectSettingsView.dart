@@ -205,7 +205,7 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
               child: Card(
                 shadowColor: Colors.transparent,
                 shape: new RoundedRectangleBorder(
-              side: new BorderSide(color: Colors.red, width: 1.0),
+              side: new BorderSide(color: Colors.red[600], width: 1.0),
                 borderRadius: BorderRadius.circular(4.0)),
                 child: Column(
                   children: [
