@@ -8,6 +8,7 @@ import '../Database/UserProfileCollection.dart';
 import '../controllers/authController.dart';
 import '../controllers/userController.dart';
 import '../utils/root.dart';
+import './settings_view.dart';
 
 class TheDrawer extends StatelessWidget {
   TheDrawer({
@@ -59,7 +60,9 @@ class TheDrawer extends StatelessWidget {
               Icons.settings,
             ),
             content: Text("Settings"),
-            onClick: () {},
+            onClick: () {
+              Get.to(SettingsView());
+            },
           ),
           MLMenuItem(
               leading: Icon(

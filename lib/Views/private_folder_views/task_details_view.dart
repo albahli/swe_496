@@ -569,8 +569,8 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
                             ),
                             SizedBox(width: mediaQuery.size.width * 0.03),
                             // Comments screen button
-                            FlatButton(
-                              child: Icon(Icons.mode_comment_outlined),
+                            IconButton(
+                              icon: Icon(Icons.mode_comment_outlined),
                               onPressed: () {
                                 Navigator.push(
                                   context,
