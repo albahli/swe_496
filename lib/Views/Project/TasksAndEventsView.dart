@@ -243,6 +243,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
               ),
               DropdownButtonHideUnderline(
                 child: DropdownButton(
+                  isDense: true,
                     value: dropDownSortButtonOption,
                     icon: Icon(Icons.sort),
                     items: ['Name', 'Date', 'Priority', 'Status']
