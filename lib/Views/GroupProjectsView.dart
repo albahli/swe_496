@@ -168,7 +168,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             }
             return Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Center(child: Text("You don't have any projects")),
+              child: Center(child: Text("You don't have any projects.")),
             );
           }),
     );
