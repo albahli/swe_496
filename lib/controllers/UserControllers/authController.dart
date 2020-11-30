@@ -116,6 +116,7 @@ class AuthController extends GetxController {
     try {
       await _auth.signOut();
       Get.find<UserController>().clear();
+    //  Get.find<ProjectController>().clear();
     } catch (e) {
       Get.snackbar(
         "Error.", // title

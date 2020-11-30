@@ -317,6 +317,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                     minWidth: 20,
                     height: 50.0,
                     child: RaisedButton(
+                      textColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.horizontal(
                               left: Radius.circular(30.0),

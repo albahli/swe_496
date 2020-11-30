@@ -219,7 +219,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
               Row(
                 children: [
                   IconButton(
-                    tooltip: 'Ascending',
+                      tooltip: 'Ascending',
                       icon: Icon(Icons.arrow_upward, size: 20),
                       onPressed: () {
                         setState(() {
@@ -228,7 +228,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                         });
                       }),
                   IconButton(
-                    tooltip: 'Descending',
+                      tooltip: 'Descending',
                       icon: Icon(
                         Icons.arrow_downward,
                         size: 20,
@@ -243,7 +243,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
               ),
               DropdownButtonHideUnderline(
                 child: DropdownButton(
-                  isDense: true,
+                    isDense: true,
                     value: dropDownSortButtonOption,
                     icon: Icon(Icons.sort),
                     items: ['Name', 'Date', 'Priority', 'Status']
@@ -639,11 +639,10 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                     .contains(taskKeywordSearch.toLowerCase()))
                 .toList();
 
-            if (sortByTaskName){
-              filteredTasksListBySearch
-                  .sort((a, b) => a.taskName.toLowerCase().compareTo(b.taskName.toLowerCase()));
-            }
-            else if (sortByTaskDueDate) {
+            if (sortByTaskName) {
+              filteredTasksListBySearch.sort((a, b) =>
+                  a.taskName.toLowerCase().compareTo(b.taskName.toLowerCase()));
+            } else if (sortByTaskDueDate) {
               filteredTasksListBySearch
                   .sort((a, b) => b.dueDate.compareTo(a.dueDate));
             } else if (sortByTaskStatus) {
@@ -716,16 +715,20 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                     title: Text(filteredTasksListBySearch[index].taskName),
                     subtitle:
                         Text('${filteredTasksListBySearch[index].dueDate}'),
-                    trailing:Text(
+                    trailing: Text(
                       '${filteredTasksListBySearch[index].taskPriority.toUpperCase()}',
                       style: TextStyle(
-                          color: filteredTasksListBySearch[index].taskPriority.toUpperCase() ==
-                              'LOW'
+                          color: filteredTasksListBySearch[index]
+                                      .taskPriority
+                                      .toUpperCase() ==
+                                  'LOW'
                               ? Colors.green
-                              : (filteredTasksListBySearch[index].taskPriority.toUpperCase() ==
-                              'HIGH'
-                              ? Colors.red
-                              : Colors.orange)),
+                              : (filteredTasksListBySearch[index]
+                                          .taskPriority
+                                          .toUpperCase() ==
+                                      'HIGH'
+                                  ? Colors.red
+                                  : Colors.orange)),
                     ),
                     onTap: () async {
                       Get.put<TaskOfProjectController>(TaskOfProjectController(
@@ -762,7 +765,10 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                   return ListTile(
                     leading: Icon(Icons.event),
                     title: Text(filteredEventsListBySearch[index].eventName),
-                    subtitle: Text('Details ...'),
+                    subtitle: Text(
+                        filteredEventsListBySearch[index].eventStartDate +
+                            ' to ' +
+                            filteredEventsListBySearch[index].eventEndDate),
                     onTap: () async {
                       Get.put<EventController>(EventController(
                           eventID: filteredEventsListBySearch[index].eventID));

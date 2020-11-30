@@ -28,7 +28,6 @@ class SignIn extends GetWidget<AuthController> {
               color: Colors.white,
               child: Theme(
                 data: ThemeData(
-                  primaryColor: Colors.red,
                 ),
                 child: Form(
                   key: formKey,
@@ -97,13 +96,12 @@ class SignIn extends GetWidget<AuthController> {
                                 minWidth: 300,
                                 height: 50.0,
                                 child: RaisedButton(
-                                  color: Colors.red,
                                   textColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.horizontal(
                                           left: Radius.circular(30.0),
                                           right: Radius.circular(30.0)),
-                                      side: BorderSide(color: Colors.red)),
+                                      ),
                                   onPressed: () async {
                                     formKey.currentState.save();
                                     if (formKey.currentState.validate()) {
