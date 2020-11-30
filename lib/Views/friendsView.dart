@@ -157,7 +157,7 @@ class _FriendsViewState extends State<FriendsView> {
               }
             },
             child: Text(
-              "submit",
+              "Submit",
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
           )

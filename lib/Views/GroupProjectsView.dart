@@ -148,7 +148,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                       leading: Icon(Icons.supervised_user_circle),
                       title:
                           Text(filteredProjectsListBySearch[index].projectName),
-                      subtitle: Text('Details...'),
+                      subtitle: Text(filteredProjectsListBySearch[index].members.length.toString() + ' Members'),
                       onTap: () async {
                         Get.put<ProjectController>(ProjectController(
                             projectID:
