@@ -26,7 +26,6 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   final formKey = GlobalKey<FormState>();
 
   int barIndex = 0;
-
   String keyword = '';
   List<Project> filteredProjectsListBySearch = new List<Project>();
 
@@ -146,7 +145,11 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                       leading: Icon(Icons.supervised_user_circle),
                       title:
                           Text(filteredProjectsListBySearch[index].projectName),
-                      subtitle: Text(filteredProjectsListBySearch[index].members.length.toString() + ' Members'),
+                      subtitle: Text(filteredProjectsListBySearch[index]
+                              .members
+                              .length
+                              .toString() +
+                          ' Members'),
                       onTap: () async {
                         Get.put<ProjectController>(ProjectController(
                             projectID:
@@ -277,10 +280,9 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
             ),
             label: 'New Project ',
             onTap: () {
-                Get.to(CreateProjectView());
-                FocusScope.of(context).unfocus();
-            }
-            ),
+              Get.to(CreateProjectView());
+              FocusScope.of(context).unfocus();
+            }),
       ],
     );
   }
