@@ -211,7 +211,6 @@ class SignIn extends GetWidget<AuthController> {
         ),
         buttons: [
           DialogButton(
-            color: Colors.red,
             radius: BorderRadius.circular(30),
             onPressed: () async {
               formAccountResetKey.currentState.save();
