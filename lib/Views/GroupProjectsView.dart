@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Views/Project/CreateProjectView.dart';
 import 'package:swe496/Views/friendsView.dart';
 import 'package:swe496/Views/MessagesView.dart';
@@ -25,8 +24,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   AuthController authController = Get.find<AuthController>();
   UserController userController = Get.find<UserController>();
   final formKey = GlobalKey<FormState>();
-  final TextEditingController _newProjectNameController =
-      TextEditingController();
+
   int barIndex = 0;
 
   String keyword = '';
@@ -430,84 +428,5 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
     ];
 
     return Timeline(children: items, position: TimelinePosition.Center);
-  }
-
-  void alertCreateProjectForm(BuildContext context) {
-    Alert(
-        context: context,
-        title: 'Create New Project',
-        closeFunction: () => null,
-        style: AlertStyle(
-            animationType: AnimationType.fromBottom,
-            animationDuration: Duration(milliseconds: 300),
-            descStyle: TextStyle(
-              fontSize: 12,
-            )),
-        content: Theme(
-          data: Get.theme,
-          child: Form(
-            key: formKey,
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  validator: (value) =>
-                      value.isEmpty ? "Project name can't be empty" : null,
-                  controller: _newProjectNameController,
-                  onSaved: (projectNameVal) =>
-                      _newProjectNameController.text = projectNameVal,
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.edit),
-                    focusedBorder: UnderlineInputBorder(),
-                    hintText: 'Graduation Project',
-                    labelText: 'Project Name',
-                  ),
-                ),
-                CheckboxListTile(
-                  title: Text("title text"),
-                  value: false,
-                  onChanged: (newValue) {},
-                  controlAffinity:
-                      ListTileControlAffinity.leading, //  <-- leading Checkbox
-                )
-              ],
-            ),
-          ),
-        ),
-        buttons: [
-          DialogButton(
-            radius: BorderRadius.circular(30),
-            onPressed: () async {
-              formKey.currentState.save();
-              if (formKey.currentState.validate()) {
-                try {
-                  //  ProjectCollection().createNewProject(
-                  //    _newProjectNameController.text, userController.user);
-                  Get.back();
-                  // Display success message
-                  Get.snackbar(
-                    "Success !", // title
-                    "Project '${_newProjectNameController.text}' has been created successfully.",
-                    // message
-                    icon: Icon(
-                      Icons.check_circle_outline,
-                    ),
-                    shouldIconPulse: true,
-                    borderWidth: 1,
-                    barBlur: 20,
-                    isDismissible: true,
-                    duration: Duration(seconds: 5),
-                  );
-                  _newProjectNameController.clear();
-                } catch (e) {
-                  print(e.message);
-                }
-              }
-            },
-            child: Text(
-              "Submit",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-            ),
-          )
-        ]).show();
   }
 }
