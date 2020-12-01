@@ -9,7 +9,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/friendsView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
-import 'package:swe496/Views/private_folder_views/personal_folder_view.dart';
+import 'package:swe496/Views/private_folder_views/private_folder_view.dart';
 import 'package:swe496/controllers/ListOfProjectsContoller.dart';
 import 'package:swe496/controllers/authController.dart';
 import 'package:swe496/controllers/projectController.dart';

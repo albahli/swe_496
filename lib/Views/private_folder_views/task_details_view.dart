@@ -197,7 +197,8 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
     } catch (e) {
       print(e);
     }
-    Get.back();
+    Navigator.pop(context);
+    // Get.back();
   }
 
   Future<void> _updateTaskDueDate() async {
@@ -279,7 +280,8 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
         fontWeight: FontWeight.w900,
       ),
       content: Container(
-        height: 160,
+        height: (MediaQuery.of(context).size.height * 0.6 -
+            MediaQuery.of(context).viewInsets.bottom),
         width: MediaQuery.of(ctx).size.width * 0.7,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -463,10 +465,6 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                // border: Border.all(
-                                //   color: Theme.of(context).primaryColor,
-                                //   width: 2,
-                                // ),
                               ),
                               child: FlatButton(
                                 onPressed: () {
@@ -655,12 +653,13 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
                               ],
                             );
                           }
-                          return (subtasks.length > 0)
-                              ? SpinKitRotatingCircle(
-                                  color: Theme.of(context).primaryColor,
-                                  duration: Duration(milliseconds: 900),
-                                )
-                              : Container();
+                          return Container();
+                          // (subtasks.length > 0)
+                          //     ? SpinKitRotatingCircle(
+                          //         color: Theme.of(context).primaryColor,
+                          //         duration: Duration(milliseconds: 900),
+                          //       )
+                          //     : Container();
                         },
                       ),
                     )

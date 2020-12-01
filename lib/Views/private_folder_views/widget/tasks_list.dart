@@ -6,7 +6,22 @@ import 'package:swe496/controllers/private_folder_controllers/tasks_list_control
 import 'package:swe496/models/private_folder_models/category.dart';
 import 'package:swe496/models/private_folder_models/task.dart';
 import '../../../controllers/authController.dart';
+import '../../../controllers/authController.dart';
 import './task_item.dart';
+import './task_entries.dart';
+
+enum CategoryOptions {
+  Rename,
+  AddTask,
+  Delete,
+  ActivityLog,
+  /* // TODO: add a pop view of actions. including the following actions:-
+        1- delete category(ask the user if he/she also wants to delete its tasks or move it to another category). 
+        2- rename category. 
+        3- Add task to this category. 
+        4- Activity Log of the category.
+   */
+}
 
 class TasksList extends StatefulWidget {
   final List<Category> categoriesList;
@@ -50,14 +65,149 @@ class _TasksListState extends State<TasksList> {
     }
   }
 
-  void _categoryOptions(String categoryId) {
-    // TODO: Add the dropdown list of the options of the category
+  Widget _categoryOptions(String categoryId) {
+    return PopupMenuButton(
+      // TODO: add a barrier or add fog shading to the back screen, so it is easier for user to focus
+      elevation: 9,
+      itemBuilder: (ctx) {
+        return [
+          PopupMenuItem(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Add task',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Icon(Icons.add),
+              ],
+            ),
+            value: CategoryOptions.AddTask,
+          ),
+          PopupMenuItem(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Activity Log',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Icon(Icons.receipt_long),
+              ],
+            ),
+            value: CategoryOptions.AddTask,
+          ),
+          PopupMenuItem(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Divider(thickness: 2),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Rename Category',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Icon(
+                      Icons.drive_file_rename_outline,
+                      color: Colors.green,
+                    )
+                  ],
+                ),
+              ],
+            ),
+            value: CategoryOptions.Rename,
+          ),
+          PopupMenuItem(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Delete Category',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Icon(
+                  Icons.delete,
+                  color: Theme.of(context).errorColor,
+                ),
+              ],
+            ),
+            value: CategoryOptions.Delete,
+          ),
+        ];
+      },
+      onSelected: (selectedOption) {
+        if (selectedOption == CategoryOptions.AddTask) {
+          Get.bottomSheet(
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: TaskEntries(
+                selectedCategory: categoryId,
+              ),
+            ),
+            ignoreSafeArea: false,
+            persistent: false,
+            enableDrag: true,
+          );
+        } else if (selectedOption == CategoryOptions.Delete) {
+          return showDialog(
+            context: context,
+            builder: (ctx) {
+              return AlertDialog(
+                title: Text('Delete category?'),
+                content: Text(
+                  'Do you really want to delete the Category ' +
+                      '\'${widget.categoriesList.singleWhere((category) => category.categoryId == categoryId).categoryName}\'?',
+                ),
+                actions: [
+                  FlatButton(
+                    onPressed: () {
+                      Get.back(result: false);
+                    },
+                    child: Text('No'),
+                  ),
+                  FlatButton(
+                      onPressed: () async {
+                        await PrivateFolderCollection().deleteCategory(
+                          userId: Get.find<AuthController>().user.uid,
+                          categoryId: categoryId,
+                        );
+
+                        Get.back(result: true);
+                      },
+                      child: Text('Yes')),
+                ],
+              );
+            },
+          );
+        } else if (selectedOption == CategoryOptions.Rename) {
+          // TODO: change the category title to be in TextField() rather than Text() widget
+        } else if (selectedOption == CategoryOptions.ActivityLog) {
+          // TODO: direct the user to the ActivityLog of the selected category
+        }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return widget.categoriesList.isEmpty
-        ? SizedBox()
+        ? Container()
         : GetX(
             init: Get.put<TasksListController>(TasksListController()),
             builder: (TasksListController tasksController) {
@@ -94,39 +244,21 @@ class _TasksListState extends State<TasksList> {
                                 ),
                               ),
                               Flexible(
-                                flex: 1,
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.more_vert,
-                                    color: Colors.grey.shade700,
-                                  ),
-                                  onPressed: () {
-                                    /* // TODO: add a pop view of actions. including the following actions:-
-                            1- delete category(ask the user if he/she also wants to delete its tasks or move it to another category). 
-                            2- rename category. 
-                            3- Add task to this category. 
-                            4- Activity Log of the category.
-                          */
-                                  },
-                                ),
-                              ),
+                                  flex: 1,
+                                  child: Container(
+                                    child: _categoryOptions(
+                                      widget.categoriesList[index].categoryId,
+                                    ),
+                                  )),
                             ],
                           ),
                           Divider(thickness: 2),
                           if (userTasks.isNotEmpty)
-                            Column(
-                              children: userTasks
-                                  .where((task) =>
-                                      task.categoryId ==
-                                      widget.categoriesList[index].categoryId)
-                                  .map(
-                                    (taskItem) => TaskItem(
-                                      task: taskItem,
-                                      tickTask: _tickTask,
-                                      deleteTask: _deleteTask,
-                                    ),
-                                  )
-                                  .toList(),
+                            CategoryTasks(
+                              userTasks: userTasks,
+                              category: widget.categoriesList[index],
+                              tickTask: _tickTask,
+                              deleteTask: _deleteTask,
                             )
                         ],
                       ),
@@ -136,5 +268,36 @@ class _TasksListState extends State<TasksList> {
               );
             },
           );
+  }
+}
+
+class CategoryTasks extends StatelessWidget {
+  const CategoryTasks({
+    Key key,
+    @required this.userTasks,
+    @required this.category,
+    @required this.tickTask,
+    @required this.deleteTask,
+  }) : super(key: key);
+
+  final List<TaskModel> userTasks;
+  final Category category;
+  final Function tickTask;
+  final Function deleteTask;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: userTasks
+          .where((task) => task.categoryId == category.categoryId)
+          .map(
+            (taskItem) => TaskItem(
+              task: taskItem,
+              tickTask: tickTask,
+              deleteTask: deleteTask,
+            ),
+          )
+          .toList(),
+    );
   }
 }

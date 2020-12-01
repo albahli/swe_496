@@ -4,9 +4,10 @@ import 'package:swe496/models/private_folder_models/category.dart';
 import 'package:swe496/models/private_folder_models/comment.dart';
 import 'package:swe496/models/private_folder_models/subtask.dart';
 import 'package:swe496/models/private_folder_models/task.dart';
+import 'package:swe496/models/private_folder_models/activity_action.dart';
+import 'package:intl/intl.dart';
 
 class PrivateFolderCollection {
-  // 15 this is the instance we need to handle Firestore operations
   final Firestore _firestore = Firestore.instance;
 
   var usersCollection = 'userProfile';
@@ -14,6 +15,7 @@ class PrivateFolderCollection {
   var categoriesCollection = 'categories';
   var subtasksCollection = 'subtasks';
   var commentsCollection = 'comments';
+  var activityLogCollection = 'activityActions';
 
   Future<void> createCategory(String userId, String categoryName) async {
     final newCatDocument = _firestore
@@ -21,6 +23,9 @@ class PrivateFolderCollection {
         .document(userId)
         .collection(categoriesCollection)
         .document();
+
+    recordPrivateFolderActivity(
+        userId: userId, actionType: 'Created category \'$categoryName\'');
 
     final newCategory = Category(newCatDocument.documentID, categoryName);
 
@@ -34,22 +39,77 @@ class PrivateFolderCollection {
     }
   }
 
-  Future<void> removeTaskFromCategory(String categoryId, String taskId) async {
-    // TODO: remove a task from category
+  Future<void> deleteCategory({
+    @required String userId,
+    @required String categoryId,
+  }) async {
+    final userDocument =
+        _firestore.collection(usersCollection).document(userId);
+
+    final categoryDocument =
+        userDocument.collection(categoriesCollection).document(categoryId);
+
+    final categoryDocData =
+        await categoryDocument.get().then((snapshot) => snapshot.data);
+
+    final taskDocuments = userDocument
+        .collection(tasksCollection)
+        .where('category', isEqualTo: categoryId)
+        .getDocuments();
+
+    recordPrivateFolderActivity(
+        userId: userId,
+        actionType: 'Deleted category ${categoryDocData['categoryName']}');
+
+    try {
+      await taskDocuments.then(
+        (snapshot) async {
+          for (DocumentSnapshot doc in snapshot.documents) {
+            await deleteTask(userId: userId, taskId: doc.data['category']);
+          }
+        },
+      );
+
+      await categoryDocument.delete();
+    } catch (e) {
+      print(e);
+    }
   }
 
-  Future<void> changeCategoryName(String categoryId, String newName) async {
-    // TODO: change the category of id 'categoryId' to the name 'newName'
+  Future<void> changeCategoryName({
+    @required String userId,
+    @required String categoryId,
+    @required String newCategoryName,
+  }) async {
+    final categoryDocument = _firestore
+        .collection(usersCollection)
+        .document(userId)
+        .collection(categoriesCollection)
+        .document(categoryId);
+
+    final categoryDocData =
+        await categoryDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType:
+          'Changed category name from ${categoryDocData['categoryName']} to $newCategoryName',
+    );
+
+    try {
+      await categoryDocument.updateData({
+        'categoryName': newCategoryName,
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
-  // Now we finished setting up Firestore for the authentication side, and we are now going to use it within our app
-  // and we are going to use it directly when we create a user in Firebase authentication service, and when we log in
-
-  // Add the created task to the tasks collection at the database
+  // Create the created task object as JSON object and add it into the tasks collection at the database
   Future<void> createTask({
     String userId,
     String categoryId,
-    String newTtaskTitle,
+    String newTaskTitle,
     DateTime dueDate,
     String state,
     String priority,
@@ -60,10 +120,13 @@ class PrivateFolderCollection {
         .collection(tasksCollection)
         .document();
 
+    recordPrivateFolderActivity(
+        userId: userId, actionType: "Created task '$newTaskTitle'");
+
     TaskModel newTask = TaskModel(
       categoryId: categoryId,
       taskId: newTaskDocument.documentID,
-      taskTitle: newTtaskTitle,
+      taskTitle: newTaskTitle,
       dueDate: dueDate,
       state: state,
       priority: priority,
@@ -91,15 +154,25 @@ class PrivateFolderCollection {
         .collection(tasksCollection)
         .document(taskId);
 
+    final taskDocData =
+        await taskDocument.get().then((snapshot) => snapshot.data);
+
+    await recordPrivateFolderActivity(
+        userId: userId, actionType: 'Deleted task ${taskDocData['taskTitle']}');
+
     try {
-      taskDocument
-          .collection(subtasksCollection)
-          .getDocuments()
-          .then((snapshot) {
-        for (DocumentSnapshot doc in snapshot.documents) {
-          doc.reference.delete();
-        }
-      });
+      await taskDocument.collection(subtasksCollection).getDocuments().then(
+        (snapshot) async {
+          for (DocumentSnapshot doc in snapshot.documents) {
+            await deleteSubtask(
+                userId: userId,
+                parentTaskId: taskId,
+                subtaskId: doc.data['subtaskId']);
+            doc.reference.delete();
+          }
+        },
+      );
+
       taskDocument
           .collection(commentsCollection)
           .getDocuments()
@@ -108,6 +181,7 @@ class PrivateFolderCollection {
           doc.reference.delete();
         }
       });
+
       await taskDocument.delete();
     } catch (e) {
       print(e);
@@ -129,6 +203,9 @@ class PrivateFolderCollection {
         .document(parentTaskId)
         .collection(subtasksCollection)
         .document();
+
+    recordPrivateFolderActivity(
+        userId: userId, actionType: 'Created subtask $subtaskTitle');
 
     Subtask newSubtask = Subtask(
       parentTaskId: parentTaskId,
@@ -162,6 +239,13 @@ class PrivateFolderCollection {
         .document(parentTaskId)
         .collection(subtasksCollection)
         .document(subtaskId);
+
+    final subtaskDocData =
+        await subtaskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+        userId: userId,
+        actionType: 'Deleted subtask ${subtaskDocData['subtaskTitle']}');
 
     try {
       print('entered the subtask deletion implementer last area');
@@ -208,17 +292,20 @@ class PrivateFolderCollection {
         .collection(tasksCollection)
         .document(parentTaskId)
         .collection(subtasksCollection)
-        .where('parentTaskId', isEqualTo: parentTaskId) // ! really need it?
         .snapshots();
 
-    return subtasksSnapshot.map((QuerySnapshot query) {
-      List<Subtask> _subtasksList = List<Subtask>();
-      query.documents.forEach((subtask) {
-        print('subtask title is ${subtask.data['subtaskTitle']}');
-        _subtasksList.add(Subtask.fromJson(subtask.data));
-      });
-      return _subtasksList;
-    });
+    return subtasksSnapshot.map(
+      (QuerySnapshot query) {
+        List<Subtask> _subtasksList = List<Subtask>();
+        query.documents.forEach(
+          (subtask) {
+            print('subtask title is ${subtask.data['subtaskTitle']}');
+            _subtasksList.add(Subtask.fromJson(subtask.data));
+          },
+        );
+        return _subtasksList;
+      },
+    );
   }
 
   Stream<List<Category>> privateFolderCategoriesStream(String userId) {
@@ -250,18 +337,34 @@ class PrivateFolderCollection {
         .document(taskId)
         .snapshots();
 
-    return taskDocument.map((taskSnapshot) {
-      return TaskModel.fromJson(taskSnapshot.data);
-    });
+    return taskDocument.map(
+      (taskSnapshot) {
+        return TaskModel.fromJson(taskSnapshot.data);
+      },
+    );
   }
 
-  Future<void> taskCompletionToggle(
-      {String userId, String taskId, bool completionState}) async {
+  Future<void> taskCompletionToggle({
+    String userId,
+    String taskId,
+    bool completionState,
+  }) async {
     final taskDocument = _firestore
         .collection(usersCollection)
         .document(userId)
         .collection(tasksCollection)
         .document(taskId);
+
+    final taskDocData =
+        await taskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType: completionState == true
+          ? 'Completed Task \'${taskDocData['taskTitle']}\''
+          : 'Redo task \'${taskDocData['taskTitle']}\'',
+    );
+
     try {
       await taskDocument.updateData({'completed': completionState});
     } catch (e) {
@@ -280,6 +383,14 @@ class PrivateFolderCollection {
         .document(userId)
         .collection(tasksCollection)
         .document(taskId);
+
+    final taskDocData =
+        await taskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType: 'Changed task \'${taskDocData['taskTitle']}\' category',
+    );
 
     try {
       await taskDocument.updateData({
@@ -301,6 +412,15 @@ class PrivateFolderCollection {
         .collection(tasksCollection)
         .document(taskId);
 
+    final taskDocData =
+        await taskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType:
+          'Changed task title from \'${taskDocData['taskTitle']}\' to \'$newTitle\'',
+    );
+
     try {
       await taskDocument.updateData({'taskTitle': newTitle});
     } catch (e) {
@@ -318,6 +438,15 @@ class PrivateFolderCollection {
         .document(userId)
         .collection(tasksCollection)
         .document(taskId);
+
+    final taskDocData =
+        await taskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType:
+          'Changed task due date \'${taskDocData['taskTitle']}\' to \'${DateFormat.yMMMd().format(newDueDate)}\'',
+    );
 
     try {
       await taskDocument.updateData({
@@ -339,6 +468,15 @@ class PrivateFolderCollection {
         .collection(tasksCollection)
         .document(taskId);
 
+    final taskDocData =
+        await taskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType:
+          'Changed status of task \'${taskDocData['taskTitle']}\' to \'$newState\'',
+    );
+
     try {
       await taskDocument.updateData({'taskState': newState});
     } catch (e) {
@@ -356,6 +494,15 @@ class PrivateFolderCollection {
         .document(userId)
         .collection(tasksCollection)
         .document(taskId);
+
+    final taskDocData =
+        await taskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType:
+          'Changed priority of task \'${taskDocData['taskTitle']}\' to \'$newPriority\'',
+    );
 
     try {
       await taskDocument.updateData({'taskPriority': newPriority});
@@ -393,6 +540,17 @@ class PrivateFolderCollection {
         .document(parentTaskId)
         .collection(subtasksCollection)
         .document(subtaskId);
+
+    final subtaskDocData =
+        await subtaskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType: completionState == true
+          ? 'Completed subtask \'${subtaskDocData['subtaskTitle']}\''
+          : 'Redo subtask \'${subtaskDocData['subtaskTitle']}\'',
+    );
+
     try {
       await subtaskDocument.updateData({'completed': completionState});
     } catch (e) {
@@ -415,8 +573,47 @@ class PrivateFolderCollection {
         .collection(subtasksCollection)
         .document(subtaskId);
 
+    final subtaskDocData =
+        await subtaskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType:
+          'Changed status of subtask \'${subtaskDocData['subtaskTitle']}\' to \'$newState\'',
+    );
+
     try {
       await subtaskDocument.updateData({'subtaskState': newState});
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> changeSubtaskPriority({
+    @required String userId,
+    @required String taskId,
+    @required String newPriority,
+    @required String subtaskId,
+  }) async {
+    final subtaskDocument = _firestore
+        .collection(usersCollection)
+        .document(userId)
+        .collection(tasksCollection)
+        .document(taskId)
+        .collection(subtasksCollection)
+        .document(subtaskId);
+
+    final subtaskDocData =
+        await subtaskDocument.get().then((snapshot) => snapshot.data);
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType:
+          'Changed priority of subtask \'${subtaskDocData['subtaskTitle']}\' to \'$newPriority\'',
+    );
+
+    try {
+      await subtaskDocument.updateData({'subtaskPriority': newPriority});
     } catch (e) {
       print(e);
     }
@@ -428,13 +625,22 @@ class PrivateFolderCollection {
     @required String commentText,
     @required DateTime dateTime,
   }) async {
-    final newCommentDocument = _firestore
+    final taskDocument = _firestore
         .collection(usersCollection)
         .document(userId)
         .collection(tasksCollection)
-        .document(taskId)
-        .collection(commentsCollection)
-        .document();
+        .document(taskId);
+
+    final taskDocData =
+        await taskDocument.get().then((snapshot) => snapshot.data);
+
+    final newCommentDocument =
+        taskDocument.collection(commentsCollection).document();
+
+    recordPrivateFolderActivity(
+      userId: userId,
+      actionType: 'Created comment in task \'${taskDocData['taskTitle']}\'',
+    );
 
     Comment newComment = Comment(
       commentId: newCommentDocument.documentID,
@@ -471,6 +677,50 @@ class PrivateFolderCollection {
         _commentsList.add(Comment.fromJson(commentDocument.data));
       });
       return _commentsList;
+    });
+  }
+
+  Future<void> recordPrivateFolderActivity({
+    @required String userId,
+    @required String actionType,
+  }) async {
+    final activityDocument = _firestore
+        .collection(usersCollection)
+        .document(userId)
+        .collection(activityLogCollection)
+        .document();
+
+    ActivityAction activity = ActivityAction(
+      actionId: activityDocument.documentID,
+      actionType: actionType,
+      actionDate: DateTime.now(),
+    );
+
+    var activityJson = activity.toJson();
+
+    try {
+      await activityDocument.setData(activityJson);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Stream<List<ActivityAction>> activityStream(String userId) {
+    final activitySnapshot = _firestore
+        .collection(usersCollection)
+        .document(userId)
+        .collection(activityLogCollection)
+        .orderBy('actionDate', descending: true)
+        .snapshots();
+
+    return activitySnapshot.map((QuerySnapshot query) {
+      List<ActivityAction> _activityActions = List<ActivityAction>();
+      query.documents.forEach(
+        (activityDocument) {
+          _activityActions.add(ActivityAction.fromJson(activityDocument.data));
+        },
+      );
+      return _activityActions;
     });
   }
 }

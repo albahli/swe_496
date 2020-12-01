@@ -6,19 +6,14 @@ import 'package:swe496/controllers/private_folder_controllers/category_controlle
 import 'package:swe496/controllers/private_folder_controllers/tasks_list_controller.dart';
 import 'package:swe496/models/private_folder_models/category.dart';
 import '../../Database/UserProfileCollection.dart';
-import '../../Database/UserProfileCollection.dart';
 import '../../controllers/authController.dart';
 import '../../controllers/userController.dart';
-import '../../controllers/userController.dart';
 import '../../utils/root.dart';
-import '../../utils/root.dart';
-import '../GroupProjectsView.dart';
 import '../friendsView.dart';
 import './widget/task_entries.dart';
 import './widget/tasks_list.dart';
 import '../the_drawer.dart';
-
-//
+import './activity_log_view.dart';
 
 class PrivateFolderView extends StatefulWidget {
   @override
@@ -72,6 +67,7 @@ class _PrivateFolderViewState extends State<PrivateFolderView> {
                     labelText: 'Category Name',
                   ),
                   autofocus: true,
+                  maxLength: 12,
                 ),
               ),
               Spacer(),
@@ -173,34 +169,33 @@ class _PrivateFolderViewState extends State<PrivateFolderView> {
 
   @override
   Widget build(BuildContext context) {
-    // to initilize one object instead of exploding the heap with many objects of the same type (when many contexts change)
+    // To initilize one object instead of exploding the heap with many objects of the same type (when many contexts change)
     final mediaQuery = MediaQuery.of(context);
     final appBar = AppBar(
-      title: GetX<UserController>(
-        initState: (_) async {
-          Get.find<UserController>().user = await UserProfileCollection()
-              .getUser(Get.find<AuthController>().user.uid);
-        },
-        builder: (_) {
-          if (_.user.name != null) {
-            return Text("Welcome " + _.user.name);
-          } else {
-            return CircularProgressIndicator();
-          }
-        },
-      ),
+      title: (DateTime.now().hour >= 0 && DateTime.now().hour < 12)
+          ? Text("Good Morning")
+          : (DateTime.now().hour >= 12 && DateTime.now().hour < 16)
+              ? Text("Good Afternoon")
+              : Text("Good Evening"),
       centerTitle: true,
       actions: [
         IconButton(
-          icon: Icon(Icons.edit),
+          icon: Icon(Icons.receipt_outlined),
           onPressed: () {
-            if (Get.isDarkMode) {
-              Get.changeTheme(ThemeData.light());
-            } else {
-              Get.changeTheme(ThemeData.dark());
-            }
+            // Route to the activity log page
+            Get.to(ActivityLogView());
           },
         ),
+        // IconButton(
+        //   icon: Icon(Icons.edit),
+        //   onPressed: () {
+        //     if (Get.isDarkMode) {
+        //       Get.changeTheme(ThemeData.light());
+        //     } else {
+        //       Get.changeTheme(ThemeData.dark());
+        //     }
+        //   },
+        // ),
         IconButton(
           icon: Icon(
             Icons.playlist_add_outlined,
@@ -255,31 +250,11 @@ class _PrivateFolderViewState extends State<PrivateFolderView> {
                 padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).viewInsets.bottom,
                 ),
-                child: TaskEntries()),
+                child: TaskEntries(selectedCategory: categories[0].categoryId)),
             ignoreSafeArea: false,
             persistent: false,
             enableDrag: true,
           );
-          // ! Future considerations
-          // showModalBottomSheet(
-          //   shape: RoundedRectangleBorder(
-          //     borderRadius: BorderRadius.only(
-          //       topLeft: Radius.circular(15.0),
-          //       topRight: Radius.circular(15.0),
-          //     ),
-          //   ),
-          //   context: context,
-          //   builder: (ctx) {
-          //     return SingleChildScrollView(
-          //       child: Padding(
-          //         padding: EdgeInsets.only(
-          //           bottom: MediaQuery.of(context).viewInsets.bottom,
-          //         ),
-          //         child: TaskEntries(),
-          //       ),
-          //     );
-          //   },
-          // );
         },
       ),
     );

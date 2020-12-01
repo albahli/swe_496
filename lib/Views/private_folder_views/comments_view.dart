@@ -38,7 +38,11 @@ class _CommentsViewState extends State<CommentsView> {
 
   Future<void> getCommentsStream() async {
     GetX<CommentsListController>(
-      init: Get.find<CommentsListController>(),
+      init: Get.find<CommentsListController>() != null
+          ? Get.find<CommentsListController>()
+          : Get.put<CommentsListController>(
+              CommentsListController(widget.taskId),
+            ),
     );
   }
 
@@ -123,9 +127,8 @@ class _CommentsViewState extends State<CommentsView> {
                 ),
                 IconButton(
                   icon: Icon(
-                    Icons.keyboard_arrow_right,
+                    Icons.send,
                     color: Theme.of(context).primaryColorDark,
-                    size: 40,
                   ),
                   onPressed: () async {
                     await _createComment();

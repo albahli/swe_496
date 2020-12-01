@@ -58,7 +58,7 @@ class _TaskItemState extends State<TaskItem> {
           await Get.delete<TaskController>();
           print('the value is $value');
         });
-        print('the task details has been removed ${widget.task.taskTitle}');
+        print('the task details closed ${widget.task.taskTitle}');
       },
       // * onDoubleTap has the same functionality as onTap: so no weird functionality occur
       onDoubleTap: () async {

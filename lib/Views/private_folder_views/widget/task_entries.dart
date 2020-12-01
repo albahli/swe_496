@@ -11,6 +11,10 @@ import '../../../controllers/authController.dart';
 class TaskEntries extends StatefulWidget {
   final categories =
       Get.put<CategoryController>(CategoryController()).categories;
+  final String selectedCategory;
+
+  TaskEntries({this.selectedCategory});
+
   @override
   _TaskEntriesState createState() => _TaskEntriesState();
 }
@@ -98,7 +102,7 @@ class _TaskEntriesState extends State<TaskEntries> {
   void initState() {
     super.initState();
 
-    _selectedCategoryIdValue = widget.categories[0].categoryId;
+    _selectedCategoryIdValue = widget.selectedCategory;
 
     // setting a listner for the task title entry focus node so once it hasn't the focus, it brings it back to it
     _tasktTitleFocusNode.addListener(() {
@@ -133,7 +137,7 @@ class _TaskEntriesState extends State<TaskEntries> {
     PrivateFolderCollection().createTask(
       userId: Get.find<AuthController>().user.uid,
       categoryId: _selectedCategoryIdValue,
-      newTtaskTitle: _taskTitleController.text,
+      newTaskTitle: _taskTitleController.text,
       dueDate: _dateTime,
       state: _selectedStateValue,
       priority: _selectedPriorityValue,
@@ -169,7 +173,6 @@ class _TaskEntriesState extends State<TaskEntries> {
   }
 
   void _showCategoriesList(BuildContext ctx) {
-    // TODO: change the view of categories in the entries of task bottom sheet
     Get.defaultDialog(
       title: "Select Category",
       titleStyle: TextStyle(
@@ -177,7 +180,8 @@ class _TaskEntriesState extends State<TaskEntries> {
         fontWeight: FontWeight.w900,
       ),
       content: Container(
-        height: 160,
+        height: (MediaQuery.of(context).size.height * 0.6 -
+            MediaQuery.of(context).viewInsets.bottom),
         width: MediaQuery.of(ctx).size.width * 0.7,
         child: Column(
           mainAxisSize: MainAxisSize.min,

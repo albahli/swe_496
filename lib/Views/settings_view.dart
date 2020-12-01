@@ -49,7 +49,7 @@ class _SettingsViewState extends State<SettingsView> {
           Container(
             padding: const EdgeInsets.all(20),
             child: Text(
-              "Adjust the app to fit your style",
+              "Adjust the app to fit your setting",
               style: Theme.of(context).textTheme.headline6,
             ),
           ),
