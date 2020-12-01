@@ -141,7 +141,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           if (barIndex == 0) // Do nothing, stay in the same page
             return;
           else if (barIndex == 1)
-            Get.to(PrivateFolderView());
+            Get.off(PrivateFolderView());
           else if (barIndex == 2)
             Get.off(FriendsView(), transition: Transition.noTransition);
         });

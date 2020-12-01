@@ -197,8 +197,7 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
     } catch (e) {
       print(e);
     }
-    Navigator.pop(context);
-    // Get.back();
+    Get.back();
   }
 
   Future<void> _updateTaskDueDate() async {

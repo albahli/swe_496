@@ -22,7 +22,7 @@ class TaskModel {
     this.completed,
   });
 
-  // 24 now we set the model the model from Firestore database data
+  // Set the dar object model from Firestore database JSON object
   TaskModel.fromJson(Map<String, dynamic> json) {
     try {
       taskId = json['taskId'];

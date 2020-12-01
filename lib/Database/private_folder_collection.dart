@@ -49,23 +49,26 @@ class PrivateFolderCollection {
     final categoryDocument =
         userDocument.collection(categoriesCollection).document(categoryId);
 
+    // To be able to use category name at Activity Log before deletion, then send it to recordPrivateFolderActivity(..)
     final categoryDocData =
         await categoryDocument.get().then((snapshot) => snapshot.data);
 
     final taskDocuments = userDocument
         .collection(tasksCollection)
-        .where('category', isEqualTo: categoryId)
-        .getDocuments();
+        .where('category', isEqualTo: categoryId);
 
     recordPrivateFolderActivity(
-        userId: userId,
-        actionType: 'Deleted category ${categoryDocData['categoryName']}');
+      userId: userId,
+      actionType: 'Deleted category ${categoryDocData['categoryName']}',
+    );
 
     try {
-      await taskDocuments.then(
+      await taskDocuments.getDocuments().then(
         (snapshot) async {
           for (DocumentSnapshot doc in snapshot.documents) {
-            await deleteTask(userId: userId, taskId: doc.data['category']);
+            if (doc.data['category'] == categoryId) {
+              doc.reference.delete();
+            }
           }
         },
       );
@@ -164,10 +167,10 @@ class PrivateFolderCollection {
       await taskDocument.collection(subtasksCollection).getDocuments().then(
         (snapshot) async {
           for (DocumentSnapshot doc in snapshot.documents) {
-            await deleteSubtask(
-                userId: userId,
-                parentTaskId: taskId,
-                subtaskId: doc.data['subtaskId']);
+            // await deleteSubtask(
+            //     userId: userId,
+            //     parentTaskId: taskId,
+            //     subtaskId: doc.data['subtaskId']);
             doc.reference.delete();
           }
         },
