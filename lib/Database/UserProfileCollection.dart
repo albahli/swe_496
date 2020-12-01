@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:password/password.dart';
+import 'package:swe496/Database/private_folder_collection.dart';
 import 'package:swe496/models/User.dart';
 
 class UserProfileCollection {
@@ -11,6 +12,10 @@ class UserProfileCollection {
           .collection('userProfile')
           .document(user.userID)
           .setData(user.toJson());
+
+      // Create the default category of the private folder
+      await PrivateFolderCollection()
+          .createCategory(user.userID, 'Tasks List:');
       return true;
     } catch (e) {
       print(e);
@@ -18,11 +23,12 @@ class UserProfileCollection {
     }
   }
 
-  Future<DocumentSnapshot> getUser(String uid) async {
+  Future<User> getUser(String uid) async {
     try {
-      DocumentSnapshot userDoc = await _firestore.collection('userProfile').document(uid).get();
+      DocumentSnapshot userDoc =
+      await _firestore.collection('userProfile').document(uid).get();
 
-      return userDoc;
+      return User.fromJson(userDoc.data);
     } catch (e) {
       print(e);
       rethrow;
@@ -158,6 +164,7 @@ class UserProfileCollection {
            .limit(1).getDocuments().then((value) {
              value.documents.forEach((element) {
                 friendId=element.data["userID"];
+                print(element.data);
                  User friend = User.fromJson(element.data);
                 
                 friend.friendsIDs.add(user.userID);

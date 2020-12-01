@@ -103,8 +103,10 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
                     Row(
                       children: [
                         IconButton(
+                          onPressed: () {
+                            // TODO: Generate the sharable link
+                          },
                           icon: Icon(Icons.link),
-                          onPressed: () {},
                         ),
                         Text('Joining link enabled'),
                         Switch(

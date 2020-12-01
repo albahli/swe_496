@@ -40,7 +40,7 @@ class AuthController extends GetxController {
       // Create new list of friends for the user
       List<String> friends = new List<String>();
 
-      // Create new list of friends for the user
+      // Create new list of chats for the user
       List<String> userChatIDs = new List<String>();
 
       // Creating user object and assigning the parameters
@@ -86,13 +86,9 @@ class AuthController extends GetxController {
       FirebaseUser firebaseUser = await _auth.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
 
-      // Getting user document form firebase
-      DocumentSnapshot userDoc =
-          await UserProfileCollection().getUser(firebaseUser.uid);
-      print(userDoc.data);
 
       // Converting the json data to user object
-      Get.find<UserController>().user = User.fromJson(userDoc.data);
+      Get.find<UserController>().user = await UserProfileCollection().getUser(firebaseUser.uid);
       print(Get.find<UserController>().user.userName);
     } catch (e) {
       Get.snackbar(
@@ -112,7 +108,7 @@ class AuthController extends GetxController {
     }
   }
 
-  void signOut() async {
+  Future signOut() async {
     try {
       await _auth.signOut();
       Get.find<UserController>().clear();
