@@ -6,6 +6,7 @@ import 'package:swe496/Views/Project/CreateProjectView.dart';
 import 'package:swe496/Views/friendsView.dart';
 import 'package:swe496/Views/MessagesView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
+import 'package:swe496/Views/private_folder_views/private_folder_view.dart';
 import 'package:swe496/controllers/ProjectControllers/ListOfProjectsContoller.dart';
 import 'package:swe496/controllers/ProjectControllers/projectController.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
@@ -206,7 +207,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           if (barIndex == 0) // Do nothing, stay in the same page
             return;
           else if (barIndex == 1)
-            return;
+            Get.off(PrivateFolderView(), transition: Transition.noTransition);
           else if (barIndex == 2)
             Get.off(FriendsView(), transition: Transition.noTransition);
           else if (barIndex == 3)
