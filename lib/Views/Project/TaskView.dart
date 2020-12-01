@@ -114,8 +114,8 @@ class _TaskViewState extends State<TaskView> {
                         taskOfProjectController.tasks != null &&
                         taskOfProjectController.tasks.isNotEmpty) {
                       // Sort the tasks and events based on due date
-                      taskOfProjectController.tasks[0].subtask.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-
+                      taskOfProjectController.tasks[0].subtask
+                          .sort((a, b) => a.dueDate.compareTo(b.dueDate));
 
                       return Column(
                         children: [
@@ -701,9 +701,12 @@ class _TaskViewState extends State<TaskView> {
                                                                 Get.back();
                                                                 return;
                                                               }
-                                                              print(taskOfProject.taskName);
-                                                              print(taskOfProject.taskDescription);
-                                                              print(taskOfProject.taskStatus);
+                                                              print(taskOfProject
+                                                                  .taskName);
+                                                              print(taskOfProject
+                                                                  .taskDescription);
+                                                              print(taskOfProject
+                                                                  .taskStatus);
                                                               await ProjectCollection().deleteSubtask(
                                                                   projectController
                                                                       .project
@@ -722,8 +725,9 @@ class _TaskViewState extends State<TaskView> {
                                                                       .dueDate,
                                                                   taskOfProject
                                                                       .taskPriority,
-                                                              taskOfProject.taskStatus
-                                                              );
+                                                                  taskOfProject
+                                                                      .taskStatus);
+                                                              Get.back();
                                                             },
                                                           ),
                                                         ),
@@ -751,16 +755,16 @@ class _TaskViewState extends State<TaskView> {
                                         } else {
                                           ProjectCollection()
                                               .changeSubtaskStatus(
-                                              projectController.projectID,
-                                              _mainTaskID.text.trim(),
-                                              taskOfProject.taskID.trim(),
-                                              taskOfProject.taskName,
-                                              taskOfProject.taskDescription,
-                                              taskOfProject.startDate,
-                                              taskOfProject.dueDate,
-                                              taskOfProject.taskPriority,
-                                              taskOfProject.taskStatus,
-                                              'Completed');
+                                                  projectController.projectID,
+                                                  _mainTaskID.text.trim(),
+                                                  taskOfProject.taskID.trim(),
+                                                  taskOfProject.taskName,
+                                                  taskOfProject.taskDescription,
+                                                  taskOfProject.startDate,
+                                                  taskOfProject.dueDate,
+                                                  taskOfProject.taskPriority,
+                                                  taskOfProject.taskStatus,
+                                                  'Completed');
                                         }
                                       } else if (index == 1) {
                                         if (mainTask) {
@@ -772,16 +776,16 @@ class _TaskViewState extends State<TaskView> {
                                         } else {
                                           ProjectCollection()
                                               .changeSubtaskStatus(
-                                              projectController.projectID,
-                                              _mainTaskID.text.trim(),
-                                              taskOfProject.taskID.trim(),
-                                              taskOfProject.taskName,
-                                              taskOfProject.taskDescription,
-                                              taskOfProject.startDate,
-                                              taskOfProject.dueDate,
-                                              taskOfProject.taskPriority,
-                                              taskOfProject.taskStatus,
-                                              'In-progress');
+                                                  projectController.projectID,
+                                                  _mainTaskID.text.trim(),
+                                                  taskOfProject.taskID.trim(),
+                                                  taskOfProject.taskName,
+                                                  taskOfProject.taskDescription,
+                                                  taskOfProject.startDate,
+                                                  taskOfProject.dueDate,
+                                                  taskOfProject.taskPriority,
+                                                  taskOfProject.taskStatus,
+                                                  'In-progress');
                                         }
                                       } else {
                                         if (mainTask) {
@@ -793,16 +797,16 @@ class _TaskViewState extends State<TaskView> {
                                         } else {
                                           ProjectCollection()
                                               .changeSubtaskStatus(
-                                              projectController.projectID,
-                                              _mainTaskID.text.trim(),
-                                              taskOfProject.taskID.trim(),
-                                              taskOfProject.taskName,
-                                              taskOfProject.taskDescription,
-                                              taskOfProject.startDate,
-                                              taskOfProject.dueDate,
-                                              taskOfProject.taskPriority,
-                                              taskOfProject.taskStatus,
-                                              'Not-Started');
+                                                  projectController.projectID,
+                                                  _mainTaskID.text.trim(),
+                                                  taskOfProject.taskID.trim(),
+                                                  taskOfProject.taskName,
+                                                  taskOfProject.taskDescription,
+                                                  taskOfProject.startDate,
+                                                  taskOfProject.dueDate,
+                                                  taskOfProject.taskPriority,
+                                                  taskOfProject.taskStatus,
+                                                  'Not-Started');
                                         }
                                       }
                                     },
@@ -811,7 +815,9 @@ class _TaskViewState extends State<TaskView> {
                                       "In-progress",
                                       "Not-Started",
                                     ],
-                                    selectedButtons: ["${taskOfProject.taskStatus}"],
+                                    selectedButtons: [
+                                      "${taskOfProject.taskStatus}"
+                                    ],
                                     selectedTextStyle: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13,
@@ -859,13 +865,17 @@ class _TaskViewState extends State<TaskView> {
                   )
                 : (last
                     ? SizedBox()
-                    : Dash(
-                        direction: Axis.vertical,
-                        dashGap: 5,
-                        length: 50,
-                        dashLength: 5,
-                        dashColor: Get.theme.unselectedWidgetColor,
-                      )),
+                    : (mainTask &&
+                            (taskOfProject.subtask.isNullOrBlank ||
+                                taskOfProject.subtask.isEmpty))
+                        ? SizedBox()
+                        : Dash(
+                            direction: Axis.vertical,
+                            dashGap: 5,
+                            length: 50,
+                            dashLength: 5,
+                            dashColor: Get.theme.unselectedWidgetColor,
+                          )),
             Spacer(),
             Expanded(
               child: Container(
@@ -1293,12 +1303,12 @@ class _TaskViewState extends State<TaskView> {
                   TextFormField(
                     controller: _editedSubtaskName,
                     validator: (taskNameVal) => taskNameVal.isEmpty
-                        ? "Subtask name cannot be empty"
+                        ? "Task name cannot be empty"
                         : null,
                     onSaved: (taskNameVal) =>
                         _editedSubtaskName.text = taskNameVal,
                     decoration: InputDecoration(
-                        labelText: 'Subtask name',
+                        labelText: 'Task name',
                         hintText: 'Meet the client.',
                         prefixIcon: Icon(Icons.edit),
                         border: OutlineInputBorder(
@@ -1310,12 +1320,12 @@ class _TaskViewState extends State<TaskView> {
                   TextFormField(
                     controller: _editedSubtaskDescription,
                     validator: (taskNameVal) => taskNameVal.isEmpty
-                        ? "Subtask description cannot be empty"
+                        ? "Task description cannot be empty"
                         : null,
                     onSaved: (_taskDescriptionVal) =>
                         _editedSubtaskDescription.text = _taskDescriptionVal,
                     decoration: InputDecoration(
-                        labelText: 'Subtask description',
+                        labelText: 'Task description',
                         hintText:
                             'Collect the requirements from the client and refine them.',
                         prefixIcon: Icon(Icons.description),
@@ -1328,7 +1338,7 @@ class _TaskViewState extends State<TaskView> {
                   ),
                   mainTask
                       ? Text('')
-                      : Text('Subtask dates limited to the main tasks date.'),
+                      : Text('Task dates limited to the main tasks date.'),
                   SizedBox(
                     height: mainTask ? 0 : 30,
                   ),
@@ -1413,7 +1423,7 @@ class _TaskViewState extends State<TaskView> {
                                     textAlignVertical: TextAlignVertical.center,
                                     readOnly: true,
                                     decoration: InputDecoration(
-                                        hintText: 'Subtask Priority',
+                                        hintText: 'Task Priority',
                                         prefixIcon: Icon(
                                           Icons.assignment_late,
                                         ),
@@ -1561,6 +1571,7 @@ class _TaskViewState extends State<TaskView> {
                     minWidth: 20,
                     height: 50.0,
                     child: RaisedButton(
+                      textColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.horizontal(
                               left: Radius.circular(30.0),
@@ -1592,8 +1603,7 @@ class _TaskViewState extends State<TaskView> {
                                   taskOfProject.startDate.trim(),
                                   taskOfProject.dueDate.trim(),
                                   taskOfProject.taskPriority.trim(),
-                            taskOfProject.taskStatus
-                          );
+                                  taskOfProject.taskStatus);
                         }
                       },
                       child: Row(

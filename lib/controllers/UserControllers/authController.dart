@@ -40,6 +40,9 @@ class AuthController extends GetxController {
       // Create new list of friends for the user
       List<String> friends = new List<String>();
 
+      // Create new list of friends for the user
+      List<String> userChatIDs = new List<String>();
+
       // Creating user object and assigning the parameters
       User _user = new User(
         userID: firebaseUser.uid,
@@ -51,6 +54,7 @@ class AuthController extends GetxController {
         userAvatar: '',
         userProjectsIDs: userProjects,
         friendsIDs: friends,
+        userChatsIDs: userChatIDs
       );
 
       // Create a new user in the fire store database
@@ -112,6 +116,7 @@ class AuthController extends GetxController {
     try {
       await _auth.signOut();
       Get.find<UserController>().clear();
+    //  Get.find<ProjectController>().clear();
     } catch (e) {
       Get.snackbar(
         "Error.", // title

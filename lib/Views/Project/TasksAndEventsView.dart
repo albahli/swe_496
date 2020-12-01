@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:swe496/Views/Project/CreateEventView.dart';
 import 'package:swe496/Views/Project/CreateTaskView.dart';
 import 'package:swe496/Views/Project/EventView.dart';
@@ -19,6 +20,7 @@ import 'package:swe496/models/TaskOfProject.dart';
 import 'package:swe496/utils/root.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
+import 'package:intl/intl.dart';
 
 class TasksAndEventsView extends StatefulWidget {
   TasksAndEventsView({Key key}) : super(key: key);
@@ -36,6 +38,21 @@ class _TasksAndEvents extends State<TasksAndEventsView>
       tabController; // Top bar navigation between the tasks and events
 
   bool isAdmin = true;
+  String taskKeywordSearch = '';
+  List<TaskOfProject> filteredTasksListBySearch = new List<TaskOfProject>();
+
+  String eventKeywordSearch = '';
+  List<Event> filteredEventsListBySearch = new List<Event>();
+
+  bool sortByTaskName = true;
+  bool sortByTaskDueDate = false;
+  bool sortByTaskPriority = false;
+  bool sortByTaskStatus = false;
+  bool ascendingSort = false;
+  bool descendingSort = false;
+
+  String dropDownSortButtonOption = 'Name';
+
   @override
   void initState() {
     super.initState();
@@ -104,7 +121,11 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           isAdmin
               ? IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () => Get.to(ProjectSettingsView()),
+                  tooltip: 'Project Settings',
+                  onPressed: () {
+                    Get.to(ProjectSettingsView());
+                    FocusScope.of(context).unfocus();
+                  },
                 )
               : SizedBox()
         ],
@@ -147,31 +168,135 @@ class _TasksAndEvents extends State<TasksAndEventsView>
       bottomNavigationBar: bottomCustomNavigationBar(),
       floatingActionButton: isAdmin
           ? floatingButtons()
-          : FloatingActionButton(child: Icon(Icons.timeline), onPressed: () => Get.bottomSheet(
-        Container(
-          child: Column(
-            children: [
-              AppBar(
-                title: Text('Timeline'),
-                centerTitle: true,
-                leading: IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () => Get.back(),
-                ),
-              ),
-              Expanded(child: viewTimeLineOfTasksAndEvents()),
-            ],
-          ),
-        ),
-        backgroundColor: Get.theme.canvasColor,
-        isScrollControlled: true,
-        ignoreSafeArea: false,
-      )),
+          : FloatingActionButton(
+              child: Icon(Icons.timeline),
+              onPressed: () => Get.bottomSheet(
+                    Container(
+                      child: Column(
+                        children: [
+                          AppBar(
+                            title: Text('Timeline'),
+                            centerTitle: true,
+                            leading: IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () => Get.back(),
+                            ),
+                          ),
+                          Expanded(child: viewTimeLineOfTasksAndEvents()),
+                        ],
+                      ),
+                    ),
+                    backgroundColor: Get.theme.canvasColor,
+                    isScrollControlled: true,
+                    ignoreSafeArea: false,
+                  )),
     );
   }
 
   // Search Bar
-  Widget _searchBar() {
+  Widget tasksSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search',
+              ),
+              onChanged: (textVal) {
+                setState(() {
+                  taskKeywordSearch = textVal;
+                });
+              },
+            ),
+          ),
+          SizedBox(
+            width: 3,
+          ),
+          Column(
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                      tooltip: 'Ascending',
+                      icon: Icon(Icons.arrow_upward, size: 20),
+                      onPressed: () {
+                        setState(() {
+                          ascendingSort = true;
+                          descendingSort = false;
+                        });
+                      }),
+                  IconButton(
+                      tooltip: 'Descending',
+                      icon: Icon(
+                        Icons.arrow_downward,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          descendingSort = true;
+                          ascendingSort = false;
+                        });
+                      }),
+                ],
+              ),
+              DropdownButtonHideUnderline(
+                child: DropdownButton(
+                    isDense: true,
+                    value: dropDownSortButtonOption,
+                    icon: Icon(Icons.sort),
+                    items: ['Name', 'Date', 'Priority', 'Status']
+                        .map((sortOption) {
+                      return new DropdownMenuItem<String>(
+                        value: sortOption,
+                        child: Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: Row(
+                            children: [Text(sortOption)],
+                          ),
+                        ),
+                        onTap: () {},
+                      );
+                    }).toList(),
+                    onTap: () {},
+                    onChanged: (selectedOption) {
+                      setState(() {
+                        dropDownSortButtonOption = selectedOption;
+                        if (selectedOption == 'Name') {
+                          sortByTaskName = true;
+                          sortByTaskDueDate = false;
+                          sortByTaskStatus = false;
+                          sortByTaskPriority = false;
+                        } else if (selectedOption == 'Date') {
+                          sortByTaskName = false;
+                          sortByTaskDueDate = true;
+                          sortByTaskStatus = false;
+                          sortByTaskPriority = false;
+                        } else if (selectedOption == 'Priority') {
+                          sortByTaskName = false;
+                          sortByTaskDueDate = false;
+                          sortByTaskStatus = false;
+                          sortByTaskPriority = true;
+                        } else if (selectedOption == 'Status') {
+                          sortByTaskName = false;
+                          sortByTaskDueDate = false;
+                          sortByTaskStatus = true;
+                          sortByTaskPriority = false;
+                        }
+                      });
+                      FocusScope.of(context).unfocus();
+                    }),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+// Search Bar
+  Widget eventsSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextField(
@@ -179,7 +304,9 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           hintText: 'Search',
         ),
         onChanged: (textVal) {
-          textVal = textVal.toLowerCase();
+          setState(() {
+            eventKeywordSearch = textVal;
+          });
         },
       ),
     );
@@ -215,6 +342,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
             return;
           else if (barIndex == 2)
             Get.to(MembersView(), transition: Transition.noTransition);
+          FocusScope.of(context).unfocus();
         });
         print(index);
       },
@@ -279,6 +407,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
             Get.to(CreateEventView(),
                 transition: Transition.downToUp,
                 duration: Duration(milliseconds: 250));
+            FocusScope.of(context).unfocus();
           },
         ),
         SpeedDialChild(
@@ -291,6 +420,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
               Get.to(CreateTaskView(),
                   transition: Transition.downToUp,
                   duration: Duration(milliseconds: 250));
+              FocusScope.of(context).unfocus();
             }),
       ],
     );
@@ -341,6 +471,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                               (timeLineListOfTasksAndEvents[index] as Event)
                                   .eventID));
                       Get.to(EventView(), preventDuplicates: false);
+                      FocusScope.of(context).unfocus();
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -404,6 +535,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                                   as TaskOfProject)
                               .taskID));
                       Get.to(TaskView(), preventDuplicates: false);
+                      FocusScope.of(context).unfocus();
                     },
                     child: Column(
                       children: [
@@ -477,7 +609,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   Widget tasksTab() {
     return Column(
       children: [
-        _searchBar(),
+        tasksSearchBar(),
         Expanded(child: getListOfTasks()),
       ],
     );
@@ -486,7 +618,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
   Widget eventsTab() {
     return Column(
       children: [
-        _searchBar(),
+        eventsSearchBar(),
         Expanded(child: getListOfEvents()),
       ],
     );
@@ -501,19 +633,108 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           if (listOfTasksOfProjectController != null &&
               listOfTasksOfProjectController.tasks != null &&
               listOfTasksOfProjectController.tasks.isNotEmpty) {
+            filteredTasksListBySearch = listOfTasksOfProjectController.tasks
+                .where((task) => task.taskName
+                    .toLowerCase()
+                    .contains(taskKeywordSearch.toLowerCase()))
+                .toList();
+
+            if (sortByTaskName) {
+              filteredTasksListBySearch.sort((a, b) =>
+                  a.taskName.toLowerCase().compareTo(b.taskName.toLowerCase()));
+            } else if (sortByTaskDueDate) {
+              filteredTasksListBySearch
+                  .sort((a, b) => b.dueDate.compareTo(a.dueDate));
+            } else if (sortByTaskStatus) {
+              filteredTasksListBySearch
+                  .sort((a, b) => a.taskStatus.compareTo(b.taskStatus));
+            } else if (sortByTaskPriority) {
+              filteredTasksListBySearch
+                  .sort((a, b) => a.taskPriority.compareTo(b.taskPriority));
+            }
+
+            if (ascendingSort) {
+              filteredTasksListBySearch = filteredTasksListBySearch;
+            } else if (descendingSort) {
+              filteredTasksListBySearch =
+                  filteredTasksListBySearch.reversed.toList();
+            }
+
             return ListView.builder(
-                itemCount: listOfTasksOfProjectController.tasks.length,
+                itemCount: filteredTasksListBySearch.length,
                 itemBuilder: (context, index) {
+                  // Formatting the current date
+                  var now = new DateTime.now().subtract(Duration(days: 1));
+                  var formatter = new DateFormat('yyyy-MM-dd');
+                  String formattedDate = formatter.format(now);
+                  Jiffy taskDueDate = Jiffy(
+                      filteredTasksListBySearch[index].dueDate, "yyyy-MM-dd");
+
+                  var remainingDays =
+                      taskDueDate.diff(formattedDate, Units.DAY);
                   return ListTile(
-                    leading: Icon(Icons.assignment),
-                    title: Text(
-                        listOfTasksOfProjectController.tasks[index].taskName),
-                    subtitle: Text('Details ...'),
+                    leading: filteredTasksListBySearch[index]
+                                .taskStatus
+                                .toUpperCase() ==
+                            'COMPLETED'
+                        ? Icon(
+                            Icons.assignment_turned_in,
+                            color: Colors.green,
+                          )
+                        : (remainingDays <= 0
+                            ? Icon(
+                                Icons.assignment_late,
+                                color: Colors.red,
+                              )
+                            : (filteredTasksListBySearch[index]
+                                        .taskStatus
+                                        .toUpperCase() ==
+                                    'NOT-STARTED'
+                                ? Icon(
+                                    Icons.assignment,
+                                    color: Colors.grey,
+                                  )
+                                : (filteredTasksListBySearch[index]
+                                            .taskStatus
+                                            .toUpperCase() ==
+                                        'IN-PROGRESS'
+                                    ? Wrap(
+                                        children: [
+                                          Icon(
+                                            Icons.assignment,
+                                            color: Colors.blue,
+                                          ),
+                                          Icon(Icons.edit,
+                                              size: 14, color: Colors.blue),
+                                        ],
+                                      )
+                                    : Icon(
+                                        Icons.assignment,
+                                        color: Colors.grey,
+                                      )))),
+                    title: Text(filteredTasksListBySearch[index].taskName),
+                    subtitle:
+                        Text('${filteredTasksListBySearch[index].dueDate}'),
+                    trailing: Text(
+                      '${filteredTasksListBySearch[index].taskPriority.toUpperCase()}',
+                      style: TextStyle(
+                          color: filteredTasksListBySearch[index]
+                                      .taskPriority
+                                      .toUpperCase() ==
+                                  'LOW'
+                              ? Colors.green
+                              : (filteredTasksListBySearch[index]
+                                          .taskPriority
+                                          .toUpperCase() ==
+                                      'HIGH'
+                                  ? Colors.red
+                                  : Colors.orange)),
+                    ),
                     onTap: () async {
                       Get.put<TaskOfProjectController>(TaskOfProjectController(
-                          taskID: listOfTasksOfProjectController
-                              .tasks[index].taskID));
+                          taskID: filteredTasksListBySearch[index].taskID));
                       Get.to(TaskView());
+                      FocusScope.of(context).unfocus();
                     },
                   );
                 });
@@ -533,18 +754,26 @@ class _TasksAndEvents extends State<TasksAndEventsView>
               listOfEventsController.events != null &&
               listOfEventsController.events.isNotEmpty &&
               !listOfEventsController.events.isNullOrBlank) {
+            filteredEventsListBySearch = listOfEventsController.events
+                .where((event) => event.eventName
+                    .toLowerCase()
+                    .contains(eventKeywordSearch.toLowerCase()))
+                .toList();
             return ListView.builder(
-                itemCount: listOfEventsController.events.length,
+                itemCount: filteredEventsListBySearch.length,
                 itemBuilder: (context, index) {
                   return ListTile(
                     leading: Icon(Icons.event),
-                    title: Text(listOfEventsController.events[index].eventName),
-                    subtitle: Text('Details ...'),
+                    title: Text(filteredEventsListBySearch[index].eventName),
+                    subtitle: Text(
+                        filteredEventsListBySearch[index].eventStartDate +
+                            ' to ' +
+                            filteredEventsListBySearch[index].eventEndDate),
                     onTap: () async {
                       Get.put<EventController>(EventController(
-                          eventID:
-                              listOfEventsController.events[index].eventID));
+                          eventID: filteredEventsListBySearch[index].eventID));
                       Get.to(EventView());
+                      FocusScope.of(context).unfocus();
                     },
                   );
                 });

@@ -203,6 +203,10 @@ class _ProjectSettingsViewState extends State<ProjectSettingsView> {
             Form(
               key: formDeletingKey,
               child: Card(
+                shadowColor: Colors.transparent,
+                shape: new RoundedRectangleBorder(
+              side: new BorderSide(color: Colors.red[600], width: 1.0),
+                borderRadius: BorderRadius.circular(4.0)),
                 child: Column(
                   children: [
                     Padding(

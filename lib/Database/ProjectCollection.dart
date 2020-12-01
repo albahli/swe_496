@@ -554,9 +554,7 @@ class ProjectCollection {
           },
         );
       });
-      //Get.back();
-     // Get.snackbar(
-       //   'Success', "Subtask '$subtaskName' has been deleted successfully");
+
     } on Exception catch (e) {
       print(e);
     }
@@ -586,8 +584,9 @@ class ProjectCollection {
       await createNewSubtask(projectID, taskID, subtaskName, subtaskDescription,
           startDate, dueDate, subtaskPriority, 'Not-Started');
     });
-
     Get.back();
+     Get.snackbar(
+      'Success', "Subtask '$subtaskName' has been updated successfully");
   }
 
   Future<void> createNewEvent(
