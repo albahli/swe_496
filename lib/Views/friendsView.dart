@@ -91,11 +91,13 @@ class _FriendsViewState extends State<FriendsView> {
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: Column(
-          children: <Widget>[
-            _searchBar(),
-            getListOfFriends(),
-          ],
+        child: SingleChildScrollView(
+                  child: Column(
+            children: <Widget>[
+              _searchBar(),
+              getListOfFriends(),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: bottomCustomNavigationBar(),
