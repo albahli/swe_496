@@ -5,12 +5,7 @@ void main() {
   test('Project ...', () async {
     // TODO: Implement test
 
-    // ARRANGE
-    final project = new Project
-     
-    // ACT
-
-    // ASSERT 
+    
 
 
 

@@ -13,7 +13,7 @@ import 'package:uuid/uuid.dart';
 class ProjectCollection {
   final Firestore _firestore = Firestore.instance;
 
-  Future<void> createNewProject(
+  Future<bool> createNewProject(
       String projectName, List<String> membersToBeAdded) async {
     String projectID =
         Uuid().v1(); // Project ID, UuiD is package that generates random ID.
@@ -81,12 +81,15 @@ class ProjectCollection {
       var jsonProject = newProject.toJson();
 
       // Send the project JSON data to the fire base.
-      return await Firestore.instance
+       await Firestore.instance
           .collection('projects')
           .document(projectID)
           .setData(jsonProject);
+
+          return true;
     } catch (e) {
       print(e);
+      return false;
     }
   }
 
@@ -625,7 +628,7 @@ class ProjectCollection {
     }
   }
 
-  Future<void> editEvent(
+  Future<bool> editEvent(
       String projectID,
       String eventID,
       String eventName,
@@ -659,8 +662,10 @@ class ProjectCollection {
               "eventLocation": location,
             }));
       });
+      return true;
     } on Exception catch (e) {
       print(e);
+      return false;
     }
   }
 
