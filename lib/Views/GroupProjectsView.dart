@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
-import 'package:multilevel_drawer/multilevel_drawer.dart';
+import 'package:swe496/Database/UserProfileCollection.dart';
 import 'package:swe496/Views/Project/CreateProjectView.dart';
 import 'package:swe496/Views/friendsView.dart';
 import 'package:swe496/Views/MessagesView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
 import 'package:swe496/Views/private_folder_views/private_folder_view.dart';
+import 'package:swe496/Views/the_drawer.dart';
 import 'package:swe496/controllers/ProjectControllers/ListOfProjectsContoller.dart';
 import 'package:swe496/controllers/ProjectControllers/projectController.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:swe496/models/Project.dart';
-import 'package:swe496/utils/root.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
-import 'AccountSettings.dart';
-
+/*
+1- User can be signed in even if the app is shut down.
+2- Updated the models
+Fixed some bugs.
+ */
 class GroupProjectsView extends StatefulWidget {
   @override
   _GroupProjectsViewState createState() => _GroupProjectsViewState();
@@ -30,7 +33,14 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   int barIndex = 0;
   String keyword = '';
   List<Project> filteredProjectsListBySearch = new List<Project>();
-  
+
+ @override
+  void didChangeDependencies()async {
+   Get.find<UserController>().user = await UserProfileCollection()
+       .getUser(Get.find<AuthController>().user.uid);
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,62 +51,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
           centerTitle: true,
           actions: <Widget>[],
         ),
-        drawer: MultiLevelDrawer(
-          header: Container(
-            // Header for Drawer
-            height: MediaQuery.of(context).size.height * 0.25,
-            child: Center(
-                child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.account_circle,
-                    size: 90,
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  userController.user.userName == null
-                      ? Text('NULL ?')
-                      : Text('${userController.user.userName}'),
-                ],
-              ),
-            )),
-          ),
-          children: [
-            // Child Elements for Each Drawer Item
-            MLMenuItem(
-                leading: Icon(
-                  Icons.person,
-                ),
-                content: Text("My Profile"),
-                onClick: () {
-                  Get.to(AccountSettings());
-                  FocusScope.of(context).unfocus();
-                }),
-            MLMenuItem(
-              leading: Icon(
-                Icons.settings,
-              ),
-              content: Text("Settings"),
-              onClick: () {},
-            ),
-            MLMenuItem(
-                leading: Icon(
-                  Icons.power_settings_new,
-                ),
-                content: Text(
-                  "Log out",
-                ),
-                onClick: () async {
-                  await authController.signOut();
-                  Get.offAll(Root());
-                  Get.delete<ListOfProjectsController>();
-                  print("Signed Out ");
-                }),
-          ],
-        ),
+        drawer: TheDrawer(authController: authController),
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,

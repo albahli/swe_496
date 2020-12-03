@@ -1,15 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Views/MessagesView.dart';
-import 'package:swe496/models/User.dart';
+import 'package:swe496/Views/the_drawer.dart';
 import 'package:swe496/utils/root.dart';
 import '../Database/UserProfileCollection.dart';
 import '../controllers/UserControllers/authController.dart';
 import '../controllers/UserControllers/userController.dart';
-import 'AccountSettings.dart';
 
 class FriendsView extends StatefulWidget {
   @override
@@ -37,61 +35,7 @@ class _FriendsViewState extends State<FriendsView> {
         centerTitle: true,
         actions: <Widget>[],
       ),
-      drawer: MultiLevelDrawer(
-        header: Container(
-          // Header for Drawer
-          height: MediaQuery.of(context).size.height * 0.25,
-          child: Center(
-              child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  Icons.account_circle,
-                  size: 90,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                userController.user.userName == null
-                    ? Text('NULL ? ')
-                    : Text('${userController.user.userName}'),
-              ],
-            ),
-          )),
-        ),
-        children: [
-          // Child Elements for Each Drawer Item
-          MLMenuItem(
-              leading: Icon(
-                Icons.person,
-              ),
-              content: Text("My Profile"),
-              onClick: () {
-                Get.to(AccountSettings());
-              }),
-          MLMenuItem(
-            leading: Icon(
-              Icons.settings,
-            ),
-            content: Text("Settings"),
-            onClick: () {},
-          ),
-          MLMenuItem(
-              leading: Icon(
-                Icons.power_settings_new,
-              ),
-              content: Text(
-                "Log out",
-              ),
-              onClick: () async {
-                authController.signOut();
-                Get.offAll(Root());
-                print("Signed Out");
-              }),
-        ],
-      ),
-
+      drawer: TheDrawer(authController: authController),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
