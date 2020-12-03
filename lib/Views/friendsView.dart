@@ -51,7 +51,7 @@ class _FriendsViewState extends State<FriendsView> {
                   height: 10,
                 ),
                 userController.user.userName == null
-                    ? Text('NULL ?')
+                    ? Text('NULL ? ')
                     : Text('${userController.user.userName}'),
               ],
             ),
