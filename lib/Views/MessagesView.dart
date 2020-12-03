@@ -10,6 +10,17 @@ import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/utils/root.dart';
 
 class MessagesView extends StatefulWidget {
+  String quickChatTo;
+  bool isdirectChat = false;
+  String directChatname ;
+  MessagesView.direct(String quickChatID , bool directChat , String chatname){
+    this.isdirectChat = directChat;
+    this.quickChatTo = quickChatID;
+    this.directChatname = chatname;
+  }
+  MessagesView(){
+
+  }
   @override
   _MessagesViewState createState() => _MessagesViewState();
 }
@@ -21,7 +32,14 @@ class _MessagesViewState extends State<MessagesView> {
   final TextEditingController _newProjectNameController =
       TextEditingController();
   int barIndex = 3;
-
+  @override
+  void initState() {
+    super.initState();
+    if(widget.isdirectChat){
+ WidgetsBinding.instance.addPostFrameCallback((_) { Get.to(chat(widget.quickChatTo , widget.directChatname , 'private' ), transition: Transition.noTransition); });
+    }
+   
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,6 +114,7 @@ class _MessagesViewState extends State<MessagesView> {
       ),
       bottomNavigationBar: bottomCustomNavigationBar(),
     );
+    
   }
 
   _searchBar() {
@@ -151,10 +170,10 @@ class _MessagesViewState extends State<MessagesView> {
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    leading: Image.asset(
+                    leading: Icon(
                         snapshot.data.documents[index]['type'] == 'group'
-                            ? 'lib/assets/groupimage.png'
-                            : 'lib/assets/personimage.png'),
+                            ? Icons.supervised_user_circle
+                            : Icons.account_circle , size: 50, color: Colors.black,),
                     title: Text(chatNameSpliter(
                         snapshot.data.documents[index]['GroupName'],
                         snapshot.data.documents[index]['type'])),
@@ -230,7 +249,7 @@ class _MessagesViewState extends State<MessagesView> {
           else if (barIndex == 1)
             return;
           else if (barIndex == 2)
-            Get.to(FriendsView(), transition: Transition.noTransition);
+            Get.off(FriendsView(), transition: Transition.noTransition);
           else if (barIndex == 3) return;
         });
 
@@ -238,4 +257,5 @@ class _MessagesViewState extends State<MessagesView> {
       },
     );
   }
+ 
 }

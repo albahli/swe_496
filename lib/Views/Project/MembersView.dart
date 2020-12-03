@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:search_choices/search_choices.dart';
 import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Database/UserProfileCollection.dart';
+import 'package:swe496/Views/Project/ChatView.dart';
 import 'package:swe496/Views/Project/ProjectSettingsView.dart';
 import 'package:swe496/Views/Project/TasksAndEventsView.dart';
 import 'package:swe496/controllers/ProjectControllers/projectController.dart';
@@ -128,7 +129,7 @@ class _MembersViewState extends State<MembersView> {
           if (barIndex == 0)
             Get.off(TasksAndEventsView(), transition: Transition.noTransition);
           else if (barIndex == 1)
-            return;
+             Get.off(ChatView(), transition: Transition.noTransition);
           else if (barIndex == 2) // Do nothing, stay in the same page
             return;
         });

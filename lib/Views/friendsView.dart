@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/MessagesView.dart';
 import 'package:swe496/models/User.dart';
 import 'package:swe496/utils/root.dart';
@@ -201,10 +202,42 @@ class _FriendsViewState extends State<FriendsView> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    leading: Icon(Icons.supervised_user_circle),
+                    leading: Icon(Icons.account_circle),
                     title: Text(filteredFriendsListBySearch[index]['userName']),
-                    subtitle: Text('Details .......'),
-                    onTap: () {},
+                    subtitle: Text('Click to chat'),
+                    onTap: () {
+                      String firstname = userController.user.userName.compareTo(filteredFriendsListBySearch[index]['userName'])==-1? userController.user.userName:filteredFriendsListBySearch[index]['userName'];
+                      String secondname = userController.user.userName.compareTo(filteredFriendsListBySearch[index]['userName'])==1? userController.user.userName:filteredFriendsListBySearch[index]['userName'];
+                      String chatname = firstname + '#' + secondname;
+                      String chatID = firstname + secondname ;
+                      // if chat id not in the userChatsIDs create new a chat and it both friends
+                      if(userController.user.userChatsIDs.contains(chatID)){
+                          Get.to(MessagesView.direct(chatID , true , chatname ), transition: Transition.noTransition);
+                      } else {
+                        List<String> membersIDs = new List<String>();
+                        membersIDs.add(userController.user.userID);
+                        membersIDs.add(filteredFriendsListBySearch[index]['userID']);
+                        try {
+                       for (int i = 0; i < membersIDs.length; i++) {
+                         Firestore.instance.collection('userProfile')
+                          .document(membersIDs[i])
+                          .updateData(({
+                          'userChatsIDs': FieldValue.arrayUnion([chatID]),
+                                       }));
+                                                                   }
+                       Map<String, dynamic> chatInfo = new Map<String, dynamic>();
+                       chatInfo['GroupName'] = firstname + '#' + secondname;
+                       chatInfo['LastMsg'] = "";
+                       chatInfo['membersIDs'] = membersIDs;
+                       chatInfo['type'] = 'private';
+                       Firestore.instance.collection('Chats').document(chatID).setData(chatInfo);
+                          Get.to(MessagesView.direct(chatID , true , chatname ), transition: Transition.noTransition);
+                            } catch (e) {
+                                   print(e);
+                                        }
+                        
+                      }
+                    },
                   );
                 });
           }
@@ -258,7 +291,7 @@ class _FriendsViewState extends State<FriendsView> {
           else if (barIndex == 2) // Do nothing, stay in the same page
            return;
           else if (barIndex == 3) // Do nothing, stay in the same page
-            Get.to(MessagesView());
+            Get.off(MessagesView());
         });
         print(index);
       },

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:swe496/Views/Project/ChatView.dart';
 import 'package:swe496/Views/Project/CreateEventView.dart';
 import 'package:swe496/Views/Project/CreateTaskView.dart';
 import 'package:swe496/Views/Project/EventView.dart';
@@ -339,7 +340,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           if (barIndex == 0) // Do nothing, stay in the same page
             return;
           else if (barIndex == 1)
-            return;
+             Get.off(ChatView(), transition: Transition.noTransition);
           else if (barIndex == 2)
             Get.to(MembersView(), transition: Transition.noTransition);
           FocusScope.of(context).unfocus();
