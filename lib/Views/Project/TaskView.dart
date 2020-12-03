@@ -741,7 +741,7 @@ class _TaskViewState extends State<TaskView> {
                                     },
                                   )
                                 : GroupButton(
-                                    spacing: 10,
+                                    spacing: 8,
                                     isRadio: true,
                                     direction: Axis.horizontal,
                                     onSelected: (index, isSelected) {

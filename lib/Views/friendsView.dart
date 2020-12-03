@@ -4,6 +4,7 @@ import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:swe496/Views/MessagesView.dart';
+import 'package:swe496/models/User.dart';
 import 'package:swe496/utils/root.dart';
 import '../Database/UserProfileCollection.dart';
 import '../controllers/UserControllers/authController.dart';
@@ -23,6 +24,8 @@ class _FriendsViewState extends State<FriendsView> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController _friendUsernameController =
       TextEditingController();
+   List<DocumentSnapshot> filteredFriendsListBySearch;
+   String keyword="";   
 
   @override
   Widget build(BuildContext context) {
@@ -92,11 +95,13 @@ class _FriendsViewState extends State<FriendsView> {
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: Column(
-          children: <Widget>[
-            _searchBar(),
-            getListOfFriends(),
-          ],
+        child: SingleChildScrollView(
+                  child: Column(
+            children: <Widget>[
+              _searchBar(),
+              getListOfFriends(),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: bottomCustomNavigationBar(),
@@ -112,8 +117,11 @@ class _FriendsViewState extends State<FriendsView> {
       child: TextField(
         decoration: InputDecoration(hintText: 'Search'),
         onChanged: (textVal) {
-          textVal = textVal.toLowerCase();
-          setState(() {});
+          
+          
+          setState(() {
+            keyword =textVal;
+          });
         },
       ),
     );
@@ -182,14 +190,19 @@ class _FriendsViewState extends State<FriendsView> {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: Text("You don't have any friends")),
               );
-
+               filteredFriendsListBySearch = snapshot.data.documents.toList()
+                  .where((user) => user.data["userName"]
+                      .toLowerCase()
+                      .contains(keyword.toLowerCase()))
+                  .toList();
+           
             return ListView.builder(
-                itemCount: snapshot.data.documents.length,
+                itemCount: filteredFriendsListBySearch.length,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   return ListTile(
                     leading: Icon(Icons.supervised_user_circle),
-                    title: Text(snapshot.data.documents[index]['userName']),
+                    title: Text(filteredFriendsListBySearch[index]['userName']),
                     subtitle: Text('Details .......'),
                     onTap: () {},
                   );
