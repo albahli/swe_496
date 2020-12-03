@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
 import 'package:swe496/Views/settings_view.dart';
+import 'package:swe496/controllers/ProjectControllers/ListOfProjectsContoller.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/controllers/UserControllers/userController.dart';
 
@@ -72,7 +73,8 @@ class TheDrawer extends StatelessWidget {
               onClick: () async {
                 await authController.signOut();
                 Get.offAll(Root());
-                print("Signed Out");
+                Get.delete<ListOfProjectsController>();
+                print("Signed Out ");
               }),
         ],
       );

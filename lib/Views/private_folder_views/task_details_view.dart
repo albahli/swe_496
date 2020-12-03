@@ -8,7 +8,7 @@ import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/controllers/private_folder_controllers/category_controller.dart';
 import 'package:swe496/controllers/private_folder_controllers/task_controller.dart';
 import '../../controllers/private_folder_controllers/subtasks_list_controller.dart';
-import 'package:swe496/models/private_folder_models/task.dart';
+import 'package:swe496/models/private_folder_models/task_of_private_folder.dart';
 import '../../models/private_folder_models/subtask.dart';
 import './comments_view.dart';
 

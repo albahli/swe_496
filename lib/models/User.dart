@@ -1,3 +1,6 @@
+import 'package:swe496/Database/UserProfileCollection.dart';
+import 'package:swe496/controllers/UserControllers/authController.dart';
+
 class User {
   String userID;
   String userName;
@@ -49,4 +52,22 @@ class User {
     data['userChatsIDs'] = this.userChatsIDs;
     return data;
   }
+  Future<void> updateBirthDate(String date,User user) async{
+    UserProfileCollection().updateBirthDate(date, user);
+  }
+  Future<void> updateName(String name,User user) async{
+    UserProfileCollection().updateName(name, user);
+  }
+  Future<void> updateEmail(String email) async{
+    AuthController().updateEmail(email);
+  }
+  Future<void> updatePassword(String password) async{
+    AuthController().updatePassword(password);
+  }
+
+  Future<void> addFriend(String friendUsername , User user){
+    return UserProfileCollection().addFriend(friendUsername, user);
+  }
+
+
 }

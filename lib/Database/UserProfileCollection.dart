@@ -107,7 +107,7 @@ class UserProfileCollection {
 
 
 
-  Future<void> updatepassword(String password,User user) async{
+  Future<void> updatePassword(String password,User user) async{
 
      try{
 
@@ -133,7 +133,7 @@ class UserProfileCollection {
 
 
 
-  Future<void> updatBirthDate(String date,User user) async{
+  Future<void> updateBirthDate(String date,User user) async{
     try{
      
       user.birthDate=date;

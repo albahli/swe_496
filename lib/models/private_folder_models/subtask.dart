@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:swe496/models/private_folder_models/task.dart';
+import 'package:swe496/models/private_folder_models/task_of_private_folder.dart';
 
 class Subtask extends TaskModel {
   String parentTaskId;

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:swe496/Views/private_folder_views/task_details_view.dart';
 import 'package:swe496/controllers/private_folder_controllers/task_controller.dart';
-import 'package:swe496/models/private_folder_models/task.dart';
+import 'package:swe496/models/private_folder_models/task_of_private_folder.dart';
 import '../../../controllers/private_folder_controllers/subtasks_list_controller.dart';
 
 class TaskItem extends StatefulWidget {

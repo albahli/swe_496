@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:swe496/Database/private_folder_collection.dart';
 
 class Comment {
   String commentId;
@@ -25,4 +26,14 @@ class Comment {
     data['dateTime'] = this.dateTime;
     return data;
   }
+
+  Future<void> createComment({
+    @required String userId,
+    @required String taskId,
+    @required String commentText,
+    @required DateTime dateTime,
+  }) async {
+    await PrivateFolderCollection().createComment(userId: userId, taskId: taskId, commentText: commentText, dateTime: dateTime);
+  }
+
 }

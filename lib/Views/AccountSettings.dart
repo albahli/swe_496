@@ -184,7 +184,7 @@ class _AccountSettingsState extends State<AccountSettings> {
               formKeyPassword.currentState.save();
               if(formKeyPassword.currentState.validate() && _newPassword.text==_confirmNewPassword.text && Password.verify(_currentPassword.text, userController.user.password)){
                 try{
-                await UserProfileCollection().updatepassword(_newPassword.text,userController.user);
+                await UserProfileCollection().updatePassword(_newPassword.text,userController.user);
                 await AuthController().updatePassword(_newPassword.text);
                 _currentPassword.clear();
                 _newPassword.clear();
@@ -350,7 +350,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                                           10) // to avoid exception
                                         _birthDateController.text =
                                             date.toString().substring(0, 10);
-                                            UserProfileCollection().updatBirthDate(_birthDateController.text, userController.user);
+                                            UserProfileCollection().updateBirthDate(_birthDateController.text, userController.user);
                                     });  
                      },
                    ),
