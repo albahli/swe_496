@@ -12,6 +12,7 @@ import 'package:swe496/controllers/ProjectControllers/projectController.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:swe496/models/Project.dart';
+import 'package:swe496/utils/root.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 import 'AccountSettings.dart';
@@ -29,7 +30,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   int barIndex = 0;
   String keyword = '';
   List<Project> filteredProjectsListBySearch = new List<Project>();
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,8 +90,10 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
                   "Log out",
                 ),
                 onClick: () async {
-                  authController.signOut();
-                  print("Signed Out");
+                  await authController.signOut();
+                  Get.offAll(Root());
+                  Get.delete<ListOfProjectsController>();
+                  print("Signed Out ");
                 }),
           ],
         ),

@@ -5,7 +5,7 @@ import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/controllers/private_folder_controllers/task_controller.dart';
 import 'package:swe496/controllers/private_folder_controllers/tasks_list_controller.dart';
 import 'package:swe496/models/private_folder_models/category.dart';
-import 'package:swe496/models/private_folder_models/task.dart';
+import 'package:swe496/models/private_folder_models/task_of_private_folder.dart';
 import './task_item.dart';
 import './task_entries.dart';
 

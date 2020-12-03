@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:swe496/models/private_folder_models/category.dart';
 import 'package:swe496/models/private_folder_models/comment.dart';
 import 'package:swe496/models/private_folder_models/subtask.dart';
-import 'package:swe496/models/private_folder_models/task.dart';
+import 'package:swe496/models/private_folder_models/task_of_private_folder.dart';
 import 'package:swe496/models/private_folder_models/activity_action.dart';
 import 'package:intl/intl.dart';
 

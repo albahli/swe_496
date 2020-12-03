@@ -1,3 +1,5 @@
+import 'package:swe496/Database/ProjectCollection.dart';
+
 import 'Chat.dart';
 import 'Event.dart';
 import 'Members.dart';
@@ -18,16 +20,16 @@ class Project {
 
   Project(
       {this.projectID,
-        this.projectName,
-        this.image,
-        this.joiningLink,
-        this.isJoiningLinkEnabled,
-        this.pinnedMessage,
-        this.chat,
-        this.event,
-        this.members,
-        this.membersIDs,
-        this.task});
+      this.projectName,
+      this.image,
+      this.joiningLink,
+      this.isJoiningLinkEnabled,
+      this.pinnedMessage,
+      this.chat,
+      this.event,
+      this.members,
+      this.membersIDs,
+      this.task});
 
   Project.fromJson(Map<String, dynamic> json) {
     projectID = json['projectID'];
@@ -36,24 +38,26 @@ class Project {
     joiningLink = json['joiningLink'];
     isJoiningLinkEnabled = json['isJoiningLinkEnabled'];
     pinnedMessage = json['pinnedMessage'];
-    chat = json['chat'] != null ? new Chat.fromJson(Map<String,dynamic>.from(json['chat'])) : null;
+    chat = json['chat'] != null
+        ? new Chat.fromJson(Map<String, dynamic>.from(json['chat']))
+        : null;
     if (json['event'] != null) {
       event = new List<Event>();
       json['event'].forEach((v) {
-        event.add(new Event.fromJson(Map<String,dynamic>.from(v)));
+        event.add(new Event.fromJson(Map<String, dynamic>.from(v)));
       });
     }
     if (json['members'] != null) {
       members = new List<Member>();
       json['members'].forEach((v) {
-        members.add(new Member.fromJson(Map<String,dynamic>.from(v)));
+        members.add(new Member.fromJson(Map<String, dynamic>.from(v)));
       });
     }
     membersIDs = List.of(json['membersIDs'].cast<String>());
     if (json['Task'] != null) {
       task = new List<TaskOfProject>();
       json['Task'].forEach((v) {
-        task.add(new TaskOfProject.fromJson(Map<String,dynamic>.from(v)));
+        task.add(new TaskOfProject.fromJson(Map<String, dynamic>.from(v)));
       });
     }
   }
@@ -81,4 +85,55 @@ class Project {
     }
     return data;
   }
+
+  Future<bool> createNewProject(
+      String projectName, List<String> membersToBeAdded) async {
+    return await ProjectCollection()
+        .createNewProject(projectName, membersToBeAdded);
+  }
+
+  Future<void> addNewMembersToProject(
+      String projectID, List<String> membersToBeAdded) async {
+    return await ProjectCollection()
+        .addNewMembersToProject(projectID, membersToBeAdded);
+  }
+
+  Future<void> removeMemberFromProject(
+      String projectID, String memberID, bool isAdmin) async {
+    return await ProjectCollection()
+        .removeMemberFromProject(projectID, memberID, isAdmin);
+  }
+
+  Future<void> changeMemberRole(
+      String projectID, String memberID, bool isCurrentMemberIsAdmin) async {
+    return await ProjectCollection()
+        .changeMemberRole(projectID, memberID, isCurrentMemberIsAdmin);
+  }
+
+  Stream<List<TaskOfProject>> getTasksOfProjectAssignedByAdmin(
+      String projectID, String assignedBy) {
+    return ProjectCollection()
+        .getTasksOfProjectAssignedByAdmin(projectID, assignedBy);
+  }
+
+  Stream<List<TaskOfProject>> getTasksOfProjectAssignedToMember(
+      String projectID, String assignedTo) {
+    return ProjectCollection()
+        .getTasksOfProjectAssignedToMember(projectID, assignedTo);
+  }
+
+  Stream<List<Event>> getEventsOfProject(String projectID){
+    return ProjectCollection().getEventsOfProject(projectID);
+  }
+
+  Future<void> updateProjectSettings(String projectID, String projectName,
+      String pinnedMessage, bool joiningLinkStatus) async {
+
+  }
+
+  Future<void> deleteProject(String projectID) async {
+    await ProjectCollection().deleteProject(projectID);
+  }
+
+
 }

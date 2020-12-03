@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:swe496/Database/private_folder_collection.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
-import 'package:swe496/models/private_folder_models/task.dart';
+import 'package:swe496/models/private_folder_models/task_of_private_folder.dart';
 
 
 class TaskController extends GetxController {

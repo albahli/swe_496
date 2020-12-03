@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:swe496/Database/private_folder_collection.dart';
 import 'package:swe496/Views/private_folder_views/widget/comment_item.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/controllers/private_folder_controllers/comments_list_controller.dart';
@@ -27,7 +26,7 @@ class _CommentsViewState extends State<CommentsView> {
   }
 
   Future<void> _createComment() async {
-    await PrivateFolderCollection().createComment(
+    await Comment().createComment(
       userId: Get.find<AuthController>().user.uid,
       taskId: widget.taskId,
       commentText: _commentTextController.text,

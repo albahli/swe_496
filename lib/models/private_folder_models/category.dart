@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+import 'package:swe496/Database/private_folder_collection.dart';
+
 class Category {
   String _categoryId;
   String _categoryName;
@@ -18,5 +21,27 @@ class Category {
     data['categoryId'] = this._categoryId;
     data['categoryName'] = this._categoryName;
     return data;
+  }
+
+  Future<void> createCategory(String userId, String categoryName) async {
+    await PrivateFolderCollection().createCategory(userId, categoryName);
+  }
+
+  Future<void> deleteCategory({
+    @required String userId,
+    @required String categoryId,
+  }) async {
+    await PrivateFolderCollection()
+        .deleteCategory(userId: userId, categoryId: categoryId);
+  }
+
+  Future<void> changeCategoryName({
+    @required String userId,
+    @required String categoryId,
+    @required String newCategoryName,
+  }) async {
+
+    await PrivateFolderCollection()
+        .changeCategoryName(userId: userId, categoryId: categoryId, newCategoryName: newCategoryName);
   }
 }

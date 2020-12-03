@@ -1,3 +1,5 @@
+import 'package:swe496/Database/ProjectCollection.dart';
+
 class Event {
   String eventID;
   String eventName;
@@ -8,11 +10,11 @@ class Event {
 
   Event(
       {this.eventID,
-        this.eventName,
-        this.eventStartDate,
-        this.eventEndDate,
-        this.eventDescription,
-        this.eventLocation});
+      this.eventName,
+      this.eventStartDate,
+      this.eventEndDate,
+      this.eventDescription,
+      this.eventLocation});
 
   Event.fromJson(Map<String, dynamic> json) {
     eventID = json['eventID'];
@@ -33,4 +35,33 @@ class Event {
     data['eventLocation'] = this.eventLocation;
     return data;
   }
+
+  Future<void> createNewEvent(
+      String projectID,
+      String eventName,
+      String eventDescription,
+      String startDate,
+      String endDate,
+      String location) async {
+    await ProjectCollection().createNewEvent(
+        projectID, eventName, eventDescription, startDate, endDate, location);
+  }
+
+  Future<bool> editEvent(
+      String projectID,
+      String eventID,
+      String eventName,
+      String eventDescription,
+      String startDate,
+      String endDate,
+      String location) async {
+    return await ProjectCollection().editEvent(projectID, eventID, eventName,
+        eventDescription, startDate, endDate, location);
+  }
+
+  Future<void> deleteEvent(String projectID, String eventID) async {
+    await ProjectCollection().deleteEvent(projectID, eventID);
+  }
+
+
 }
