@@ -142,7 +142,7 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.contacts),
-          label:'Friends',
+          label: 'Friends',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.message),
