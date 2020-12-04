@@ -8,9 +8,9 @@ import 'package:swe496/models/private_folder_models/task_of_private_folder.dart'
 class TaskController extends GetxController {
   String taskId;
 
-  Rx<TaskModel> _task = Rx<TaskModel>();
+  Rx<TaskOfPrivateFolder> _task = Rx<TaskOfPrivateFolder>();
 
-  TaskModel get task => _task.value;
+  TaskOfPrivateFolder get task => _task.value;
 
   Future<bool> get hasSubtasks async => await PrivateFolderCollection()
           .taskHasSubtasks(taskId, Get.find<AuthController>().user.uid)

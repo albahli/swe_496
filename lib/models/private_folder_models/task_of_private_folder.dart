@@ -4,7 +4,7 @@ import 'package:swe496/models/Task.dart';
 
 // Show the tasks we have to bring their data from Firestore and then set that as a model and
 // bring it back to the personal folder
-class TaskModel extends Task {
+class TaskOfPrivateFolder extends Task {
   String categoryId;
   String taskTitle;
   String taskId;
@@ -13,7 +13,7 @@ class TaskModel extends Task {
   String priority;
   bool completed;
 
-  TaskModel({
+  TaskOfPrivateFolder({
     @required this.categoryId,
     @required this.taskId,
     @required this.taskTitle,
@@ -24,7 +24,7 @@ class TaskModel extends Task {
   });
 
   // Set the dar object model from Firestore database JSON object
-  TaskModel.fromJson(Map<String, dynamic> json) {
+  TaskOfPrivateFolder.fromJson(Map<String, dynamic> json) {
     try {
       taskId = json['taskId'];
       categoryId = json['category'];

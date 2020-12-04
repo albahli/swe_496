@@ -26,7 +26,7 @@ class TaskDetailsView extends StatefulWidget {
 class _TaskDetailsViewState extends State<TaskDetailsView> {
   final _taskTitleController = TextEditingController();
 
-  TaskModel task;
+  TaskOfPrivateFolder task;
   String _selectedStateValue;
   String _selectedPriorityValue;
   String _selectedCategoryIdValue;

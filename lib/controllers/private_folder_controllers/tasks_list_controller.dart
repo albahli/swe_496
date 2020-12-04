@@ -5,10 +5,10 @@ import 'package:swe496/models/private_folder_models/task_of_private_folder.dart'
 
 class TasksListController extends GetxController {
   // 26 we make an observable task models
-  Rx<List<TaskModel>> _tasksList = Rx<List<TaskModel>>();
+  Rx<List<TaskOfPrivateFolder>> _tasksList = Rx<List<TaskOfPrivateFolder>>();
 
   // 27 we need to stream the list of tasks to the private folder
-  List<TaskModel> get tasks => _tasksList.value;
+  List<TaskOfPrivateFolder> get tasks => _tasksList.value;
 
   // 28 we need to bind the _tasksList to the stream coming from Firestore of the database
   @override

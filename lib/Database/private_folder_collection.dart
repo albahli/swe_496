@@ -126,7 +126,7 @@ class PrivateFolderCollection {
     recordPrivateFolderActivity(
         userId: userId, actionType: "Created task '$newTaskTitle'");
 
-    TaskModel newTask = TaskModel(
+    TaskOfPrivateFolder newTask = TaskOfPrivateFolder(
       categoryId: categoryId,
       taskId: newTaskDocument.documentID,
       taskTitle: newTaskTitle,
@@ -260,7 +260,7 @@ class PrivateFolderCollection {
   }
 
   // The stream to provide to the tasks
-  Stream<List<TaskModel>> privateFolderTasksStream(String userId) {
+  Stream<List<TaskOfPrivateFolder>> privateFolderTasksStream(String userId) {
     final tasksSnapshot = _firestore
         .collection(usersCollection)
         .document(userId)
@@ -273,10 +273,10 @@ class PrivateFolderCollection {
 
     return tasksSnapshot.map(
       (QuerySnapshot query) {
-        List<TaskModel> _tasksList = List<TaskModel>();
+        List<TaskOfPrivateFolder> _tasksList = List<TaskOfPrivateFolder>();
         query.documents.forEach(
           (DocumentSnapshot taskDocument) {
-            _tasksList.add(TaskModel.fromJson(taskDocument.data));
+            _tasksList.add(TaskOfPrivateFolder.fromJson(taskDocument.data));
           },
         );
         return _tasksList;
@@ -332,7 +332,7 @@ class PrivateFolderCollection {
     );
   }
 
-  Future<Stream<TaskModel>> taskStream(String userId, taskId) async {
+  Future<Stream<TaskOfPrivateFolder>> taskStream(String userId, taskId) async {
     final taskDocument = _firestore
         .collection(usersCollection)
         .document(userId)
@@ -342,7 +342,7 @@ class PrivateFolderCollection {
 
     return taskDocument.map(
       (taskSnapshot) {
-        return TaskModel.fromJson(taskSnapshot.data);
+        return TaskOfPrivateFolder.fromJson(taskSnapshot.data);
       },
     );
   }

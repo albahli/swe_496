@@ -7,7 +7,7 @@ import 'package:swe496/models/private_folder_models/task_of_private_folder.dart'
 import '../../../controllers/private_folder_controllers/subtasks_list_controller.dart';
 
 class TaskItem extends StatefulWidget {
-  final TaskModel task;
+  final TaskOfPrivateFolder task;
   final Function tickTask;
   final Function deleteTask;
 

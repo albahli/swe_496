@@ -32,8 +32,8 @@ class TasksList extends StatefulWidget {
 }
 
 class _TasksListState extends State<TasksList> {
-  List<TaskModel> userTasks = [];
-  List<TaskModel> completedTasks = [];
+  List<TaskOfPrivateFolder> userTasks = [];
+  List<TaskOfPrivateFolder> completedTasks = [];
 
   void _tickTask(String taskId, bool currentCompletionState) {
     PrivateFolderCollection().taskCompletionToggle(
@@ -44,9 +44,9 @@ class _TasksListState extends State<TasksList> {
     setState(() {
       currentCompletionState
           ? completedTasks
-              .removeWhere((TaskModel task) => task.taskId == taskId)
+              .removeWhere((TaskOfPrivateFolder task) => task.taskId == taskId)
           : completedTasks.add(
-              userTasks.firstWhere((TaskModel task) => task.taskId == taskId));
+              userTasks.firstWhere((TaskOfPrivateFolder task) => task.taskId == taskId));
     });
   }
 
@@ -279,7 +279,7 @@ class CategoryTasks extends StatelessWidget {
     @required this.deleteTask,
   }) : super(key: key);
 
-  final List<TaskModel> userTasks;
+  final List<TaskOfPrivateFolder> userTasks;
   final Category category;
   final Function tickTask;
   final Function deleteTask;
