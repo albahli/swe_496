@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
+import 'package:swe496/Views/AccountSettings.dart';
 import 'package:swe496/Views/settings_view.dart';
 import 'package:swe496/controllers/ProjectControllers/ListOfProjectsContoller.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
@@ -53,7 +54,9 @@ class TheDrawer extends StatelessWidget {
                 Icons.person,
               ),
               content: Text("My Profile"),
-              onClick: () {}),
+              onClick: () {
+                Get.to(AccountSettings());
+              }),
           MLMenuItem(
             leading: Icon(
               Icons.settings,

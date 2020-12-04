@@ -10,6 +10,7 @@ import 'package:swe496/controllers/private_folder_controllers/category_controlle
 import 'package:swe496/controllers/private_folder_controllers/tasks_list_controller.dart';
 import 'package:swe496/models/private_folder_models/category.dart';
 import '../../utils/root.dart';
+import '../MessagesView.dart';
 import '../friendsView.dart';
 import '../the_drawer.dart';
 import './activity_log_view.dart';
@@ -131,19 +132,19 @@ class _PrivateFolderViewState extends State<PrivateFolderView> {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.people),
-          title: Text('Groups'),
+          label: 'Groups',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment_turned_in),
-          title: Text('Tasks'),
+          label: 'Tasks',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.contacts),
-          title: Text('Friends'),
+          label:'Friends',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.message),
-          title: Text('Messages'),
+          label: 'Messages',
         ),
       ],
       currentIndex: barIndex,
@@ -153,12 +154,14 @@ class _PrivateFolderViewState extends State<PrivateFolderView> {
         setState(() {
           barIndex = index;
 
-          if (barIndex == 0) // Do nothing, stay in the same page
+          if (barIndex == 0)
             Get.to(Root());
           else if (barIndex == 1)
-            return;
+            return;// Do nothing, stay in the same page
           else if (barIndex == 2)
             Get.off(FriendsView(), transition: Transition.noTransition);
+          else if (barIndex == 3)
+            Get.off(MessagesView());
         });
 
         print(index);

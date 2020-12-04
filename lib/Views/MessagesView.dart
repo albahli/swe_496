@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:multilevel_drawer/multilevel_drawer.dart';
-import 'package:swe496/Views/GroupProjectsView.dart';
 import 'package:swe496/Views/Messages.dart';
 import 'package:swe496/Views/friendsView.dart';
+import 'package:swe496/Views/private_folder_views/private_folder_view.dart';
 import 'package:swe496/controllers/UserControllers/userController.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/utils/root.dart';
@@ -29,8 +29,6 @@ class _MessagesViewState extends State<MessagesView> {
   AuthController authController = Get.find<AuthController>();
   UserController userController = Get.find<UserController>();
   final formKey = GlobalKey<FormState>();
-  final TextEditingController _newProjectNameController =
-      TextEditingController();
   int barIndex = 3;
   @override
   void initState() {
@@ -222,19 +220,19 @@ class _MessagesViewState extends State<MessagesView> {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.people),
-          title: Text('Groups'),
+          label: 'Groups',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment_turned_in),
-          title: Text('Tasks'),
+          label: 'Tasks',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.contacts),
-          title: Text('Friends'),
+          label:'Friends',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.message),
-          title: Text('Messages'),
+          label: 'Messages',
         ),
       ],
       currentIndex: barIndex,
@@ -245,9 +243,9 @@ class _MessagesViewState extends State<MessagesView> {
           barIndex = index;
 
           if (barIndex == 0) // Do nothing, stay in the same page
-            Get.off(GroupProjectsView(), transition: Transition.noTransition);
+            Get.to(Root(), transition: Transition.noTransition);
           else if (barIndex == 1)
-            return;
+            Get.off(PrivateFolderView(), transition: Transition.noTransition);
           else if (barIndex == 2)
             Get.off(FriendsView(), transition: Transition.noTransition);
           else if (barIndex == 3) return;

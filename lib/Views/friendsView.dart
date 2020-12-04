@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:swe496/Database/ProjectCollection.dart';
 import 'package:swe496/Views/MessagesView.dart';
+import 'package:swe496/Views/private_folder_views/private_folder_view.dart';
 import 'package:swe496/Views/the_drawer.dart';
 import 'package:swe496/utils/root.dart';
 import '../Database/UserProfileCollection.dart';
@@ -230,11 +230,11 @@ class _FriendsViewState extends State<FriendsView> {
 
           if (barIndex == 0)
             Get.to(Root());
-          else if (barIndex == 1)// Do nothing, stay in the same page
-            return;
+          else if (barIndex == 1)
+            Get.off(PrivateFolderView());
           else if (barIndex == 2) // Do nothing, stay in the same page
            return;
-          else if (barIndex == 3) // Do nothing, stay in the same page
+          else if (barIndex == 3)
             Get.off(MessagesView());
         });
         print(index);
