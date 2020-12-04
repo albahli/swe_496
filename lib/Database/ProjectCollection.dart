@@ -64,10 +64,19 @@ class ProjectCollection {
 
     // Add the new project ID to the user's project list.
     userController.user.userProjectsIDs.add(projectID);
+      // Add the new chat ID to the user's chat list.
+    userController.user.userChatsIDs.add(projectID);
+
     try {
       // Convert the project object to be a JSON.
       var jsonUser = userController.user.toJson();
-
+       // add the project chat to the chats collection
+        Map<String, dynamic> chatInfo = new Map<String, dynamic>();
+        chatInfo['GroupName'] = projectName;
+        chatInfo['LastMsg'] = "";
+        chatInfo['membersIDs'] = membersIDs;
+        chatInfo['type'] = 'group';
+       Firestore.instance.collection('Chats').document(projectID).setData(chatInfo); 
       // Send the user JSON data to the fire base.
       await Firestore.instance
           .collection('userProfile')
@@ -76,7 +85,8 @@ class ProjectCollection {
 
       // Add the project to other members.
       addProjectIDInMembersProfile(projectID, membersIDs);
-
+      //add the chat id to other members
+      addChatIDInMembersProfile(projectID, membersIDs);
       // Convert the project object to be a JSON.
       var jsonProject = newProject.toJson();
 
@@ -102,6 +112,21 @@ class ProjectCollection {
             .document(membersIDs[i])
             .updateData(({
               'userProjectsIDs': FieldValue.arrayUnion([projectID]),
+            }));
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future<void> addChatIDInMembersProfile(
+      String projectID, List<String> membersIDs) async {
+    try {
+      for (int i = 0; i < membersIDs.length; i++) {
+        await Firestore.instance
+            .collection('userProfile')
+            .document(membersIDs[i])
+            .updateData(({
+              'userChatsIDs': FieldValue.arrayUnion([projectID]),
             }));
       }
     } catch (e) {
@@ -171,7 +196,9 @@ class ProjectCollection {
         await transaction.update(
           documentReference,
           {
-            'userProjectsIDs': FieldValue.arrayUnion([projectID])
+            'userProjectsIDs': FieldValue.arrayUnion([projectID]),
+            // add chat also
+             'userChatsIDs': FieldValue.arrayUnion([projectID])
           },
         );
       });
@@ -233,7 +260,9 @@ class ProjectCollection {
         await transaction.update(
           documentReference,
           {
-            'userProjectsIDs': FieldValue.arrayRemove([projectID])
+            'userProjectsIDs': FieldValue.arrayRemove([projectID]),
+            // chat also
+             'userChatsIDs': FieldValue.arrayRemove([projectID]),
           },
         );
       });

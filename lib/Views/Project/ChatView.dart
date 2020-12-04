@@ -1,406 +1,119 @@
-import 'dart:ui';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/rendering.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:swe496/controllers/UserControllers/userController.dart';
-import 'helpFunctions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'package:swe496/Views/Messages.dart';
+import 'package:swe496/Views/Project/MembersView.dart';
+
+import 'package:swe496/Views/Project/TasksAndEventsView.dart';
+import 'package:swe496/controllers/ProjectControllers/projectController.dart';
+import 'package:swe496/controllers/UserControllers/userController.dart';
+import 'package:swe496/utils/root.dart';
+import 'dart:io';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-class chat extends StatelessWidget {
-  String chatid;
-  String name;
-  String type;
+class ChatView extends StatefulWidget {
+  final String projectID;
 
-  chat(String id , String n , String t) {
-    chatid = id;
-    this.name = n;
-    this.type = t;
-  }
+  ChatView({Key key, this.projectID}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var maxheight = screenSize.height;
-    var _maxWidth = screenSize.width;
-    print(this.chatid);
-    print('in group chat');
-    print(name + type);
-    return Material(
-      // height: maxheight,
-      // width: _maxWidth,
-      // child: Scaffold(
-      // resizeToAvoidBottomInset: true,
-
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-           
-            infoRow(name , type),
-            Container(
-              height: maxheight * 0.865,
-              width: _maxWidth,
-              child: Scaffold(
-                body: ChatArea(this.chatid),
-                resizeToAvoidBottomInset: true,
-              ),
-            ),
-          ],
-        ),
-      ),
-
-      // ),
-    );
-  }
+  _ChatViewState createState() => _ChatViewState();
 }
 
-class member extends StatelessWidget {
-  Icon adminIcon;
-  String name = "nameeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-  member(bool admin) {
-    adminIcon = Icon(Icons.settings);
-    if (!admin) {
-      adminIcon = null;
-    } else
-      name = "admin";
-  }
-  @override
-  Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var maxheight = screenSize.height;
-    var maxwidth = screenSize.width;
-    return Container(
-      decoration: BoxDecoration(
-        // color: Colors.white70,
+class _ChatViewState extends State<ChatView> {
+  int barIndex = 1; // Current page index in bottom navigation bar
+  ProjectController projectController = Get.find<ProjectController>();
+  UserController userController = Get.find<UserController>();
 
-        borderRadius: BorderRadius.all(Radius.circular(15)),
-      ),
-      padding: EdgeInsets.only(left: 5, right: 5, top: 1),
-      height: maxheight * 0.1,
-      //color: Colors.amber,
-      child: Column(
-        children: <Widget>[
-          //Divider(color: Colors.black,),
-          Row(
-            children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: Container(
-                  height: maxheight * 0.07,
-                  width: maxheight * 0.07,
-                  decoration: BoxDecoration(
-                    //  color: Colors.blue,
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-
-                  padding: EdgeInsets.only(left: 5),
-                  child: Text(
-                    name,
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  //color: Colors.blue,
-                  //  alignment: Alignment.center,
-                  //  height: 30,
-                  // width: maxwidth*0.6,
-                ),
-              ),
-              Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: adminIcon,
-                  )),
-            ],
-          ),
-          Divider(
-            color: Colors.black,
-            thickness: 1.1,
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class GroupchatUpperBar extends StatefulWidget {
-  String chatname;
-  String type;
-  GroupchatUpperBar(String name , String type) {
-    this.chatname = name;
-    this.type = type;
-  }
-
-  @override
-  _GroupchatUpperBarState createState() => _GroupchatUpperBarState();
-}
-
-class infoRow extends StatefulWidget {
-  String type;
-  String name;
-  infoRow(String name, String type) {
-    this.name = name;
-    this.type = type;
-  }
-  infoRow.def(String na) {
-    this.name = 'error';
-  }
-
-  @override
-  _infoRowState createState() => _infoRowState();
-}
-
-class _infoRowState extends State<infoRow> {
-  ImageStream x;
- // ImageProvider m = AssetImage('images/assets/whiteimage.png');
-
-  //NetworkImage g;
-  //bool isloading = true;
-  //AssetImage defaltImg = AssetImage('C:/Users/ABOD/Desktop/photos/images.jfif');
-  @override
-  initState() {
-    /*
-    print('object');
-    if (!widget.imgsrc.isNull) {
-      print(widget.imgsrc);
-      try {
-        g = NetworkImage(widget.imgsrc);
-        g
-            .resolve(new ImageConfiguration())
-            .addListener(ImageStreamListener((info, call) {
-          if (mounted) {
-            setState(() {
-              isloading = false;
-            });
-          }
-        }));
-      } catch (e) {
-        print(e.message);
-      }
-    }
-    */
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var maxheight = screenSize.height;
-    var _maxWidth = screenSize.width;
-
-    return Material(
-      child: Container(
-        padding: EdgeInsets.only(bottom: 6),
-        color: Colors.lightBlue,
-        width: _maxWidth,
-        child: Column(
-          children: <Widget>[
-            // Container(
-            //  color: Colors.redAccent,
-            // // height: maxheight*0.045,
-            // ),
-            Container(
-                // padding: EdgeInsets.only(top: maxheight*0.035),
-                padding: EdgeInsets.only(top: maxheight * 0.035),
-                color: Colors.lightBlue,
-                height: maxheight * 0.13,
-                width: _maxWidth,
-                child: Container(
-                    // padding: EdgeInsets.only(left: 5),
-                    // onPressed: ViewGroupinfo,
-                    child: Row(
-                  children: <Widget>[
-                    Expanded(
-                        flex: 2,
-                        child: FlatButton(
-                          //   color: Colors.blue,
-                          //  padding: EdgeInsets.all(4),
-                          onPressed: null, //ViewGroupinfo,
-                          colorBrightness: Brightness.dark,
-                          highlightColor: Colors.redAccent,
-                          child: Container(
-                            // height: maxheight*0.1,
-                            // width: maxheight*0.1,
-                            //color: Colors.blue,
-
-                            //height: 60,
-                            // margin: EdgeInsets.all(5),
-
-                            child: widget.type=='group'
-                                ? Icon(Icons.supervised_user_circle , size: 70 , color: Colors.black,)
-                                : Icon(Icons.account_circle , size: 70 , color: Colors.black,)
-                            // child: Image(image: AssetImage("C:/Users/ABOD/Desktop/photos/2.png")),
-                          ),
-                        )),
-                    Expanded(
-                        flex: 5,
-                        child: Container(
-                          //  colorBrightness: Brightness.dark,
-                          //   highlightColor: Colors.redAccent,
-                          //   onPressed: null ,// ViewGroupinfo,
-                          child: Container(
-                            //  color: Colors.green,
-                            // alignment:AlignmentDirectional.center ,
-                            // name max length 69
-                            child: Text(
-                              widget.name,
-                              maxLines: 3,
-                              textAlign: TextAlign.left,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 18),
-                            ),
-                          ),
-                        )),
-                    Expanded(
-                        flex: 1,
-                        child: Container(
-                          //   color: Colors.orange,
-                          //    color: Colors.redAccent,
-                          alignment: Alignment.centerLeft,
-
-                          // child:  DropdownButton( items: null, onChanged: null , icon: Icon(Icons.more_vert) , iconSize: 30, ),
-                        )),
-                  ],
-                ))),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GroupchatUpperBarState extends State<GroupchatUpperBar> {
-  Stream barStream;
-  datebaseMethods db = new datebaseMethods();
-  String imgsrc;
-  var name;
- // NetworkImage zg;
-  Widget info() {
-    return StreamBuilder(
-        stream: barStream,
-        builder: (context, snapshot) {
-          //   if(true ){
-          print('next try');
-          String imgsrc;
-          //print(snapshot.data['image']);
-          if (snapshot.hasData) {
-            return snapshot.hasData
-                ? infoRow('', 'project name ')
-                : infoRow('', 'namee');
-          } else
-            return Container();
-          //imgsrc = snapshot.data['image']:{};
-          //  print(imgsrc);
-          //   db.retriveimage(imgsrc).whenComplete(() {} ).then((value) {
-          //  print(value.toString());
-
-          //  return Container(
-          //  child: infoRow( snapshot.data['image'] , snapshot.data['name'].toString()) ,
-          // );
-        }
-        // });}
-        ////
-        //    },
-        );
-  }
-/*
-    void dl() async{
-    var pic = FirebaseStorage.instance.ref().child('2.png');
-     pic.getDownloadURL().then((value) => {
-     print(value),
-       this.setState(() {
-    imgsrc = value.toString();
-      //final http.Response downloadData= await http.get(value);
-      //this.img = downloadData.body;
-    })
-  });
-  }
-*/
-
-  void dx() async {
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    //db.getGroupNameAndImage(widget.projectId).then((value) {
-    //  barStream = value;
-    //  setState(() {});
-   // }
-   // );
-    super.initState();
-  }
-
-  void ViewGroupinfo() {
   
-  }
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var maxheight = screenSize.height;
 
-    var _maxWidth = screenSize.width;
-    return info();
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      // still not working in landscape mode
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+          ),
+          onPressed: () {
+            Get.offAll(Root());
+            Get.delete<ProjectController>();
+            print("back to 'Root' from 'chat View'");
+          },
+        ),
+        title: Text(projectController.project.projectName),
+        centerTitle: true,
+      ),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: ChatAreaView(projectController.projectID)),
+      bottomNavigationBar: bottomCustomNavigationBar(),
+    );
+  }
+
+  // Bottom Navigation Bar
+  Widget bottomCustomNavigationBar() {
+    return BottomNavigationBar(
+
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(IconData(61545, fontFamily: 'MaterialIcons')),
+          label: 'Tasks & Events',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.chat),
+          label: 'Chat',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.group_work),
+          label: 'Members',
+        ),
+      ],
+      currentIndex: barIndex,
+      showSelectedLabels: true,
+      showUnselectedLabels: true,
+      onTap: (index) {
+        setState(() {
+          barIndex = index;
+
+          if (barIndex == 0)
+            Get.off(TasksAndEventsView(), transition: Transition.noTransition);
+          else if (barIndex == 1)
+            return;
+          else if (barIndex == 2) // Do nothing, stay in the same page
+            Get.off(MembersView(), transition: Transition.noTransition);
+        });
+        print(index);
+      },
+    );
   }
 }
-
-class ChatArea extends StatefulWidget {
+class ChatAreaView extends StatefulWidget {
   String chatId;
-  ChatArea(projectid) {
+  ChatAreaView(projectid) {
     chatId = projectid;
   }
 
   @override
-  State<StatefulWidget> createState() {
-    return ChatAreaState();
+  State<ChatAreaView> createState() {
+    return ChatAreaViewState();
   }
 }
 
-class MediaView extends StatelessWidget {
-  PickedFile media;
-  MediaView(PickedFile media) {
-    this.media = media;
-  }
-  void send() {}
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            // color: Colors.red,
-            alignment: Alignment.center,
-            height: 500,
-            width: 500,
-            //  child: Image.file(PickedFile) ,
-          ),
-          Container(
-            child: FlatButton(onPressed: send, child: Text('send')),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class ChatAreaState extends State<ChatArea> {
+class ChatAreaViewState extends State<ChatAreaView> {
   File _selectedMedia;
   final storage = FirebaseStorage.instance;
   final picker = ImagePicker();
   void getImage(BuildContext context, String type) async {
     PickedFile pickedFile = await picker.getImage(source: ImageSource.gallery);
+    if(!pickedFile.isNull){
     File imageFile = File(pickedFile.path);
     showDialog(
       context: context,
@@ -436,9 +149,9 @@ class ChatAreaState extends State<ChatArea> {
         ],
       ),
       barrierDismissible: true,
+    
     );
-    // File imageFile = File(PickedFile.path);
-    // Get.to(new MediaView(PickedFile));
+    }
   }
 
   void getVideo() {}
@@ -550,7 +263,7 @@ class ChatAreaState extends State<ChatArea> {
   @override
   void initState() {
     // TODO: implement initState
-    dbMethods.getChatmessages(widget.chatId).then((value) {
+    dbMethods.getChatmessages(this.widget.chatId).then((value) {
       chatMsgStream = value;
 
       setState(() {});
@@ -566,43 +279,20 @@ class ChatAreaState extends State<ChatArea> {
     return Scaffold(
       // height: maxheight,
 
-      backgroundColor: Color.fromARGB(70, 0, 70, 155),
+    // backgroundColor: Color.fromARGB(70, 0, 70, 155),
       body: Container(
         child: Stack(
-          // alignment: Alignment.bottomCenter,
-          //crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
-            //     Container(
-            // height: maxheight*0.765,
-            // padding: EdgeInsets.only(bottom:5  , top: 5 , left: 2 , right: 8),
-            //   color: Color.fromARGB(70, 0, 70, 155),
-            //     SingleChildScrollView (
-            //      primary: false,
-            //     scrollDirection: Axis.vertical,
+
             Container(
       ////          height: maxheight * 0.765,
+            
                 padding: EdgeInsets.all(5),
-                //  color: Colors.amber,
+            
                 child: chatMessageList()),
-            //   color: Color.fromARGB(70, 0, 70, 155),
-            //   height: maxheight*0.765 ,
-            //     color: Colors.pink,
-            //  width: _maxWidth,
-            //   child: Column(
-            //   padding: EdgeInsets.only(bottom:5  , top: 5 , left: 2 , right: 8),
-            //   children: <Widget>[
-            //    SingleChildScrollView(child: Container(child: chatMessageList())),
-            //   ],
-
-            //   )
-
-            //   ),
-            //   ) ,
-
-            // SingleChildScrollView(child: chatMessageList()),
-            // alignment: Alignment.bottomCenter,
 
             Container(
+              margin: EdgeInsets.all(0),
               alignment: Alignment.bottomCenter,
               child: Container(
     ////            height: maxheight,
@@ -611,10 +301,11 @@ class ChatAreaState extends State<ChatArea> {
                 child: Container(
       ////            height: maxheight * 0.1,
                   //color: Colors.indigo[100],
-                  color: Colors.white,
 
+                
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   child: Row(
+                   
                     children: [
                       PopupMenuButton<String>(
                           padding: EdgeInsets.all(0),
@@ -662,7 +353,7 @@ class ChatAreaState extends State<ChatArea> {
                           style: TextStyle(color: Colors.black),
                           maxLines: 2,
                           minLines: 1,
-                          //textAlignVertical: TextAlignVertical.top,
+                          
                           decoration: InputDecoration(
                             hintText: "message",
                             // border: InputBorder,
@@ -674,8 +365,7 @@ class ChatAreaState extends State<ChatArea> {
                           sendMessage();
                         },
                         child: Container(
-                          //height: 40,
-                          // width: 40,
+                       
                           decoration: BoxDecoration(
                               gradient: LinearGradient(colors: [
                                 const Color(0x36FFFFFF),
@@ -698,6 +388,42 @@ class ChatAreaState extends State<ChatArea> {
     );
   }
 }
+class datebaseMethods{
+  datebaseMethods(){
+    
+  }
+  Future uploadImage(var x) async  {
+
+    
+  }
+  Future retriveimage(String imgName) {
+
+  }
+  getUserByUserName(String username) async {
+    return await 
+    Firestore.instance.collection('users').where('name', isEqualTo: username).getDocuments();
+  }
+  getChatmessages(String chatid) async {
+    return await Firestore.instance.collection('Chats').document(chatid).collection('messages'). orderBy('time').snapshots();
+  }
+  sendmessages(String groupid , messageMap) async {
+    print(groupid);
+    String lastmsg = '';
+    String content = ''; 
+    if(messageMap['isFile']){
+      content = 'sent a file';
+    } else content = messageMap['msg'];
+    lastmsg = messageMap['senderName'] + ' : ' + content;
+    Firestore.instance.collection('Chats').document(groupid).updateData(({'LastMsg':lastmsg})).catchError((e){print(e.toString());});
+    Firestore.instance.collection('Chats').document(groupid).collection('messages').add(messageMap).catchError((e){print(e.toString());});
+  }
+  getGroupNameAndImage(String projectid)  async{
+    return await Firestore.instance.collection('Chats').document('1').snapshots();
+    
+  }
+
+}
+
 
 class messageWidget extends StatelessWidget {
   UserController userController = Get.find<UserController>();
@@ -759,7 +485,7 @@ class messageWidget extends StatelessWidget {
     var widgetSize = this.widgetWidth(_maxWidth);
     return Material(
       child: Container(
-        color: Color.fromARGB(70, 0, 70, 155),
+        //color: Color.fromARGB(70, 0, 70, 155),
         padding: EdgeInsets.only(bottom: 25, right: 2, left: 6),
         alignment: msgAlign,
         child: ConstrainedBox(

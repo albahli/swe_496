@@ -31,6 +31,13 @@ class datebaseMethods{
   }
   sendmessages(String groupid , messageMap) async {
     print(groupid);
+    String lastmsg = '';
+    String content = ''; 
+    if(messageMap['isFile']){
+      content = 'sent a file';
+    } else content = messageMap['msg'];
+    lastmsg = messageMap['senderName'] + ' : ' + content;
+    Firestore.instance.collection('Chats').document(groupid).updateData(({'LastMsg':lastmsg})).catchError((e){print(e.toString());});
     Firestore.instance.collection('Chats').document(groupid).collection('messages').add(messageMap).catchError((e){print(e.toString());});
   }
   getGroupNameAndImage(String projectid)  async{
