@@ -1,16 +1,15 @@
 # swe496
 
-A new Flutter application.
+This is our graduation project.
 
-## Getting Started
+## Brief Description
 
-This project is a starting point for a Flutter application.
+It's a mobile application that helps to organize the tasks and events between the individuals and groups.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Technologies used in this project:
+- Dart.
+- Flutter.
+- Firebase Authentication.
+- Firebase Cloud Firestore.
+- Firebase Storage.
+- Google Maps API.
