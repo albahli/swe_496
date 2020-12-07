@@ -4,37 +4,37 @@ import 'package:swe496/models/Task.dart';
 
 // Show the tasks we have to bring their data from Firestore and then set that as a model and
 // bring it back to the personal folder
-class TaskOfPrivateFolder extends Task {
+class TaskOfPrivateFolder implements Task {
   String categoryId;
-  String taskTitle;
-  String taskId;
+  String taskName;
+  String taskID;
   DateTime dueDate;
-  String state;
-  String priority;
+  String taskStatus;
+  String taskPriority;
   bool completed;
 
   TaskOfPrivateFolder({
     @required this.categoryId,
-    @required this.taskId,
-    @required this.taskTitle,
+    @required this.taskID,
+    @required this.taskName,
     this.dueDate,
-    this.state,
-    this.priority,
+    this.taskStatus,
+    this.taskPriority,
     this.completed,
   });
 
   // Set the dar object model from Firestore database JSON object
   TaskOfPrivateFolder.fromJson(Map<String, dynamic> json) {
     try {
-      taskId = json['taskId'];
+      taskID = json['taskID'];
       categoryId = json['category'];
-      taskTitle = json['taskTitle'];
+      taskName = json['taskName'];
       dueDate = json['dueDate'] == null
           ? null
           : DateTime.fromMicrosecondsSinceEpoch(
               json['dueDate'].microsecondsSinceEpoch);
-      state = json['taskState'];
-      priority = json['taskPriority'];
+      taskStatus = json['taskStatus'];
+      taskPriority = json['taskPriority'];
       completed = json['completed'];
     } catch (e) {
       print('The error occured in the model $e');
@@ -43,12 +43,12 @@ class TaskOfPrivateFolder extends Task {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
-    data['taskId'] = this.taskId;
+    data['taskID'] = this.taskID;
     data['category'] = this.categoryId;
-    data['taskTitle'] = this.taskTitle;
+    data['taskName'] = this.taskName;
     data['dueDate'] = this.dueDate;
-    data['taskState'] = this.state;
-    data['taskPriority'] = this.priority;
+    data['taskStatus'] = this.taskStatus;
+    data['taskPriority'] = this.taskPriority;
     data['completed'] = this.completed;
 
     return data;

@@ -44,15 +44,15 @@ class _TasksListState extends State<TasksList> {
     setState(() {
       currentCompletionState
           ? completedTasks
-              .removeWhere((TaskOfPrivateFolder task) => task.taskId == taskId)
+              .removeWhere((TaskOfPrivateFolder task) => task.taskID == taskId)
           : completedTasks.add(
-              userTasks.firstWhere((TaskOfPrivateFolder task) => task.taskId == taskId));
+              userTasks.firstWhere((TaskOfPrivateFolder task) => task.taskID == taskId));
     });
   }
 
   Future<void> _deleteTask(String taskId) async {
     try {
-      userTasks.removeWhere((task) => task.taskId == taskId);
+      userTasks.removeWhere((task) => task.taskID == taskId);
       Get.delete<TaskController>();
       await PrivateFolderCollection().deleteTask(
         userId: Get.find<AuthController>().user.uid,

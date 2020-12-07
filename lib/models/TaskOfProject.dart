@@ -3,7 +3,7 @@ import 'package:swe496/models/Task.dart';
 
 import 'Message.dart';
 
-class TaskOfProject extends Task {
+class TaskOfProject implements Task {
   String taskID;
   String taskName;
   String taskDescription;

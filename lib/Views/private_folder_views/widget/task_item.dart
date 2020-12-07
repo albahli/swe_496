@@ -27,29 +27,29 @@ class _TaskItemState extends State<TaskItem> {
 
   @override
   Widget build(BuildContext context) {
-    final _stateColorIndicator = widget.task.state == 'in-progress'
+    final _stateColorIndicator = widget.task.taskStatus == 'in-progress'
         ? Colors.green
-        : widget.task.state == 'not-started'
+        : widget.task.taskStatus == 'not-started'
             ? Colors.orange[700]
             : Colors.red;
 
-    final _priorityColorIndicator = widget.task.priority == 'high'
+    final _priorityColorIndicator = widget.task.taskPriority == 'high'
         ? Colors.red[800]
-        : widget.task.priority == 'medium'
+        : widget.task.taskPriority == 'medium'
             ? Colors.yellow[800]
             : Colors.blue;
 
     final _priorityFontWeight =
-        widget.task.priority == 'high' ? FontWeight.w900 : FontWeight.w700;
+        widget.task.taskPriority == 'high' ? FontWeight.w900 : FontWeight.w700;
 
     return GestureDetector(
       onTap: () async {
-        Get.put<TaskController>(TaskController(taskId: widget.task.taskId));
+        Get.put<TaskController>(TaskController(taskId: widget.task.taskID));
         Get.find<TaskController>();
         // Show the setails of the task of id 'task.taskId' where the task is injected to this class
         // await Future.delayed(Duration(milliseconds: 200)); // ! consider uncommenting this if there is an error
         await Get.bottomSheet(
-          TaskDetailsView(taskId: widget.task.taskId),
+          TaskDetailsView(taskId: widget.task.taskID),
           enableDrag: true,
           ignoreSafeArea: false,
           persistent: true, // ! UI err? change persistent to false
@@ -58,16 +58,16 @@ class _TaskItemState extends State<TaskItem> {
           await Get.delete<TaskController>();
           print('the value is $value');
         });
-        print('the task details closed ${widget.task.taskTitle}');
+        print('the task details closed ${widget.task.taskName}');
       },
       // * onDoubleTap has the same functionality as onTap: so no weird functionality occur
       onDoubleTap: () async {
-        Get.put<TaskController>(TaskController(taskId: widget.task.taskId));
+        Get.put<TaskController>(TaskController(taskId: widget.task.taskID));
         Get.find<TaskController>();
         // Show the setails of the task of id 'task.taskId' where the task is injected to this class
         // await Future.delayed(Duration(milliseconds: 200)); // ! consider uncommenting this if there is an error
         await Get.bottomSheet(
-          TaskDetailsView(taskId: widget.task.taskId),
+          TaskDetailsView(taskId: widget.task.taskID),
           enableDrag: true,
           ignoreSafeArea: false,
           persistent: true, // ! UI err? change persistent to false
@@ -76,7 +76,7 @@ class _TaskItemState extends State<TaskItem> {
           await Get.delete<TaskController>();
           print('the value is $value');
         });
-        print('the task details has been removed ${widget.task.taskTitle}');
+        print('the task details has been removed ${widget.task.taskName}');
       },
       child: Dismissible(
         key: UniqueKey(),
@@ -98,7 +98,7 @@ class _TaskItemState extends State<TaskItem> {
               return AlertDialog(
                 title: Text('Delete task?'),
                 content: Text(
-                    'Do you really want to delete the task \'${widget.task.taskTitle}\'?'),
+                    'Do you really want to delete the task \'${widget.task.taskName}\'?'),
                 actions: [
                   FlatButton(
                       onPressed: () {
@@ -118,7 +118,7 @@ class _TaskItemState extends State<TaskItem> {
         },
         onDismissed: (_) async {
           Get.delete<TaskController>();
-          await widget.deleteTask(widget.task.taskId);
+          await widget.deleteTask(widget.task.taskID);
         },
         child: Card(
           elevation: 0,
@@ -143,7 +143,7 @@ class _TaskItemState extends State<TaskItem> {
                         child: InkWell(
                             onTap: () {
                               widget.tickTask(
-                                  widget.task.taskId, widget.task.completed);
+                                  widget.task.taskID, widget.task.completed);
                             },
                             enableFeedback: true,
                             focusColor: _stateColorIndicator,
@@ -176,7 +176,7 @@ class _TaskItemState extends State<TaskItem> {
                     children: [
                       SizedBox(height: 7),
                       Text(
-                        widget.task.taskTitle,
+                        widget.task.taskName,
                         style: widget.task.completed
                             ? Theme.of(context).textTheme.headline6.copyWith(
                                   decoration: TextDecoration.lineThrough,
@@ -193,7 +193,7 @@ class _TaskItemState extends State<TaskItem> {
                               style: TextStyle(
                                 color: widget.task.completed
                                     ? Colors.grey[500]
-                                    : widget.task.state == 'overdue'
+                                    : widget.task.taskStatus == 'overdue'
                                         ? Colors.red
                                         : Colors.grey[600],
                                 decoration: widget.task.completed
@@ -212,9 +212,9 @@ class _TaskItemState extends State<TaskItem> {
                     width: MediaQuery.of(context).size.width * 0.42,
                     padding: EdgeInsets.only(left: 10),
                     child: Text(
-                      widget.task.priority == 'low'
+                      widget.task.taskPriority == 'low'
                           ? '!'
-                          : widget.task.priority == 'high'
+                          : widget.task.taskPriority == 'high'
                               ? '!!!'
                               : '!!',
                       style: TextStyle(

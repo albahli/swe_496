@@ -108,12 +108,12 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
       Get.put(TaskController(taskId: widget.taskId));
       var task = Get.find<TaskController>().task;
       _selectedCategoryIdValue = task.categoryId;
-      _selectedStateValue = task.state;
-      _selectedPriorityValue = task.priority;
-      _taskTitleController.text = task.taskTitle;
+      _selectedStateValue = task.taskStatus;
+      _selectedPriorityValue = task.taskPriority;
+      _taskTitleController.text = task.taskName;
       _dateTime = task.dueDate;
-      _taskModelId = task.taskId;
-      print('print task.taskId in initState ${task.taskId}');
+      _taskModelId = task.taskID;
+      print('print task.taskId in initState ${task.taskID}');
       print('print widget.taskId in initState ${widget.taskId}');
     } catch (e) {
       print('catched in initState of TaskDetailsView >> $e');

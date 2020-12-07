@@ -4,6 +4,5 @@ abstract class Task{
   String taskName;
   String taskStatus;
   String taskPriority;
-  bool completed;
 
 }

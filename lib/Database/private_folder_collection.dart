@@ -128,11 +128,11 @@ class PrivateFolderCollection {
 
     TaskOfPrivateFolder newTask = TaskOfPrivateFolder(
       categoryId: categoryId,
-      taskId: newTaskDocument.documentID,
-      taskTitle: newTaskTitle,
+      taskID: newTaskDocument.documentID,
+      taskName: newTaskTitle,
       dueDate: dueDate,
-      state: state,
-      priority: priority,
+      taskStatus: state,
+      taskPriority: priority,
       completed: false,
     );
 
@@ -161,7 +161,7 @@ class PrivateFolderCollection {
         await taskDocument.get().then((snapshot) => snapshot.data);
 
     await recordPrivateFolderActivity(
-        userId: userId, actionType: 'Deleted task ${taskDocData['taskTitle']}');
+        userId: userId, actionType: 'Deleted task ${taskDocData['taskName']}');
 
     try {
       await taskDocument.collection(subtasksCollection).getDocuments().then(
@@ -266,9 +266,9 @@ class PrivateFolderCollection {
         .document(userId)
         .collection(tasksCollection)
         .orderBy('dueDate')
-        .orderBy('taskState')
+        .orderBy('taskStatus')
         .orderBy('taskPriority')
-        .orderBy('taskTitle')
+        .orderBy('taskName')
         .snapshots();
 
     return tasksSnapshot.map(
@@ -364,8 +364,8 @@ class PrivateFolderCollection {
     recordPrivateFolderActivity(
       userId: userId,
       actionType: completionState == true
-          ? 'Completed Task \'${taskDocData['taskTitle']}\''
-          : 'Redo task \'${taskDocData['taskTitle']}\'',
+          ? 'Completed Task \'${taskDocData['taskName']}\''
+          : 'Redo task \'${taskDocData['taskName']}\'',
     );
 
     try {
@@ -392,7 +392,7 @@ class PrivateFolderCollection {
 
     recordPrivateFolderActivity(
       userId: userId,
-      actionType: 'Changed task \'${taskDocData['taskTitle']}\' category',
+      actionType: 'Changed task \'${taskDocData['taskName']}\' category',
     );
 
     try {
@@ -421,11 +421,11 @@ class PrivateFolderCollection {
     recordPrivateFolderActivity(
       userId: userId,
       actionType:
-          'Changed task title from \'${taskDocData['taskTitle']}\' to \'$newTitle\'',
+          'Changed task title from \'${taskDocData['taskName']}\' to \'$newTitle\'',
     );
 
     try {
-      await taskDocument.updateData({'taskTitle': newTitle});
+      await taskDocument.updateData({'taskName': newTitle});
     } catch (e) {
       print(e);
     }
@@ -448,7 +448,7 @@ class PrivateFolderCollection {
     recordPrivateFolderActivity(
       userId: userId,
       actionType:
-          'Changed task due date \'${taskDocData['taskTitle']}\' to \'${DateFormat.yMMMd().format(newDueDate)}\'',
+          'Changed task due date \'${taskDocData['taskName']}\' to \'${DateFormat.yMMMd().format(newDueDate)}\'',
     );
 
     try {
@@ -477,11 +477,11 @@ class PrivateFolderCollection {
     recordPrivateFolderActivity(
       userId: userId,
       actionType:
-          'Changed status of task \'${taskDocData['taskTitle']}\' to \'$newState\'',
+          'Changed status of task \'${taskDocData['taskName']}\' to \'$newState\'',
     );
 
     try {
-      await taskDocument.updateData({'taskState': newState});
+      await taskDocument.updateData({'taskStatus': newState});
     } catch (e) {
       print(e);
     }
@@ -504,7 +504,7 @@ class PrivateFolderCollection {
     recordPrivateFolderActivity(
       userId: userId,
       actionType:
-          'Changed priority of task \'${taskDocData['taskTitle']}\' to \'$newPriority\'',
+          'Changed priority of task \'${taskDocData['taskName']}\' to \'$newPriority\'',
     );
 
     try {
@@ -642,7 +642,7 @@ class PrivateFolderCollection {
 
     recordPrivateFolderActivity(
       userId: userId,
-      actionType: 'Created comment in task \'${taskDocData['taskTitle']}\'',
+      actionType: 'Created comment in task \'${taskDocData['taskName']}\'',
     );
 
     Comment newComment = Comment(

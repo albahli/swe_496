@@ -131,9 +131,5 @@ class Project {
 
   }
 
-  Future<void> deleteProject(String projectID) async {
-    await ProjectCollection().deleteProject(projectID);
-  }
-
 
 }
