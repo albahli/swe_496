@@ -21,16 +21,22 @@ class Subtask extends TaskOfPrivateFolder {
   });
 
   Subtask.fromJson(Map<String, dynamic> json) {
-    parentTaskId = json['parentTaskId'];
-    subtaskId = json['subtaskId'];
-    subtaskTitle = json['subtaskTitle'];
-    dueDate = json['dueDate'] == null
-        ? null
-        : DateTime.fromMicrosecondsSinceEpoch(
-            json['dueDate'].microsecondsSinceEpoch);
-    subtaskState = json['subtaskState'];
-    subtaskPriority = json['subtaskPriority'];
-    completed = json['completed'];
+    try {
+      parentTaskId = json['parentTaskId'];
+      subtaskId = json['subtaskId'];
+      subtaskTitle = json['subtaskTitle'];
+      dueDate = json['dueDate'] == null
+          ? null
+          : DateTime.fromMicrosecondsSinceEpoch(
+              json['dueDate'].microsecondsSinceEpoch);
+      subtaskState = json['subtaskState'];
+      subtaskPriority = json['subtaskPriority'];
+      completed = json['completed'];
+    } catch (e) {
+      print(
+        'catched in >models>private_folder_models>subtask.dart>Subtask.fromJson(p1): $e',
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {

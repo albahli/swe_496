@@ -95,7 +95,7 @@ class _PrivateFolderViewState extends State<PrivateFolderView> {
                         _formKey.currentState.validate();
                         return;
                       }
-                      await PrivateFolderCollection().createCategory(
+                      PrivateFolderCollection().createCategory(
                         Get.find<AuthController>().user.uid,
                         _categoryController.text,
                       );
@@ -140,7 +140,7 @@ class _PrivateFolderViewState extends State<PrivateFolderView> {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.contacts),
-          label:'Friends',
+          label: 'Friends',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.message),
@@ -153,18 +153,14 @@ class _PrivateFolderViewState extends State<PrivateFolderView> {
       onTap: (index) {
         setState(() {
           barIndex = index;
-
           if (barIndex == 0)
             Get.to(Root());
           else if (barIndex == 1)
-            return;// Do nothing, stay in the same page
+            return; // Do nothing, stay in the same page
           else if (barIndex == 2)
             Get.off(FriendsView(), transition: Transition.noTransition);
-          else if (barIndex == 3)
-            Get.off(MessagesView());
+          else if (barIndex == 3) Get.off(MessagesView());
         });
-
-        print(index);
       },
     );
   }
