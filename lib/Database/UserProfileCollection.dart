@@ -39,11 +39,16 @@ class UserProfileCollection {
 
   Future<void> saveTokenToDatabase(String token) async {
     // Assume user is logged in for this example
-    String userId = Get.find<AuthController>().user.uid;
+    try {
+      String userId = Get.find<AuthController>().user.uid;
 
-    await _firestore.collection('userProfile').document(userId).setData({
-      'tokens': FieldValue.arrayUnion([token]),
-    }, merge: true);
+      await _firestore.collection('userProfile').document(userId).setData({
+        'tokens': token,
+      }, merge: true);
+    } on Exception catch (e) {
+      print(e);
+    }
+
   }
 
   Future<bool> checkIfUsernameIsTaken(String username) async {
