@@ -25,6 +25,7 @@ class TaskDetailsView extends StatefulWidget {
 
 class _TaskDetailsViewState extends State<TaskDetailsView> {
   final _taskTitleController = TextEditingController();
+  final _taskTitleFocusNode = FocusNode();
 
   TaskOfPrivateFolder task;
   String _selectedStateValue;
@@ -113,10 +114,10 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
       _taskTitleController.text = task.taskName;
       _dateTime = task.dueDate;
       _taskModelId = task.taskID;
-      print('print task.taskId in initState ${task.taskID}');
-      print('print widget.taskId in initState ${widget.taskId}');
     } catch (e) {
-      print('catched in initState of TaskDetailsView >> $e');
+      print(
+        'catched in >Views>private_folder_views>task_details_view.dart>initState(): $e',
+      );
     }
   }
 
@@ -130,14 +131,21 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
   @override
   void dispose() async {
     _taskTitleController.dispose();
+    _taskTitleFocusNode.dispose();
     Get.delete<SubtasksListController>();
-    subtasks = [];
+    subtasks = []; // TODO: When saving subtasks, remove this line
     super.dispose();
+  }
+
+  Future<void> _unfocusNodes() async {
+    _taskTitleFocusNode.unfocus();
   }
 
   GestureDetector addSubtask() {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        await _unfocusNodes();
+        // TODO: Solve the malfunction of the subtask being hidden at all when its softkey is dismissed
         Get.bottomSheet(
           Padding(
             padding: EdgeInsets.only(
@@ -194,7 +202,9 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
         newTitle: givenTaskTitle,
       );
     } catch (e) {
-      print(e);
+      print(
+        'catched in catched in >Views>private_folder_views>task_details_view.dart>_updateTaskTitle(): $e',
+      );
     }
     Get.back();
   }
@@ -210,13 +220,13 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
           newDueDate: _dateTime);
     } catch (e) {
       print(
-          'catched in the function _updateTaskDueDate of TaskDetailsView state widget >> $e');
+        'catched in >Views>private_folder_views>task_details_view.dart>_updateTaskDueDate(): $e',
+      );
     }
   }
 
   Future<void> _updateTaskStatus(String value) async {
     try {
-      print('the value in _updateTaskStatus is $value');
       await PrivateFolderCollection().changeStatus(
         userId: Get.find<AuthController>().user.uid,
         taskId: _taskModelId,
@@ -224,7 +234,8 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
       );
     } catch (e) {
       print(
-          'catched in the function _updateTaskStatus of TaskDetailsView state widget >> $e');
+        'catched in >Views>private_folder_views>task_details_view.dart>_updateTaskStatus(p1): $e',
+      );
     }
   }
 
@@ -235,10 +246,10 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
         taskId: _taskModelId,
         newPriority: value,
       );
-      print('printed in _updateTaskPriority $_selectedCategoryIdValue');
     } catch (e) {
       print(
-          'catched in the function _updateTaskPriority of TaskDetailsView state widget >> $e');
+        'catched in >Views>private_folder_views>task_details_view.dart>_updateTaskPriority(p1): $e',
+      );
     }
   }
 
@@ -278,7 +289,7 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
         fontWeight: FontWeight.w900,
       ),
       content: Container(
-        height: (MediaQuery.of(context).size.height * 0.6 -
+        height: (MediaQuery.of(context).size.height * 0.3 -
             MediaQuery.of(context).viewInsets.bottom),
         width: MediaQuery.of(ctx).size.width * 0.7,
         child: Column(
@@ -349,14 +360,20 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
     final _priorityFontWeight =
         _selectedPriorityValue == 'high' ? FontWeight.w800 : FontWeight.w600;
     try {
-      print('in the return of build method ${widget.taskId}');
       print(
-          'in the return of build method ${widget.categories.first.categoryName}');
+        'in the return of >Views>private_folder_views>task_details_view.dart>TaskDetailsView>build(): ${widget.taskId}',
+      );
+      print(
+        'in the return of >Views>private_folder_views>task_details_view.dart>TaskDetailsView>build(): ${widget.categories.first.categoryName}',
+      );
       try {
-        print('task.taskId, in the return of build method $_taskModelId');
+        print(
+          'in the try of the return of >Views>private_folder_views>task_details_view.dart>TaskDetailsView>build(): $_taskModelId',
+        );
       } catch (e) {
         print(
-            'catched in the return of the build method after calling _taskModelId');
+          'catched in >Views>private_folder_views>task_details_view.dart>build(): $e',
+        );
       }
 
       return GetX<TaskController>(
@@ -613,15 +630,12 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
                             SubtasksListController(_taskModelId)),
                         builder:
                             (SubtasksListController subtasksListController) {
-                          print('checked 0');
-// TODO: switch back the logic >> if(subtasksListController == null || ... || ... ) then return progress indicator
+                          // TODO: switch back the logic >> if(subtasksListController == null || ... || ... ) then return progress indicator
                           if (subtasksListController != null &&
                               subtasksListController.subtasks != null &&
                               subtasksListController.subtasks.isNotEmpty) {
-                            print('checked 1');
                             subtasks = subtasksListController.subtasks;
-                            print(
-                                'in the if ${subtasksListController.subtasks.first.subtaskTitle}');
+
                             return Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -670,6 +684,9 @@ class _TaskDetailsViewState extends State<TaskDetailsView> {
         },
       );
     } catch (e) {
+      print(
+        'catched in >Views>private_folder_views>task_details_view.dart>build(): $e',
+      );
       setState(() {
         return;
       });

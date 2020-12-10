@@ -17,15 +17,12 @@ class PrivateFolderCollection {
   var commentsCollection = 'comments';
   var activityLogCollection = 'activityActions';
 
-  Future<void> createCategory(String userId, String categoryName) async {
+  Future<String> createCategory(String userId, String categoryName) async {
     final newCatDocument = _firestore
         .collection(usersCollection)
         .document(userId)
         .collection(categoriesCollection)
         .document();
-
-    recordPrivateFolderActivity(
-        userId: userId, actionType: 'Created category \'$categoryName\'');
 
     final newCategory = Category(newCatDocument.documentID, categoryName);
 
@@ -34,12 +31,15 @@ class PrivateFolderCollection {
 
     try {
       await newCatDocument.setData(category);
+      recordPrivateFolderActivity(
+          userId: userId, actionType: 'Created category \'$categoryName\'');
     } catch (e) {
       print('$e create category exception');
     }
+    return newCategory.categoryName;
   }
 
-  Future<void> deleteCategory({
+  Future<bool> deleteCategory({
     @required String userId,
     @required String categoryId,
   }) async {
@@ -57,11 +57,6 @@ class PrivateFolderCollection {
         .collection(tasksCollection)
         .where('category', isEqualTo: categoryId);
 
-    recordPrivateFolderActivity(
-      userId: userId,
-      actionType: 'Deleted category ${categoryDocData['categoryName']}',
-    );
-
     try {
       await taskDocuments.getDocuments().then(
         (snapshot) async {
@@ -74,12 +69,17 @@ class PrivateFolderCollection {
       );
 
       await categoryDocument.delete();
+      recordPrivateFolderActivity(
+        userId: userId,
+        actionType: 'Deleted category ${categoryDocData['categoryName']}',
+      );
     } catch (e) {
       print(e);
     }
+    return true;
   }
 
-  Future<void> changeCategoryName({
+  Future<bool> changeCategoryName({
     @required String userId,
     @required String categoryId,
     @required String newCategoryName,
@@ -93,23 +93,23 @@ class PrivateFolderCollection {
     final categoryDocData =
         await categoryDocument.get().then((snapshot) => snapshot.data);
 
-    recordPrivateFolderActivity(
-      userId: userId,
-      actionType:
-          'Changed category name from ${categoryDocData['categoryName']} to $newCategoryName',
-    );
-
     try {
       await categoryDocument.updateData({
         'categoryName': newCategoryName,
       });
+      recordPrivateFolderActivity(
+        userId: userId,
+        actionType:
+            'Changed category name from ${categoryDocData['categoryName']} to $newCategoryName',
+      );
     } catch (e) {
       print(e);
     }
+    return true;
   }
 
   // Create the created task object as JSON object and add it into the tasks collection at the database
-  Future<void> createTask({
+  Future<String> createTask({
     String userId,
     String categoryId,
     String newTaskTitle,
@@ -123,9 +123,6 @@ class PrivateFolderCollection {
         .collection(tasksCollection)
         .document();
 
-    recordPrivateFolderActivity(
-        userId: userId, actionType: "Created task '$newTaskTitle'");
-
     TaskOfPrivateFolder newTask = TaskOfPrivateFolder(
       categoryId: categoryId,
       taskID: newTaskDocument.documentID,
@@ -136,18 +133,21 @@ class PrivateFolderCollection {
       completed: false,
     );
 
-    // formatting the task dart object to be a JSON object
+    // Formatting the task dart object to a JSON object
     final jsonTask = newTask.toJson();
 
     try {
       await newTaskDocument.setData(jsonTask);
+      recordPrivateFolderActivity(
+          userId: userId, actionType: "Created task '$newTaskTitle'");
     } catch (e) {
       print('$e create task exception');
       rethrow;
     }
+    return newTask.taskName;
   }
 
-  Future<void> deleteTask({
+  Future<bool> deleteTask({
     @required String userId,
     @required String taskId,
   }) async {
@@ -160,17 +160,10 @@ class PrivateFolderCollection {
     final taskDocData =
         await taskDocument.get().then((snapshot) => snapshot.data);
 
-    await recordPrivateFolderActivity(
-        userId: userId, actionType: 'Deleted task ${taskDocData['taskName']}');
-
     try {
       await taskDocument.collection(subtasksCollection).getDocuments().then(
         (snapshot) async {
           for (DocumentSnapshot doc in snapshot.documents) {
-            // await deleteSubtask(
-            //     userId: userId,
-            //     parentTaskId: taskId,
-            //     subtaskId: doc.data['subtaskId']);
             doc.reference.delete();
           }
         },
@@ -186,9 +179,13 @@ class PrivateFolderCollection {
       });
 
       await taskDocument.delete();
+      recordPrivateFolderActivity(
+          userId: userId,
+          actionType: 'Deleted task ${taskDocData['taskName']}');
     } catch (e) {
       print(e);
     }
+    return true;
   }
 
   Future<void> createSubtask({

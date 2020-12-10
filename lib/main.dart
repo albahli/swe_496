@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
     final pushNotificationService = PushNotificationService(_firebaseMessaging);
     pushNotificationService.initialise();
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       initialBinding: AuthBinding(),
       theme: ThemeData.light(),
       defaultTransition: Transition.noTransition,

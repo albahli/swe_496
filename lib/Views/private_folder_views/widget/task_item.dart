@@ -56,9 +56,7 @@ class _TaskItemState extends State<TaskItem> {
           isScrollControlled: await Get.find<TaskController>().hasSubtasks,
         ).then((value) async {
           await Get.delete<TaskController>();
-          print('the value is $value');
         });
-        print('the task details closed ${widget.task.taskName}');
       },
       // * onDoubleTap has the same functionality as onTap: so no weird functionality occur
       onDoubleTap: () async {
@@ -74,9 +72,7 @@ class _TaskItemState extends State<TaskItem> {
           isScrollControlled: await Get.find<TaskController>().hasSubtasks,
         ).then((value) async {
           await Get.delete<TaskController>();
-          print('the value is $value');
         });
-        print('the task details has been removed ${widget.task.taskName}');
       },
       child: Dismissible(
         key: UniqueKey(),

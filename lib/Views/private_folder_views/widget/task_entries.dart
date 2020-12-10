@@ -20,14 +20,12 @@ class TaskEntries extends StatefulWidget {
 
 class _TaskEntriesState extends State<TaskEntries> {
   final _taskTitleController = TextEditingController();
-  final _tasktTitleFocusNode = FocusNode();
+  final _taskTitleFocusNode = FocusNode();
   // state is by default not-started, and user can switch it while creating to in-progress, other states are to time and completion factors
   String _selectedStateValue = 'not-started';
   // priority is by default 'low', and user can switch it to medium and high
   String _selectedPriorityValue = 'low';
   String _selectedCategoryIdValue;
-
-  // TODO: comment adding feature
 
   DateTime _dateTime;
   final _states = <DropdownMenuItem>[
@@ -104,10 +102,10 @@ class _TaskEntriesState extends State<TaskEntries> {
     _selectedCategoryIdValue = widget.selectedCategory;
 
     // setting a listner for the task title entry focus node so once it hasn't the focus, it brings it back to it
-    _tasktTitleFocusNode.addListener(() {
-      if (!_tasktTitleFocusNode.hasFocus) {
+    _taskTitleFocusNode.addListener(() {
+      if (!_taskTitleFocusNode.hasFocus) {
         // if the task title loses the focus node, it immediately requested it back
-        FocusScope.of(context).requestFocus(_tasktTitleFocusNode);
+        FocusScope.of(context).requestFocus(_taskTitleFocusNode);
       }
     });
   }
@@ -115,7 +113,7 @@ class _TaskEntriesState extends State<TaskEntries> {
   @override
   void dispose() {
     _taskTitleController.dispose();
-    _tasktTitleFocusNode.dispose();
+    _taskTitleFocusNode.dispose();
     super.dispose();
   }
 
@@ -163,7 +161,6 @@ class _TaskEntriesState extends State<TaskEntries> {
       if (dateChosen == null) {
         return;
       }
-      print(dateChosen);
       //  Then mark the widget as dirty and set the state if a date chosen
       setState(() {
         _dateTime = dateChosen;
@@ -266,7 +263,7 @@ class _TaskEntriesState extends State<TaskEntries> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             onSubmitted: (_) => _addTaskFromEntries(),
             cursorColor: Theme.of(context).primaryColor,
-            focusNode: _tasktTitleFocusNode,
+            focusNode: _taskTitleFocusNode,
             autofocus: true,
           ),
           // This is the container which encapsulates the row of date, state, and priority buttons

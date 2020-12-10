@@ -14,12 +14,7 @@ enum CategoryOptions {
   AddTask,
   Delete,
   ActivityLog,
-  /* // TODO: add a pop view of actions. including the following actions:-
-        1- delete category(ask the user if he/she also wants to delete its tasks or move it to another category). 
-        2- rename category. 
-        3- Add task to this category. 
-        4- Activity Log of the category.
-   */
+  // TODO: When deleting a category, ask the user if he/she also wants to delete its tasks or move it to another category (if any).
 }
 
 class TasksList extends StatefulWidget {
@@ -41,13 +36,15 @@ class _TasksListState extends State<TasksList> {
       userId: Get.find<AuthController>().user.uid,
       taskId: taskId,
     );
-    setState(() {
-      currentCompletionState
-          ? completedTasks
-              .removeWhere((TaskOfPrivateFolder task) => task.taskID == taskId)
-          : completedTasks.add(
-              userTasks.firstWhere((TaskOfPrivateFolder task) => task.taskID == taskId));
-    });
+    setState(
+      () {
+        currentCompletionState
+            ? completedTasks.removeWhere(
+                (TaskOfPrivateFolder task) => task.taskID == taskId)
+            : completedTasks.add(userTasks.firstWhere(
+                (TaskOfPrivateFolder task) => task.taskID == taskId));
+      },
+    );
   }
 
   Future<void> _deleteTask(String taskId) async {
@@ -60,7 +57,9 @@ class _TasksListState extends State<TasksList> {
       );
       setState(() {});
     } catch (e) {
-      print(e);
+      print(
+        'catched in >Views>private_folder_view>widget>tasks_list.dart>_deleteTask(p1): $e',
+      );
     }
   }
 
@@ -100,52 +99,58 @@ class _TasksListState extends State<TasksList> {
                 Icon(Icons.receipt_long),
               ],
             ),
-            value: CategoryOptions.AddTask,
+            value: CategoryOptions.ActivityLog,
           ),
           PopupMenuItem(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Divider(thickness: 2),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Rename Category',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Rename Category',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
                       ),
-                    ),
-                    Icon(
-                      Icons.drive_file_rename_outline,
-                      color: Colors.green,
-                    )
-                  ],
+                      Icon(
+                        Icons.drive_file_rename_outline,
+                        color: Colors.green,
+                      )
+                    ],
+                  ),
                 ),
               ],
             ),
             value: CategoryOptions.Rename,
           ),
-          PopupMenuItem(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Delete Category',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+          if (widget.categoriesList.length > 1)
+            PopupMenuItem(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Delete Category',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
-                ),
-                Icon(
-                  Icons.delete,
-                  color: Theme.of(context).errorColor,
-                ),
-              ],
+                  Icon(
+                    Icons.delete,
+                    color: Theme.of(context).errorColor,
+                  ),
+                ],
+              ),
+              value: CategoryOptions.Delete,
             ),
-            value: CategoryOptions.Delete,
-          ),
         ];
       },
       onSelected: (selectedOption) {
@@ -181,15 +186,18 @@ class _TasksListState extends State<TasksList> {
                     child: Text('No'),
                   ),
                   FlatButton(
-                      onPressed: () async {
+                    onPressed: () async {
+                      if (widget.categoriesList.length > 1) {
                         await PrivateFolderCollection().deleteCategory(
                           userId: Get.find<AuthController>().user.uid,
                           categoryId: categoryId,
                         );
-
+                        setState(() {});
                         Get.back(result: true);
-                      },
-                      child: Text('Yes')),
+                      }
+                    },
+                    child: Text('Yes'),
+                  ),
                 ],
               );
             },
@@ -243,12 +251,13 @@ class _TasksListState extends State<TasksList> {
                                 ),
                               ),
                               Flexible(
-                                  flex: 1,
-                                  child: Container(
-                                    child: _categoryOptions(
-                                      widget.categoriesList[index].categoryId,
-                                    ),
-                                  )),
+                                flex: 1,
+                                child: Container(
+                                  child: _categoryOptions(
+                                    widget.categoriesList[index].categoryId,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                           Divider(thickness: 2),

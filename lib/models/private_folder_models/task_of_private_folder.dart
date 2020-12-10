@@ -37,7 +37,9 @@ class TaskOfPrivateFolder implements Task {
       taskPriority = json['taskPriority'];
       completed = json['completed'];
     } catch (e) {
-      print('The error occured in the model $e');
+      print(
+        'catched in >models>private_folder_models>task_of_private_folder.dart>TaskOfPPrivateFolder.fromJson(p1): $e',
+      );
     }
   }
 
@@ -104,14 +106,13 @@ class TaskOfPrivateFolder implements Task {
         userId: userId, parentTaskId: parentTaskId, subtaskId: subtaskId);
   }
 
-
   Future<void> taskCompletionToggle({
     String userId,
     String taskId,
     bool completionState,
   }) async {
-
-    await PrivateFolderCollection().taskCompletionToggle(userId: userId,taskId: taskId, completionState: completionState);
+    await PrivateFolderCollection().taskCompletionToggle(
+        userId: userId, taskId: taskId, completionState: completionState);
   }
 
   Future<void> changeTaskCategory({
@@ -119,7 +120,8 @@ class TaskOfPrivateFolder implements Task {
     @required String taskId,
     @required String newCategoryId,
   }) async {
-    await PrivateFolderCollection().changeTaskCategory(userId: userId, taskId: taskId, newCategoryId: newCategoryId);
+    await PrivateFolderCollection().changeTaskCategory(
+        userId: userId, taskId: taskId, newCategoryId: newCategoryId);
   }
 
   Future<void> changeTaskTitle({
@@ -127,7 +129,8 @@ class TaskOfPrivateFolder implements Task {
     @required String taskId,
     @required String newTitle,
   }) async {
-    await PrivateFolderCollection().changeTaskTitle(userId: userId, taskId: taskId, newTitle: newTitle);
+    await PrivateFolderCollection()
+        .changeTaskTitle(userId: userId, taskId: taskId, newTitle: newTitle);
   }
 
   Future<void> changeTaskDueDate({
@@ -135,7 +138,8 @@ class TaskOfPrivateFolder implements Task {
     @required String taskId,
     @required DateTime newDueDate,
   }) async {
-    await PrivateFolderCollection().changeTaskDueDate(userId: userId, taskId: taskId, newDueDate: newDueDate);
+    await PrivateFolderCollection().changeTaskDueDate(
+        userId: userId, taskId: taskId, newDueDate: newDueDate);
   }
 
   Future<void> changeStatus({
@@ -143,7 +147,8 @@ class TaskOfPrivateFolder implements Task {
     @required String taskId,
     @required String newState,
   }) async {
-    await PrivateFolderCollection().changeStatus(userId: userId, taskId: taskId, newState: newState);
+    await PrivateFolderCollection()
+        .changeStatus(userId: userId, taskId: taskId, newState: newState);
   }
 
   Future<void> changePriority({
@@ -151,7 +156,8 @@ class TaskOfPrivateFolder implements Task {
     @required String taskId,
     @required String newPriority,
   }) async {
-    await PrivateFolderCollection().changePriority(userId: userId, taskId: taskID, newPriority: newPriority);
+    await PrivateFolderCollection().changePriority(
+        userId: userId, taskId: taskID, newPriority: newPriority);
   }
 
   Future<bool> taskHasSubtasks(String taskId, String userId) async {
@@ -164,7 +170,11 @@ class TaskOfPrivateFolder implements Task {
     String subtaskId,
     bool completionState,
   }) async {
-    await PrivateFolderCollection().subtaskCompletionToggle(userId: userId, parentTaskId: parentTaskId, subtaskId: subtaskId, completionState: completionState);
+    await PrivateFolderCollection().subtaskCompletionToggle(
+        userId: userId,
+        parentTaskId: parentTaskId,
+        subtaskId: subtaskId,
+        completionState: completionState);
   }
 
   Future<void> changeSubtaskStatus({
@@ -173,7 +183,11 @@ class TaskOfPrivateFolder implements Task {
     @required String newState,
     @required String subtaskId,
   }) async {
-    await PrivateFolderCollection().changeSubtaskStatus(userId: userId, taskId: taskId, newState: newState, subtaskId: subtaskId);
+    await PrivateFolderCollection().changeSubtaskStatus(
+        userId: userId,
+        taskId: taskId,
+        newState: newState,
+        subtaskId: subtaskId);
   }
 
   Future<void> changeSubtaskPriority({
@@ -182,9 +196,12 @@ class TaskOfPrivateFolder implements Task {
     @required String newPriority,
     @required String subtaskId,
   }) async {
-    await PrivateFolderCollection().changeSubtaskPriority(userId: userId, taskId: taskId, newPriority: newPriority, subtaskId: subtaskId);
+    await PrivateFolderCollection().changeSubtaskPriority(
+        userId: userId,
+        taskId: taskId,
+        newPriority: newPriority,
+        subtaskId: subtaskId);
   }
-
 
 // Now we are going to stream the list of all the task models available in the database, so we have to get the
 // data from Firestore and model it here then use the controller to feed it back to the personal folder

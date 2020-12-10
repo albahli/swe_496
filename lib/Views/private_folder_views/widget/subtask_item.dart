@@ -5,7 +5,6 @@ import 'package:swe496/Database/private_folder_collection.dart';
 import 'package:swe496/controllers/UserControllers/authController.dart';
 import 'package:swe496/models/private_folder_models/subtask.dart';
 
-
 class SubtaskItem extends StatefulWidget {
   final Subtask subtask;
   final Function tickSubtask;
@@ -21,14 +20,15 @@ class _SubtaskItemState extends State<SubtaskItem> {
 
   Future<void> _deleteSubtask() async {
     try {
-      print('entered the subtask deletion caller area');
       await PrivateFolderCollection().deleteSubtask(
         userId: Get.find<AuthController>().user.uid,
         parentTaskId: widget.subtask.parentTaskId,
         subtaskId: widget.subtask.subtaskId,
       );
     } catch (e) {
-      print(e);
+      print(
+        'catched in >Views>private_folder_views>widget>subtask_item.dart>_deleteSubtask(): $e',
+      );
     }
   }
 
