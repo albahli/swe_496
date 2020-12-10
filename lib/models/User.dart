@@ -12,6 +12,7 @@ class User {
   List<String> userProjectsIDs;
   List<String> friendsIDs;
   List<String> userChatsIDs;
+  List<String> tokens;
 
   User(
       {this.userID,

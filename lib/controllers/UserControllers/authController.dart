@@ -157,6 +157,8 @@ class AuthController extends GetxController {
       print(e.toString());
     }
   }
+
+
 }
 
 

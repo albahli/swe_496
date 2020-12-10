@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
@@ -34,6 +35,17 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
   void didChangeDependencies() async {
     Get.find<UserController>().user = await UserProfileCollection()
         .getUser(Get.find<AuthController>().user.uid);
+
+    // Get the token each time the application loads
+    String token = await FirebaseMessaging().getToken();
+
+    // Save the initial token to the database
+    await UserProfileCollection().saveTokenToDatabase(token);
+
+
+    // Any time the token refreshes, store this in the database too.
+    FirebaseMessaging().onTokenRefresh.listen(UserProfileCollection().saveTokenToDatabase);
+
     super.didChangeDependencies();
   }
 
