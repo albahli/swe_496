@@ -444,18 +444,19 @@ class ProjectCollection {
     // Convert the sub task object to JSON
     var newSubtaskJSON = newSubtaskOfProject.toJson();
     try {
-             _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(mainTaskID).setData(
-          ({
-            'subTask': FieldValue.arrayUnion([
-              newSubtaskJSON,
-            ]),
-          }), merge: true);
-             updateTaskNotificationByLeader(projectID, mainTaskID);
-
+          .document(mainTaskID)
+          .setData(
+              ({
+                'subTask': FieldValue.arrayUnion([
+                  newSubtaskJSON,
+                ]),
+              }),
+              merge: true);
+      updateTaskNotificationByLeader(projectID, mainTaskID);
     } on Exception catch (e) {
       print(e);
     }
@@ -480,19 +481,21 @@ class ProjectCollection {
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID).setData(
-          ({
-            "taskName": taskName,
-            "taskDescription": taskDescription,
-            "startDate": startDate,
-            "dueDate": dueDate,
-            "taskPriority": taskPriority,
-            "assignedTo": assignedTo.isEmpty ? '' : listOfUserNameAndID[1],
-            "isAssigned": assignedTo.isEmpty ? 'false' : 'true',
-            "taskStatus": 'Not-started',
-            "isUpdatedByLeader": true,
-            "isUpdatedByAssignedMember": false,
-          }), merge: true);
+          .document(taskID)
+          .setData(
+              ({
+                "taskName": taskName,
+                "taskDescription": taskDescription,
+                "startDate": startDate,
+                "dueDate": dueDate,
+                "taskPriority": taskPriority,
+                "assignedTo": assignedTo.isEmpty ? '' : listOfUserNameAndID[1],
+                "isAssigned": assignedTo.isEmpty ? 'false' : 'true',
+                "taskStatus": 'Not-started',
+                "isUpdatedByLeader": true,
+                "isUpdatedByAssignedMember": false,
+              }),
+              merge: true);
 
       Get.back();
       Get.snackbar('Success', "Task '$taskName' has been updated successfully");
@@ -637,13 +640,10 @@ class ProjectCollection {
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID).setData(
-        {
-          'subTask': FieldValue.arrayRemove([deletedSubtaskJSON])
-        },
-        merge: true
-      );
-
+          .document(taskID)
+          .setData({
+        'subTask': FieldValue.arrayRemove([deletedSubtaskJSON])
+      }, merge: true);
     } on Exception catch (e) {
       print(e);
     }
@@ -736,19 +736,20 @@ class ProjectCollection {
     insertIntoActivityLog(projectID, "Updated an event '$eventName'");
 
     try {
-     _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('events')
-          .document(eventID).setData(
-          ({
-            "eventName": eventName,
-            "eventDescription": eventDescription,
-            "eventStartDate": startDate,
-            "eventEndDate": endDate,
-            "eventLocation": location,
-          }), merge: true);
-
+          .document(eventID)
+          .setData(
+              ({
+                "eventName": eventName,
+                "eventDescription": eventDescription,
+                "eventStartDate": startDate,
+                "eventEndDate": endDate,
+                "eventLocation": location,
+              }),
+              merge: true);
 
       return true;
     } on Exception catch (e) {
@@ -766,8 +767,8 @@ class ProjectCollection {
           .collection('projects')
           .document(projectID)
           .collection('events')
-          .document(eventID).delete();
-
+          .document(eventID)
+          .delete();
     } on Exception catch (e) {
       print(e);
     }
@@ -874,12 +875,14 @@ class ProjectCollection {
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID).setData(
-          ({
-            'message': FieldValue.arrayUnion([
-              jsonMessage,
-            ]),
-          }), merge: true);
+          .document(taskID)
+          .setData(
+              ({
+                'message': FieldValue.arrayUnion([
+                  jsonMessage,
+                ]),
+              }),
+              merge: true);
 
       updateTaskNotificationByLeader(projectID, taskID);
     } on Exception catch (e) {
@@ -890,15 +893,13 @@ class ProjectCollection {
   Future<void> updateProjectSettings(String projectID, String projectName,
       String pinnedMessage, bool joiningLinkStatus) async {
     try {
-
-          _firestore.collection('projects').document(projectID).setData(
-              ({
-                'projectName': projectName,
-                'pinnedMessage': pinnedMessage,
-                'isJoiningLinkEnabled': joiningLinkStatus
-              }), merge: true);
-
-
+      _firestore.collection('projects').document(projectID).setData(
+          ({
+            'projectName': projectName,
+            'pinnedMessage': pinnedMessage,
+            'isJoiningLinkEnabled': joiningLinkStatus
+          }),
+          merge: true);
     } on Exception catch (e) {
       print(e);
     }
@@ -948,8 +949,7 @@ class ProjectCollection {
 
   Future<void> deleteProject(String projectID) async {
     try {
-          _firestore.collection('projects').document(projectID).delete();
-
+      _firestore.collection('projects').document(projectID).delete();
     } on Exception catch (e) {
       print(e);
     }
