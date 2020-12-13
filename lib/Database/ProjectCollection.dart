@@ -959,7 +959,7 @@ class ProjectCollection {
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Updated task statues to '$taskStatus'");
 
-    //updateTaskNotificationByAssignedMember(projectID, taskID);
+    updateTaskNotificationByAssignedMember(projectID, taskID);
 
     try {
       _firestore
