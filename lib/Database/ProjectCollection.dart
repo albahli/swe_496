@@ -64,19 +64,22 @@ class ProjectCollection {
 
     // Add the new project ID to the user's project list.
     userController.user.userProjectsIDs.add(projectID);
-      // Add the new chat ID to the user's chat list.
+    // Add the new chat ID to the user's chat list.
     userController.user.userChatsIDs.add(projectID);
 
     try {
       // Convert the project object to be a JSON.
       var jsonUser = userController.user.toJson();
-       // add the project chat to the chats collection
-        Map<String, dynamic> chatInfo = new Map<String, dynamic>();
-        chatInfo['GroupName'] = projectName;
-        chatInfo['LastMsg'] = "";
-        chatInfo['membersIDs'] = membersIDs;
-        chatInfo['type'] = 'group';
-       Firestore.instance.collection('Chats').document(projectID).setData(chatInfo); 
+      // add the project chat to the chats collection
+      Map<String, dynamic> chatInfo = new Map<String, dynamic>();
+      chatInfo['GroupName'] = projectName;
+      chatInfo['LastMsg'] = "";
+      chatInfo['membersIDs'] = membersIDs;
+      chatInfo['type'] = 'group';
+      Firestore.instance
+          .collection('Chats')
+          .document(projectID)
+          .setData(chatInfo);
       // Send the user JSON data to the fire base.
       await Firestore.instance
           .collection('userProfile')
@@ -91,12 +94,12 @@ class ProjectCollection {
       var jsonProject = newProject.toJson();
 
       // Send the project JSON data to the fire base.
-       await Firestore.instance
+      await Firestore.instance
           .collection('projects')
           .document(projectID)
           .setData(jsonProject);
 
-          return true;
+      return true;
     } catch (e) {
       print(e);
       return false;
@@ -118,6 +121,7 @@ class ProjectCollection {
       print(e);
     }
   }
+
   Future<void> addChatIDInMembersProfile(
       String projectID, List<String> membersIDs) async {
     try {
@@ -198,7 +202,7 @@ class ProjectCollection {
           {
             'userProjectsIDs': FieldValue.arrayUnion([projectID]),
             // add chat also
-             'userChatsIDs': FieldValue.arrayUnion([projectID])
+            'userChatsIDs': FieldValue.arrayUnion([projectID])
           },
         );
       });
@@ -262,7 +266,7 @@ class ProjectCollection {
           {
             'userProjectsIDs': FieldValue.arrayRemove([projectID]),
             // chat also
-             'userChatsIDs': FieldValue.arrayRemove([projectID]),
+            'userChatsIDs': FieldValue.arrayRemove([projectID]),
           },
         );
       });
@@ -479,32 +483,24 @@ class ProjectCollection {
     List listOfUserNameAndID = assignedTo.split(',');
 
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID);
+          .document(taskID).setData(
+          ({
+            "taskName": taskName,
+            "taskDescription": taskDescription,
+            "startDate": startDate,
+            "dueDate": dueDate,
+            "taskPriority": taskPriority,
+            "assignedTo": assignedTo.isEmpty ? '' : listOfUserNameAndID[1],
+            "isAssigned": assignedTo.isEmpty ? 'false' : 'true',
+            "taskStatus": 'Not-started',
+            "isUpdatedByLeader": true,
+            "isUpdatedByAssignedMember": false,
+          }), merge: true);
 
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              "taskName": taskName,
-              "taskDescription": taskDescription,
-              "startDate": startDate,
-              "dueDate": dueDate,
-              "taskPriority": taskPriority,
-              "assignedTo": assignedTo.isEmpty ? '' : listOfUserNameAndID[1],
-              "isAssigned": assignedTo.isEmpty ? 'false' : 'true',
-              "taskStatus": 'Not-started',
-              "isUpdatedByLeader" : true,
-              "isUpdatedByAssignedMember" : false,
-            }));
-      });
       Get.back();
       Get.snackbar('Success', "Task '$taskName' has been updated successfully");
     } on Exception catch (e) {
@@ -512,110 +508,88 @@ class ProjectCollection {
     }
   }
 
-  Future<void> updateTaskNotificationByLeader(String projectID,
-      String taskID,) async {
-
+  Future<void> updateTaskNotificationByLeader(
+    String projectID,
+    String taskID,
+  ) async {
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID);
-
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              "isUpdatedByLeader" : true,
-              "isUpdatedByAssignedMember" : false,
-            }));
-      });
-    } on Exception catch (e) {
-      print(e);
-    }
-  }
-  Future<void> updateTaskNotificationByAssignedMember(String projectID,
-      String taskID,) async {
-
-    try {
-      DocumentReference documentReference = _firestore
-          .collection('projects')
-          .document(projectID)
-          .collection('tasks')
-          .document(taskID);
-
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              "isUpdatedByLeader" : false,
-              "isUpdatedByAssignedMember" : true,
-            }));
-      });
+          .document(taskID)
+          .setData(
+              ({
+                "isUpdatedByLeader": true,
+                "isUpdatedByAssignedMember": false,
+              }),
+              merge: true);
     } on Exception catch (e) {
       print(e);
     }
   }
 
-  Future<void> readNotificationByAssignedMember(String projectID,
-      String taskID,) async {
-
+  Future<void> updateTaskNotificationByAssignedMember(
+    String projectID,
+    String taskID,
+  ) async {
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID);
-
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              "isUpdatedByLeader" : false,
-            }));
-      });
+          .document(taskID)
+          .setData(
+              ({
+                "isUpdatedByLeader": false,
+                "isUpdatedByAssignedMember": true,
+              }),
+              merge: true);
     } on Exception catch (e) {
       print(e);
     }
   }
 
-  Future<void> readNotificationByLeader(String projectID,
-      String taskID,) async {
-
+  Future<void> readNotificationByAssignedMember(
+    String projectID,
+    String taskID,
+  ) async {
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID);
-
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              "isUpdatedByAssignedMember" : false,
-            }));
-      });
+          .document(taskID)
+          .setData(
+              ({
+                "isUpdatedByLeader": false,
+              }),
+              merge: true);
     } on Exception catch (e) {
       print(e);
     }
   }
+
+  Future<void> readNotificationByLeader(
+    String projectID,
+    String taskID,
+  ) async {
+    try {
+      _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID)
+          .setData(
+              ({
+                "isUpdatedByAssignedMember": false,
+              }),
+              merge: true);
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> deleteTask(
     String projectID,
     String taskID,
@@ -624,36 +598,27 @@ class ProjectCollection {
     insertIntoActivityLog(projectID, "Deleted a task");
 
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID);
-
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-
-        await transaction.delete(documentReference);
-      });
+          .document(taskID)
+          .delete();
     } on Exception catch (e) {
       print(e);
     }
   }
 
   Future<void> deleteSubtask(
-    String projectID,
-    String taskID,
-    String subtaskID,
-    String subtaskName,
-    String subtaskDescription,
-    String startDate,
-    String dueDate,
-    String subtaskPriority,
-      String subtaskStatus
-  ) async {
+      String projectID,
+      String taskID,
+      String subtaskID,
+      String subtaskName,
+      String subtaskDescription,
+      String startDate,
+      String dueDate,
+      String subtaskPriority,
+      String subtaskStatus) async {
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Deleted a subtask '$subtaskName'");
 
@@ -694,7 +659,6 @@ class ProjectCollection {
           },
         );
       });
-
     } on Exception catch (e) {
       print(e);
     }
@@ -718,8 +682,16 @@ class ProjectCollection {
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Updated a subtask '$subtaskName'");
 
-    await deleteSubtask(projectID, taskID, subtaskID, oldSubtaskName,
-            oldSubtaskDescription, oldStartDate, oldDueDate, oldSubtaskPriority, subtaskStatus)
+    await deleteSubtask(
+            projectID,
+            taskID,
+            subtaskID,
+            oldSubtaskName,
+            oldSubtaskDescription,
+            oldStartDate,
+            oldDueDate,
+            oldSubtaskPriority,
+            subtaskStatus)
         .then((value) async {
       await createNewSubtask(projectID, taskID, subtaskName, subtaskDescription,
           startDate, dueDate, subtaskPriority, 'Not-Started');
@@ -727,8 +699,8 @@ class ProjectCollection {
 
     updateTaskNotificationByLeader(projectID, taskID);
     Get.back();
-     Get.snackbar(
-      'Success', "Subtask '$subtaskName' has been updated successfully");
+    Get.snackbar(
+        'Success', "Subtask '$subtaskName' has been updated successfully");
   }
 
   Future<void> createNewEvent(
@@ -779,28 +751,20 @@ class ProjectCollection {
     insertIntoActivityLog(projectID, "Updated an event '$eventName'");
 
     try {
-      DocumentReference documentReference = _firestore
+     _firestore
           .collection('projects')
           .document(projectID)
           .collection('events')
-          .document(eventID);
+          .document(eventID).setData(
+          ({
+            "eventName": eventName,
+            "eventDescription": eventDescription,
+            "eventStartDate": startDate,
+            "eventEndDate": endDate,
+            "eventLocation": location,
+          }), merge: true);
 
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
 
-        await transaction.update(
-            documentReference,
-            ({
-              "eventName": eventName,
-              "eventDescription": eventDescription,
-              "eventStartDate": startDate,
-              "eventEndDate": endDate,
-              "eventLocation": location,
-            }));
-      });
       return true;
     } on Exception catch (e) {
       print(e);
@@ -813,20 +777,12 @@ class ProjectCollection {
     insertIntoActivityLog(projectID, 'Deleted an event');
 
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('events')
-          .document(eventID);
+          .document(eventID).delete();
 
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-
-        await transaction.delete(documentReference);
-      });
     } on Exception catch (e) {
       print(e);
     }
@@ -929,25 +885,16 @@ class ProjectCollection {
     var jsonMessage = message.toJson();
 
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID);
-
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              'message': FieldValue.arrayUnion([
-                jsonMessage,
-              ]),
-            }));
-      });
+          .document(taskID).setData(
+          ({
+            'message': FieldValue.arrayUnion([
+              jsonMessage,
+            ]),
+          }), merge: true);
 
       updateTaskNotificationByLeader(projectID, taskID);
     } on Exception catch (e) {
@@ -1038,29 +985,20 @@ class ProjectCollection {
     }
   }
 
-  Future <void> changeMainTaskStatus(String projectID, String taskID, String taskStatus) async{
+  Future<void> changeMainTaskStatus(
+      String projectID, String taskID, String taskStatus) async {
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Updated task statues to '$taskStatus'");
 
-    updateTaskNotificationByAssignedMember(projectID, taskID);
+    //updateTaskNotificationByAssignedMember(projectID, taskID);
+
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID);
-
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              "taskStatus": taskStatus
-            }));
-      });
+          .document(taskID)
+          .updateData(({"taskStatus": taskStatus}));
     } on Exception catch (e) {
       print(e);
     }
@@ -1076,16 +1014,25 @@ class ProjectCollection {
       String dueDate,
       String subtaskPriority,
       String oldSubtaskStatus,
-      String newSubTaskStatus
-      ) async {
+      String newSubTaskStatus) async {
     // Record this action in the activity log of the project
-    insertIntoActivityLog(projectID, "Updated a subtask status to '$newSubTaskStatus'");
+    insertIntoActivityLog(
+        projectID, "Updated a subtask status to '$newSubTaskStatus'");
 
-    await deleteSubtask(projectID, taskID, subtaskID, subtaskName, subtaskDescription, startDate, dueDate, subtaskPriority, oldSubtaskStatus).then((value) async{
-        }).then((value) async{
-          await createNewSubtask(projectID, taskID, subtaskName, subtaskDescription, startDate, dueDate, subtaskPriority, newSubTaskStatus);
-
+    await deleteSubtask(
+            projectID,
+            taskID,
+            subtaskID,
+            subtaskName,
+            subtaskDescription,
+            startDate,
+            dueDate,
+            subtaskPriority,
+            oldSubtaskStatus)
+        .then((value) async {})
+        .then((value) async {
+      await createNewSubtask(projectID, taskID, subtaskName, subtaskDescription,
+          startDate, dueDate, subtaskPriority, newSubTaskStatus);
     });
   }
-
 }
