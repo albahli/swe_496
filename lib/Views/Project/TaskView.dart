@@ -114,10 +114,10 @@ class _TaskViewState extends State<TaskView> {
                         taskOfProjectController.tasks != null &&
                         taskOfProjectController.tasks.isNotEmpty) {
                      isAdmin ? ProjectCollection()
-                          .updateTaskNotificationByAssignedMember(
+                          .readNotificationByLeader(
                               projectController.projectID,
                               taskOfProjectController.tasks[0].taskID) : ProjectCollection()
-                         .updateTaskNotificationByLeader(
+                         .readNotificationByAssignedMember(
                          projectController.projectID,
                          taskOfProjectController.tasks[0].taskID) ;
                       // Sort the tasks and events based on due date

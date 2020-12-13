@@ -538,8 +538,6 @@ class ProjectCollection {
       print(e);
     }
   }
-
-
   Future<void> updateTaskNotificationByAssignedMember(String projectID,
       String taskID,) async {
 
@@ -567,6 +565,57 @@ class ProjectCollection {
     }
   }
 
+  Future<void> readNotificationByAssignedMember(String projectID,
+      String taskID,) async {
+
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        await transaction.update(
+            documentReference,
+            ({
+              "isUpdatedByLeader" : false,
+            }));
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> readNotificationByLeader(String projectID,
+      String taskID,) async {
+
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        await transaction.update(
+            documentReference,
+            ({
+              "isUpdatedByAssignedMember" : false,
+            }));
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
   Future<void> deleteTask(
     String projectID,
     String taskID,
@@ -993,6 +1042,7 @@ class ProjectCollection {
     // Record this action in the activity log of the project
     insertIntoActivityLog(projectID, "Updated task statues to '$taskStatus'");
 
+    updateTaskNotificationByAssignedMember(projectID, taskID);
     try {
       DocumentReference documentReference = _firestore
           .collection('projects')
