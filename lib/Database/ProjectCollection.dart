@@ -454,6 +454,7 @@ class ProjectCollection {
               newSubtaskJSON,
             ]),
           }), merge: true);
+             updateTaskNotificationByLeader(projectID, mainTaskID);
 
     } on Exception catch (e) {
       print(e);

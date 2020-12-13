@@ -717,14 +717,14 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                       Text(filteredTasksListBySearch[index].taskName),
                      isAdmin ? ( filteredTasksListBySearch[index].isUpdatedByAssignedMember
                           ? Text(
-                              '   NEW',
+                              '   NEW UPDATES',
                               style: TextStyle(
                                   color: Colors.orangeAccent[400],
                                   fontSize: 10),
                             )
                           : SizedBox()) : ( filteredTasksListBySearch[index].isUpdatedByLeader
                          ? Text(
-                       '   NEW +',
+                       '   NEW UPDATES',
                        style: TextStyle(
                            color: Colors.orangeAccent[400],
                            fontSize: 10),
