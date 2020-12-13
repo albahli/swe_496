@@ -37,14 +37,14 @@ class _GroupProjectsViewState extends State<GroupProjectsView> {
         .getUser(Get.find<AuthController>().user.uid);
 
     // Get the token each time the application loads
-    String token = await FirebaseMessaging().getToken();
+   // String token = await FirebaseMessaging().getToken();
 
     // Save the initial token to the database
-    await UserProfileCollection().saveTokenToDatabase(token);
+    //await UserProfileCollection().saveTokenToDatabase(token);
 
 
     // Any time the token refreshes, store this in the database too.
-    FirebaseMessaging().onTokenRefresh.listen(UserProfileCollection().saveTokenToDatabase);
+  //  FirebaseMessaging().onTokenRefresh.listen(UserProfileCollection().saveTokenToDatabase);
 
     super.didChangeDependencies();
   }

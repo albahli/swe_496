@@ -357,6 +357,7 @@ class ProjectCollection {
       taskStatus: _taskStatus,
       subtask: subTasksList,
       message: messagesList,
+      isUpdated: false
     );
 
     // Creating the list of tasks for that project.
@@ -498,11 +499,38 @@ class ProjectCollection {
               "taskPriority": taskPriority,
               "assignedTo": assignedTo.isEmpty ? '' : listOfUserNameAndID[1],
               "isAssigned": assignedTo.isEmpty ? 'false' : 'true',
-              "taskStatus": 'Not-started'
+              "taskStatus": 'Not-started',
+              "isUpdated" : true,
             }));
       });
       Get.back();
       Get.snackbar('Success', "Task '$taskName' has been updated successfully");
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> updateTaskNotification(String projectID,
+      String taskID,) async {
+
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        await transaction.update(
+            documentReference,
+            ({
+              "isUpdated" : true,
+            }));
+      });
     } on Exception catch (e) {
       print(e);
     }
@@ -616,6 +644,8 @@ class ProjectCollection {
       await createNewSubtask(projectID, taskID, subtaskName, subtaskDescription,
           startDate, dueDate, subtaskPriority, 'Not-Started');
     });
+
+    updateTaskNotification(projectID, taskID);
     Get.back();
      Get.snackbar(
       'Success', "Subtask '$subtaskName' has been updated successfully");
@@ -838,6 +868,8 @@ class ProjectCollection {
               ]),
             }));
       });
+
+      updateTaskNotification(projectID, taskID);
     } on Exception catch (e) {
       print(e);
     }

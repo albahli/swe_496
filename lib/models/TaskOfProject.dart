@@ -16,6 +16,7 @@ class TaskOfProject implements Task {
   String assignedTo;
   List<TaskOfProject> subtask;
   List<Message> message;
+  bool isUpdated;
 
   TaskOfProject(
       {this.taskID,
@@ -29,7 +30,8 @@ class TaskOfProject implements Task {
       this.assignedBy,
       this.assignedTo,
       this.subtask,
-      this.message});
+      this.message,
+      this.isUpdated});
 
   TaskOfProject.fromJson(Map<String, dynamic> json) {
     taskID = json['taskID'];
@@ -42,6 +44,7 @@ class TaskOfProject implements Task {
     isAssigned = json['isAssigned'];
     assignedBy = json['assignedBy'];
     assignedTo = json['assignedTo'];
+    isUpdated = json['isUpdated'];
     if (json['subTask'] != null) {
       subtask = new List<TaskOfProject>();
       json['subTask'].forEach((v) {
@@ -68,6 +71,7 @@ class TaskOfProject implements Task {
     data['isAssigned'] = this.isAssigned;
     data['assignedBy'] = this.assignedBy;
     data['assignedTo'] = this.assignedTo;
+    data['isUpdated'] = this.isUpdated;
     if (this.subtask != null) {
       data['subTask'] = this.subtask.map((v) => v.toJson()).toList();
     }

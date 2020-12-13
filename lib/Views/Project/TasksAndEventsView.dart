@@ -340,7 +340,7 @@ class _TasksAndEvents extends State<TasksAndEventsView>
           if (barIndex == 0) // Do nothing, stay in the same page
             return;
           else if (barIndex == 1)
-             Get.off(ChatView(), transition: Transition.noTransition);
+            Get.off(ChatView(), transition: Transition.noTransition);
           else if (barIndex == 2)
             Get.to(MembersView(), transition: Transition.noTransition);
           FocusScope.of(context).unfocus();
@@ -713,7 +713,10 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                                         Icons.assignment,
                                         color: Colors.grey,
                                       )))),
-                    title: Text(filteredTasksListBySearch[index].taskName),
+                    title: Wrap(children: [
+                      Text(filteredTasksListBySearch[index].taskName),
+                      filteredTasksListBySearch[index].isUpdated ? Text('   NEW', style: TextStyle(color: Colors.orangeAccent[400], fontSize: 10),) : SizedBox(),
+                    ]),
                     subtitle:
                         Text('${filteredTasksListBySearch[index].dueDate}'),
                     trailing: Text(
