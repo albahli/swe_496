@@ -357,7 +357,8 @@ class ProjectCollection {
       taskStatus: _taskStatus,
       subtask: subTasksList,
       message: messagesList,
-      isUpdated: false
+      isUpdatedByLeader: true,
+      isUpdatedByAssignedMember: false,
     );
 
     // Creating the list of tasks for that project.
@@ -500,7 +501,8 @@ class ProjectCollection {
               "assignedTo": assignedTo.isEmpty ? '' : listOfUserNameAndID[1],
               "isAssigned": assignedTo.isEmpty ? 'false' : 'true',
               "taskStatus": 'Not-started',
-              "isUpdated" : true,
+              "isUpdatedByLeader" : true,
+              "isUpdatedByAssignedMember" : false,
             }));
       });
       Get.back();
@@ -510,7 +512,7 @@ class ProjectCollection {
     }
   }
 
-  Future<void> updateTaskNotification(String projectID,
+  Future<void> updateTaskNotificationByLeader(String projectID,
       String taskID,) async {
 
     try {
@@ -528,7 +530,35 @@ class ProjectCollection {
         await transaction.update(
             documentReference,
             ({
-              "isUpdated" : true,
+              "isUpdatedByLeader" : true,
+              "isUpdatedByAssignedMember" : false,
+            }));
+      });
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> updateTaskNotificationByAssignedMember(String projectID,
+      String taskID,) async {
+
+    try {
+      DocumentReference documentReference = _firestore
+          .collection('projects')
+          .document(projectID)
+          .collection('tasks')
+          .document(taskID);
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(documentReference);
+        if (!snapshot.exists) {
+          throw Exception("data does not exist!");
+        }
+        await transaction.update(
+            documentReference,
+            ({
+              "isUpdatedByLeader" : false,
+              "isUpdatedByAssignedMember" : true,
             }));
       });
     } on Exception catch (e) {
@@ -645,7 +675,7 @@ class ProjectCollection {
           startDate, dueDate, subtaskPriority, 'Not-Started');
     });
 
-    updateTaskNotification(projectID, taskID);
+    updateTaskNotificationByLeader(projectID, taskID);
     Get.back();
      Get.snackbar(
       'Success', "Subtask '$subtaskName' has been updated successfully");
@@ -869,7 +899,7 @@ class ProjectCollection {
             }));
       });
 
-      updateTaskNotification(projectID, taskID);
+      updateTaskNotificationByLeader(projectID, taskID);
     } on Exception catch (e) {
       print(e);
     }
