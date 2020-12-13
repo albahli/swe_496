@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:bubble/bubble.dart';
+import 'package:swe496/utils/root.dart';
 
 class TaskView extends StatefulWidget {
   const TaskView({Key key, this.taskID}) : super(key: key);
@@ -96,8 +97,18 @@ class _TaskViewState extends State<TaskView> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
-            Get.delete<TaskOfProjectController>();
-            Get.back();
+            // Here if project is deleted while the task view is opened, it will navigate
+            // to the root.
+            if (!projectController.initialized ||
+                projectController.project == null) {
+              Get.delete<TaskOfProjectController>();
+              Get.offAll(Root());
+              Get.delete<
+                  ProjectController>();
+            } else {
+              Get.delete<TaskOfProjectController>();
+              Get.back();
+            }
           },
         ),
       ),
@@ -113,13 +124,14 @@ class _TaskViewState extends State<TaskView> {
                     if (taskOfProjectController != null &&
                         taskOfProjectController.tasks != null &&
                         taskOfProjectController.tasks.isNotEmpty) {
-                     isAdmin ? ProjectCollection()
-                          .readNotificationByLeader(
+                      isAdmin
+                          ? ProjectCollection().readNotificationByLeader(
                               projectController.projectID,
-                              taskOfProjectController.tasks[0].taskID) : ProjectCollection()
-                         .readNotificationByAssignedMember(
-                         projectController.projectID,
-                         taskOfProjectController.tasks[0].taskID) ;
+                              taskOfProjectController.tasks[0].taskID)
+                          : ProjectCollection()
+                              .readNotificationByAssignedMember(
+                                  projectController.projectID,
+                                  taskOfProjectController.tasks[0].taskID);
                       // Sort the tasks and events based on due date
                       taskOfProjectController.tasks[0].subtask
                           .sort((a, b) => a.dueDate.compareTo(b.dueDate));

@@ -251,7 +251,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
                           });
 
                           ProjectCollection().createNewProject(_projectName.text, members);
-                         // Get.back();
+                          Get.back();
                           Get.snackbar('Success !',
                               "Project '${_projectName.text} has been created successfully.'");
                         }
