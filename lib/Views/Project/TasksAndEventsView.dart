@@ -715,7 +715,21 @@ class _TasksAndEvents extends State<TasksAndEventsView>
                                       )))),
                     title: Wrap(children: [
                       Text(filteredTasksListBySearch[index].taskName),
-                      filteredTasksListBySearch[index].isUpdatedByLeader ? Text('   NEW', style: TextStyle(color: Colors.orangeAccent[400], fontSize: 10),) : SizedBox(),
+                     isAdmin ? ( filteredTasksListBySearch[index].isUpdatedByAssignedMember
+                          ? Text(
+                              '   NEW',
+                              style: TextStyle(
+                                  color: Colors.orangeAccent[400],
+                                  fontSize: 10),
+                            )
+                          : SizedBox()) : ( filteredTasksListBySearch[index].isUpdatedByLeader
+                         ? Text(
+                       '   NEW +',
+                       style: TextStyle(
+                           color: Colors.orangeAccent[400],
+                           fontSize: 10),
+                     )
+                         : SizedBox()),
                     ]),
                     subtitle:
                         Text('${filteredTasksListBySearch[index].dueDate}'),
