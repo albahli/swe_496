@@ -444,25 +444,17 @@ class ProjectCollection {
     // Convert the sub task object to JSON
     var newSubtaskJSON = newSubtaskOfProject.toJson();
     try {
-      DocumentReference documentReference = _firestore
+             _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(mainTaskID);
+          .document(mainTaskID).setData(
+          ({
+            'subTask': FieldValue.arrayUnion([
+              newSubtaskJSON,
+            ]),
+          }), merge: true);
 
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              'subTask': FieldValue.arrayUnion([
-                newSubtaskJSON,
-              ]),
-            }));
-      });
     } on Exception catch (e) {
       print(e);
     }
@@ -640,25 +632,17 @@ class ProjectCollection {
     var deletedSubtaskJSON = deletedSubtaskOfProject.toJson();
 
     try {
-      DocumentReference documentReference = _firestore
+      _firestore
           .collection('projects')
           .document(projectID)
           .collection('tasks')
-          .document(taskID);
+          .document(taskID).setData(
+        {
+          'subTask': FieldValue.arrayRemove([deletedSubtaskJSON])
+        },
+        merge: true
+      );
 
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-
-        await transaction.update(
-          documentReference,
-          {
-            'subTask': FieldValue.arrayRemove([deletedSubtaskJSON])
-          },
-        );
-      });
     } on Exception catch (e) {
       print(e);
     }
@@ -905,22 +889,15 @@ class ProjectCollection {
   Future<void> updateProjectSettings(String projectID, String projectName,
       String pinnedMessage, bool joiningLinkStatus) async {
     try {
-      DocumentReference documentReference =
-          _firestore.collection('projects').document(projectID);
 
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.update(
-            documentReference,
-            ({
-              'projectName': projectName,
-              'pinnedMessage': pinnedMessage,
-              'isJoiningLinkEnabled': joiningLinkStatus
-            }));
-      });
+          _firestore.collection('projects').document(projectID).setData(
+              ({
+                'projectName': projectName,
+                'pinnedMessage': pinnedMessage,
+                'isJoiningLinkEnabled': joiningLinkStatus
+              }), merge: true);
+
+
     } on Exception catch (e) {
       print(e);
     }
@@ -970,16 +947,8 @@ class ProjectCollection {
 
   Future<void> deleteProject(String projectID) async {
     try {
-      DocumentReference documentReference =
-          _firestore.collection('projects').document(projectID);
+          _firestore.collection('projects').document(projectID).delete();
 
-      await _firestore.runTransaction((transaction) async {
-        DocumentSnapshot snapshot = await transaction.get(documentReference);
-        if (!snapshot.exists) {
-          throw Exception("data does not exist!");
-        }
-        await transaction.delete(documentReference);
-      });
     } on Exception catch (e) {
       print(e);
     }
