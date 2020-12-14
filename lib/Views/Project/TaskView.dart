@@ -45,7 +45,7 @@ class _TaskViewState extends State<TaskView> {
   TextEditingController _subtaskStatus = new TextEditingController();
 
   TextEditingController _subtaskPriority =
-      new TextEditingController(text: 'Low');
+  new TextEditingController(text: 'Low');
 
   TextEditingController _subtaskStartDate = new TextEditingController(
       text: DateTime.now().toString().substring(0, 10));
@@ -126,12 +126,12 @@ class _TaskViewState extends State<TaskView> {
                         taskOfProjectController.tasks.isNotEmpty) {
                       isAdmin
                           ? ProjectCollection().readNotificationByLeader(
-                              projectController.projectID,
-                              taskOfProjectController.tasks[0].taskID)
+                          projectController.projectID,
+                          taskOfProjectController.tasks[0].taskID)
                           : ProjectCollection()
-                              .readNotificationByAssignedMember(
-                                  projectController.projectID,
-                                  taskOfProjectController.tasks[0].taskID);
+                          .readNotificationByAssignedMember(
+                          projectController.projectID,
+                          taskOfProjectController.tasks[0].taskID);
                       // Sort the tasks and events based on due date
                       taskOfProjectController.tasks[0].subtask
                           .sort((a, b) => a.dueDate.compareTo(b.dueDate));
@@ -148,16 +148,16 @@ class _TaskViewState extends State<TaskView> {
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
                             itemCount:
-                                taskOfProjectController.tasks[0].subtask.length,
+                            taskOfProjectController.tasks[0].subtask.length,
                             itemBuilder: (_, index) {
                               return taskCard(
                                   taskOfProjectController
                                       .tasks[0].subtask[index],
                                   false,
                                   (index ==
-                                          taskOfProjectController
-                                                  .tasks[0].subtask.length -
-                                              1
+                                      taskOfProjectController
+                                          .tasks[0].subtask.length -
+                                          1
                                       ? true
                                       : false));
                             },
@@ -172,17 +172,17 @@ class _TaskViewState extends State<TaskView> {
                               Spacer(),
                               isAdmin
                                   ? FloatingActionButton(
-                                      child: Icon(Icons.add),
-                                      tooltip: 'Add Subtask',
-                                      onPressed: () {
-                                        Get.bottomSheet(
-                                          createSubTaskView(
-                                              taskOfProjectController.tasks[0]),
-                                          isScrollControlled: true,
-                                          ignoreSafeArea: false,
-                                        );
-                                      },
-                                    )
+                                child: Icon(Icons.add),
+                                tooltip: 'Add Subtask',
+                                onPressed: () {
+                                  Get.bottomSheet(
+                                    createSubTaskView(
+                                        taskOfProjectController.tasks[0]),
+                                    isScrollControlled: true,
+                                    ignoreSafeArea: false,
+                                  );
+                                },
+                              )
                                   : SizedBox(),
                               Spacer(),
                               Expanded(
@@ -218,11 +218,11 @@ class _TaskViewState extends State<TaskView> {
                               children: [
                                 Center(
                                     child: Text(
-                                  'Comments',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                )),
+                                      'Comments',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    )),
                                 Divider(
                                   thickness: 2,
                                 ),
@@ -231,168 +231,186 @@ class _TaskViewState extends State<TaskView> {
                                 ),
                                 Container(
                                   child: taskOfProjectController
-                                                  .tasks[0].message.length ==
-                                              0 ||
-                                          taskOfProjectController
-                                              .tasks[0].message.isEmpty
+                                      .tasks[0].message.length ==
+                                      0 ||
+                                      taskOfProjectController
+                                          .tasks[0].message.isEmpty
                                       ? Align(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Text(
-                                            'No comments',
-                                            style: TextStyle(
-                                              color: Get
-                                                  .theme.unselectedWidgetColor,
-                                              fontStyle: FontStyle.italic,
-                                            ),
-                                          ))
-                                      : ListView.builder(
-                                          controller: _scrollController,
-                                          physics: ScrollPhysics(),
-                                          shrinkWrap: true,
-                                          itemCount: taskOfProjectController
-                                              .tasks[0].message.length,
-                                          itemBuilder: (_, index) {
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: taskOfProjectController
-                                                          .tasks[0]
-                                                          .message[index]
-                                                          .senderID ==
-                                                      userController.user.userID
-                                                  ? Bubble(
-                                                      margin: BubbleEdges.only(
-                                                          top: 10),
-                                                      color: Get.theme
-                                                          .primaryColorLight,
-                                                      alignment:
-                                                          Alignment.topRight,
-                                                      nip:
-                                                          BubbleNip.rightBottom,
-                                                      child: Column(
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                '${taskOfProjectController.tasks[0].message[index].from}',
-                                                                style: TextStyle(
-                                                                    color: Get
-                                                                        .theme
-                                                                        .accentColor),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .left,
-                                                              ),
-                                                              Spacer(),
-                                                              Text(
-                                                                '${taskOfProjectController.tasks[0].message[index].time.toDate().toString().substring(0, 16)}',
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Get
-                                                                      .theme
-                                                                      .unselectedWidgetColor,
-                                                                  fontSize: 10,
-                                                                ),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child: Row(
-                                                              children: [
-                                                                Flexible(
-                                                                  child: Text(
-                                                                    '${taskOfProjectController.tasks[0].message[index].contentOfMessage}',
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Row(
-                                                            children: [],
-                                                          )
-                                                        ],
-                                                      ),
-                                                      padding:
-                                                          BubbleEdges.all(8),
-                                                    )
-                                                  : Bubble(
-                                                      margin: BubbleEdges.only(
-                                                          top: 10),
-                                                      alignment:
-                                                          Alignment.topLeft,
-                                                      nip: BubbleNip.leftBottom,
-                                                      child: Column(
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                '${taskOfProjectController.tasks[0].message[index].from}',
-                                                                style: TextStyle(
-                                                                    color: Get
-                                                                        .theme
-                                                                        .accentColor),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .left,
-                                                              ),
-                                                              Spacer(),
-                                                              Text(
-                                                                '${taskOfProjectController.tasks[0].message[index].time.toDate().toString().substring(0, 16)}',
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Get
-                                                                      .theme
-                                                                      .unselectedWidgetColor,
-                                                                  fontSize: 10,
-                                                                ),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .right,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(8.0),
-                                                            child: Row(
-                                                              children: [
-                                                                Flexible(
-                                                                  child: Text(
-                                                                      '${taskOfProjectController.tasks[0].message[index].contentOfMessage}'),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Row(
-                                                            children: [],
-                                                          )
-                                                        ],
-                                                      ),
-                                                      padding:
-                                                          BubbleEdges.all(8),
-                                                    ),
-                                            );
-                                          },
+                                      alignment: Alignment.bottomCenter,
+                                      child: Text(
+                                        'No comments',
+                                        style: TextStyle(
+                                          color: Get
+                                              .theme.unselectedWidgetColor,
+                                          fontStyle: FontStyle.italic,
                                         ),
+                                      ))
+                                      : ListView.builder(
+                                    controller: _scrollController,
+                                    physics: ScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: taskOfProjectController
+                                        .tasks[0].message.length,
+                                    itemBuilder: (_, index) {
+                                      return Padding(
+                                        padding:
+                                        const EdgeInsets.all(8.0),
+                                        child: taskOfProjectController
+                                            .tasks[0]
+                                            .message[index]
+                                            .senderID ==
+                                            userController.user.userID
+                                            ? Bubble(
+                                          margin: BubbleEdges.only(
+                                              top: 10),
+                                          color: Get.theme
+                                              .primaryColorLight,
+                                          alignment:
+                                          Alignment.topRight,
+                                          nip:
+                                          BubbleNip.rightBottom,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .center,
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment
+                                                    .start,
+                                                children: [
+                                                  Text(
+                                                    '${taskOfProjectController
+                                                        .tasks[0].message[index]
+                                                        .from}',
+                                                    style: TextStyle(
+                                                        color: Get
+                                                            .theme
+                                                            .accentColor),
+                                                    textAlign:
+                                                    TextAlign
+                                                        .left,
+                                                  ),
+                                                  Spacer(),
+                                                  Text(
+                                                    '${taskOfProjectController
+                                                        .tasks[0].message[index]
+                                                        .time.toDate()
+                                                        .toString()
+                                                        .substring(0, 16)}',
+                                                    style:
+                                                    TextStyle(
+                                                      color: Get
+                                                          .theme
+                                                          .unselectedWidgetColor,
+                                                      fontSize: 10,
+                                                    ),
+                                                    textAlign:
+                                                    TextAlign
+                                                        .right,
+                                                  ),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding:
+                                                const EdgeInsets
+                                                    .all(8.0),
+                                                child: Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
+                                                        '${taskOfProjectController
+                                                            .tasks[0]
+                                                            .message[index]
+                                                            .contentOfMessage}',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [],
+                                              )
+                                            ],
+                                          ),
+                                          padding:
+                                          BubbleEdges.all(8),
+                                        )
+                                            : Bubble(
+                                          margin: BubbleEdges.only(
+                                              top: 10),
+                                          alignment:
+                                          Alignment.topLeft,
+                                          nip: BubbleNip.leftBottom,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .center,
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment
+                                                    .start,
+                                                children: [
+                                                  Text(
+                                                    '${taskOfProjectController
+                                                        .tasks[0].message[index]
+                                                        .from}',
+                                                    style: TextStyle(
+                                                        color: Get
+                                                            .theme
+                                                            .accentColor),
+                                                    textAlign:
+                                                    TextAlign
+                                                        .left,
+                                                  ),
+                                                  Spacer(),
+                                                  Text(
+                                                    '${taskOfProjectController
+                                                        .tasks[0].message[index]
+                                                        .time.toDate()
+                                                        .toString()
+                                                        .substring(0, 16)}',
+                                                    style:
+                                                    TextStyle(
+                                                      color: Get
+                                                          .theme
+                                                          .unselectedWidgetColor,
+                                                      fontSize: 10,
+                                                    ),
+                                                    textAlign:
+                                                    TextAlign
+                                                        .right,
+                                                  ),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding:
+                                                const EdgeInsets
+                                                    .all(8.0),
+                                                child: Row(
+                                                  children: [
+                                                    Flexible(
+                                                      child: Text(
+                                                          '${taskOfProjectController
+                                                              .tasks[0]
+                                                              .message[index]
+                                                              .contentOfMessage}'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [],
+                                              )
+                                            ],
+                                          ),
+                                          padding:
+                                          BubbleEdges.all(8),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ],
                             ),
@@ -423,7 +441,7 @@ class _TaskViewState extends State<TaskView> {
                                         decoration: BoxDecoration(
                                           color: Get.theme.cardColor,
                                           borderRadius:
-                                              BorderRadius.circular(25.0),
+                                          BorderRadius.circular(25.0),
                                           boxShadow: [
                                             BoxShadow(
                                                 offset: Offset(0, 3),
@@ -439,10 +457,10 @@ class _TaskViewState extends State<TaskView> {
                                                 maxLines: null,
                                                 decoration: InputDecoration(
                                                     hintText:
-                                                        "Add a comment...",
+                                                    "Add a comment...",
                                                     contentPadding:
-                                                        const EdgeInsets.all(
-                                                            20.0),
+                                                    const EdgeInsets.all(
+                                                        20.0),
                                                     border: InputBorder.none),
                                               ),
                                             ),
@@ -457,24 +475,36 @@ class _TaskViewState extends State<TaskView> {
                                           child: Icon(Icons.send),
                                           onPressed: () {
                                             print(
-                                                "here '${_commentController.text}'");
+                                                "here '${_commentController
+                                                    .text}'");
                                             _commentController.text.trim();
                                             print(
-                                                "here '${_commentController.text}'");
+                                                "here '${_commentController
+                                                    .text}'");
 
                                             if (_commentController.text.isNull)
                                               return;
 
                                             ProjectCollection()
                                                 .addCommentToTask(
-                                                    projectController
-                                                        .project.projectID,
-                                                    taskOfProjectController
-                                                        .tasks[0].taskID,
-                                                    userController.user.userID,
-                                                    userController
-                                                        .user.userName,
-                                                    _commentController.text);
+                                                projectController
+                                                    .project.projectID,
+                                                taskOfProjectController
+                                                    .tasks[0].taskID,
+                                                userController.user.userID,
+                                                userController
+                                                    .user.userName,
+                                                _commentController.text);
+
+                                            isAdmin ? ProjectCollection()
+                                                .updateTaskNotificationByLeader(
+                                                projectController.projectID, taskOfProjectController
+                                                .tasks[0].taskID,) : ProjectCollection()
+                                                .updateTaskNotificationByAssignedMember(
+                                              projectController.projectID, taskOfProjectController
+                                                .tasks[0].taskID,);
+
+
                                             _commentController.clear();
                                           },
                                         )),
@@ -488,9 +518,9 @@ class _TaskViewState extends State<TaskView> {
                     }
                     return Center(
                         child: Padding(
-                      padding: const EdgeInsets.only(top: 100),
-                      child: Text('Task has been deleted'),
-                    ));
+                          padding: const EdgeInsets.only(top: 100),
+                          child: Text('Task has been deleted'),
+                        ));
                   })
             ],
           ),
@@ -560,69 +590,70 @@ class _TaskViewState extends State<TaskView> {
                         left: BorderSide(
                             width: 3,
                             color: taskOfProject.taskStatus.toUpperCase() ==
-                                    'COMPLETED'
+                                'COMPLETED'
                                 ? Colors.green
                                 : (remainingDays <= 0
-                                    ? Colors.red
-                                    : (taskOfProject.taskStatus.toUpperCase() ==
-                                            'NOT-STARTED'
-                                        ? Colors.grey
-                                        : (taskOfProject.taskStatus
-                                                    .toUpperCase() ==
-                                                'IN-PROGRESS'
-                                            ? Colors.blue
-                                            : Colors.green)))))),
+                                ? Colors.red
+                                : (taskOfProject.taskStatus.toUpperCase() ==
+                                'NOT-STARTED'
+                                ? Colors.grey
+                                : (taskOfProject.taskStatus
+                                .toUpperCase() ==
+                                'IN-PROGRESS'
+                                ? Colors.blue
+                                : Colors.green)))))),
                 child: Column(
                   children: [
                     ListTile(
                       title: Text(taskOfProject.taskName),
                       leading: taskOfProject.taskStatus.toUpperCase() ==
-                              'COMPLETED'
+                          'COMPLETED'
                           ? Icon(
-                              Icons.assignment_turned_in,
-                              color: Colors.green,
-                            )
+                        Icons.assignment_turned_in,
+                        color: Colors.green,
+                      )
                           : (remainingDays <= 0
-                              ? Icon(
-                                  Icons.assignment_late,
-                                  color: Colors.red,
-                                )
-                              : (taskOfProject.taskStatus.toUpperCase() ==
-                                      'NOT-STARTED'
-                                  ? Icon(
-                                      Icons.assignment,
-                                      color: Colors.grey,
-                                    )
-                                  : (taskOfProject.taskStatus.toUpperCase() ==
-                                          'IN-PROGRESS'
-                                      ? Wrap(
-                                          children: [
-                                            Icon(
-                                              Icons.assignment,
-                                              color: Colors.blue,
-                                            ),
-                                            Icon(Icons.edit,
-                                                size: 14, color: Colors.blue),
-                                          ],
-                                        )
-                                      : Icon(
-                                          Icons.assignment,
-                                          color: Colors.grey,
-                                        )))),
+                          ? Icon(
+                        Icons.assignment_late,
+                        color: Colors.red,
+                      )
+                          : (taskOfProject.taskStatus.toUpperCase() ==
+                          'NOT-STARTED'
+                          ? Icon(
+                        Icons.assignment,
+                        color: Colors.grey,
+                      )
+                          : (taskOfProject.taskStatus.toUpperCase() ==
+                          'IN-PROGRESS'
+                          ? Wrap(
+                        children: [
+                          Icon(
+                            Icons.assignment,
+                            color: Colors.blue,
+                          ),
+                          Icon(Icons.edit,
+                              size: 14, color: Colors.blue),
+                        ],
+                      )
+                          : Icon(
+                        Icons.assignment,
+                        color: Colors.grey,
+                      )))),
                       subtitle: Text(
-                          "Due date ${taskOfProject.dueDate.toString().substring(0, 10)}"),
+                          "Due date ${taskOfProject.dueDate.toString()
+                              .substring(0, 10)}"),
                       trailing: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           '${taskOfProject.taskPriority.toUpperCase()}',
                           style: TextStyle(
                               color: taskOfProject.taskPriority.toUpperCase() ==
-                                      'LOW'
+                                  'LOW'
                                   ? Colors.green
                                   : (taskOfProject.taskPriority.toUpperCase() ==
-                                          'HIGH'
-                                      ? Colors.red
-                                      : Colors.orange)),
+                                  'HIGH'
+                                  ? Colors.red
+                                  : Colors.orange)),
                         ),
                       ),
                     ),
@@ -631,9 +662,9 @@ class _TaskViewState extends State<TaskView> {
                         Divider(),
                         Flexible(
                             child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(taskOfProject.taskDescription),
-                        ))
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(taskOfProject.taskDescription),
+                            ))
                       ],
                     ),
                     Row(
@@ -643,20 +674,20 @@ class _TaskViewState extends State<TaskView> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             (taskOfProject.taskStatus.toUpperCase() ==
-                                    'COMPLETED'
+                                'COMPLETED'
                                 ? 'Completed'
                                 : (remainingDays < 1
-                                    ? 'Overdue'
-                                    : 'Days left: $remainingDays')),
+                                ? 'Overdue'
+                                : 'Days left: $remainingDays')),
                             style: TextStyle(
                                 color: taskOfProject.taskStatus.toUpperCase() ==
-                                        'COMPLETED'
+                                    'COMPLETED'
                                     ? Get.theme.primaryColor
                                     : (remainingDays <= 1
-                                        ? Colors.red
-                                        : (remainingDays < 3
-                                            ? Colors.orange
-                                            : Get.theme.primaryColor))),
+                                    ? Colors.red
+                                    : (remainingDays < 3
+                                    ? Colors.orange
+                                    : Get.theme.primaryColor))),
                           ),
                         ),
                         Spacer(),
@@ -665,200 +696,202 @@ class _TaskViewState extends State<TaskView> {
                           children: [
                             isAdmin
                                 ? FlatButton(
-                                    child: const Text('EDIT'),
-                                    onPressed: () {
-                                      Get.bottomSheet(
-                                          editTask(taskOfProject, mainTask),
-                                          isScrollControlled: true,
-                                          ignoreSafeArea: false);
-                                    },
-                                  )
+                              child: const Text('EDIT'),
+                              onPressed: () {
+                                Get.bottomSheet(
+                                    editTask(taskOfProject, mainTask),
+                                    isScrollControlled: true,
+                                    ignoreSafeArea: false);
+                              },
+                            )
                                 : SizedBox(),
                             isAdmin
                                 ? IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () async {
-                                      showModalBottomSheet(
-                                          context: context,
-                                          builder: (BuildContext bc) {
-                                            return Wrap(
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Container(
-                                                    color:
-                                                        Get.theme.canvasColor,
-                                                    child: Column(
-                                                      children: [
-                                                        ListTile(
-                                                          title: mainTask
-                                                              ? Text(
-                                                                  'Delete task? All subtasks will be deleted')
-                                                              : Text(
-                                                                  'Delete subtask?'),
-                                                          trailing: FlatButton(
-                                                            child: const Text(
-                                                              'DELETE',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .red),
-                                                            ),
-                                                            onPressed:
-                                                                () async {
-                                                              if (mainTask) {
-                                                                Get.back();
-                                                                await ProjectCollection().deleteTask(
-                                                                    projectController
-                                                                        .project
-                                                                        .projectID,
-                                                                    _mainTaskID
-                                                                        .text);
-                                                                Get.snackbar(
-                                                                    'Success',
-                                                                    "task has been deleted successfully");
-                                                                Get.back();
-                                                                return;
-                                                              }
-                                                              print(taskOfProject
-                                                                  .taskName);
-                                                              print(taskOfProject
-                                                                  .taskDescription);
-                                                              print(taskOfProject
-                                                                  .taskStatus);
-                                                              await ProjectCollection().deleteSubtask(
-                                                                  projectController
-                                                                      .project
-                                                                      .projectID,
-                                                                  _mainTaskID
-                                                                      .text,
-                                                                  taskOfProject
-                                                                      .taskID,
-                                                                  taskOfProject
-                                                                      .taskName,
-                                                                  taskOfProject
-                                                                      .taskDescription,
-                                                                  taskOfProject
-                                                                      .startDate,
-                                                                  taskOfProject
-                                                                      .dueDate,
-                                                                  taskOfProject
-                                                                      .taskPriority,
-                                                                  taskOfProject
-                                                                      .taskStatus);
-                                                              Get.back();
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext bc) {
+                                      return Wrap(
+                                        children: [
+                                          Padding(
+                                            padding:
+                                            const EdgeInsets.all(8.0),
+                                            child: Container(
+                                              color:
+                                              Get.theme.canvasColor,
+                                              child: Column(
+                                                children: [
+                                                  ListTile(
+                                                    title: mainTask
+                                                        ? Text(
+                                                        'Delete task? All subtasks will be deleted')
+                                                        : Text(
+                                                        'Delete subtask?'),
+                                                    trailing: FlatButton(
+                                                      child: const Text(
+                                                        'DELETE',
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .red),
+                                                      ),
+                                                      onPressed:
+                                                          () async {
+                                                        if (mainTask) {
+                                                          Get.back();
+                                                          await ProjectCollection()
+                                                              .deleteTask(
+                                                              projectController
+                                                                  .project
+                                                                  .projectID,
+                                                              _mainTaskID
+                                                                  .text);
+                                                          Get.snackbar(
+                                                              'Success',
+                                                              "task has been deleted successfully");
+                                                          Get.back();
+                                                          return;
+                                                        }
+                                                        print(taskOfProject
+                                                            .taskName);
+                                                        print(taskOfProject
+                                                            .taskDescription);
+                                                        print(taskOfProject
+                                                            .taskStatus);
+                                                        await ProjectCollection()
+                                                            .deleteSubtask(
+                                                            projectController
+                                                                .project
+                                                                .projectID,
+                                                            _mainTaskID
+                                                                .text,
+                                                            taskOfProject
+                                                                .taskID,
+                                                            taskOfProject
+                                                                .taskName,
+                                                            taskOfProject
+                                                                .taskDescription,
+                                                            taskOfProject
+                                                                .startDate,
+                                                            taskOfProject
+                                                                .dueDate,
+                                                            taskOfProject
+                                                                .taskPriority,
+                                                            taskOfProject
+                                                                .taskStatus);
+                                                        Get.back();
+                                                      },
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            );
-                                          });
-                                    },
-                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              },
+                            )
                                 : GroupButton(
-                                    spacing: 8,
-                                    isRadio: true,
-                                    direction: Axis.horizontal,
-                                    onSelected: (index, isSelected) {
-                                      if (index == 0) {
-                                        if (mainTask) {
-                                          return ProjectCollection()
-                                              .changeMainTaskStatus(
-                                                  projectController.projectID,
-                                                  taskOfProject.taskID,
-                                                  'Completed');
-                                        } else {
-                                          ProjectCollection()
-                                              .changeSubtaskStatus(
-                                                  projectController.projectID,
-                                                  _mainTaskID.text.trim(),
-                                                  taskOfProject.taskID.trim(),
-                                                  taskOfProject.taskName,
-                                                  taskOfProject.taskDescription,
-                                                  taskOfProject.startDate,
-                                                  taskOfProject.dueDate,
-                                                  taskOfProject.taskPriority,
-                                                  taskOfProject.taskStatus,
-                                                  'Completed');
-                                        }
-                                      } else if (index == 1) {
-                                        if (mainTask) {
-                                          return ProjectCollection()
-                                              .changeMainTaskStatus(
-                                                  projectController.projectID,
-                                                  taskOfProject.taskID,
-                                                  'In-progress');
-                                        } else {
-                                          ProjectCollection()
-                                              .changeSubtaskStatus(
-                                                  projectController.projectID,
-                                                  _mainTaskID.text.trim(),
-                                                  taskOfProject.taskID.trim(),
-                                                  taskOfProject.taskName,
-                                                  taskOfProject.taskDescription,
-                                                  taskOfProject.startDate,
-                                                  taskOfProject.dueDate,
-                                                  taskOfProject.taskPriority,
-                                                  taskOfProject.taskStatus,
-                                                  'In-progress');
-                                        }
-                                      } else {
-                                        if (mainTask) {
-                                          return ProjectCollection()
-                                              .changeMainTaskStatus(
-                                                  projectController.projectID,
-                                                  taskOfProject.taskID,
-                                                  'Not-Started');
-                                        } else {
-                                          ProjectCollection()
-                                              .changeSubtaskStatus(
-                                                  projectController.projectID,
-                                                  _mainTaskID.text.trim(),
-                                                  taskOfProject.taskID.trim(),
-                                                  taskOfProject.taskName,
-                                                  taskOfProject.taskDescription,
-                                                  taskOfProject.startDate,
-                                                  taskOfProject.dueDate,
-                                                  taskOfProject.taskPriority,
-                                                  taskOfProject.taskStatus,
-                                                  'Not-Started');
-                                        }
-                                      }
-                                    },
-                                    buttons: [
-                                      "Completed",
-                                      "In-progress",
-                                      "Not-Started",
-                                    ],
-                                    selectedButtons: [
-                                      "${taskOfProject.taskStatus}"
-                                    ],
-                                    selectedTextStyle: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 13,
-                                      color: Get.textTheme.caption.color,
-                                    ),
-                                    unselectedTextStyle: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
-                                    ),
-                                    selectedColor: Get.theme.canvasColor,
-                                    unselectedColor: Colors.grey[300],
-                                    selectedBorderColor: Get.theme.primaryColor,
-                                    unselectedBorderColor: Colors.grey[500],
-                                    borderRadius: BorderRadius.circular(2.0),
-                                    selectedShadow: <BoxShadow>[
-                                      BoxShadow(color: Colors.transparent)
-                                    ],
-                                    unselectedShadow: <BoxShadow>[
-                                      BoxShadow(color: Colors.transparent)
-                                    ],
-                                  )
+                              spacing: 8,
+                              isRadio: true,
+                              direction: Axis.horizontal,
+                              onSelected: (index, isSelected) {
+                                if (index == 0) {
+                                  if (mainTask) {
+                                    return ProjectCollection()
+                                        .changeMainTaskStatus(
+                                        projectController.projectID,
+                                        taskOfProject.taskID,
+                                        'Completed');
+                                  } else {
+                                    ProjectCollection()
+                                        .changeSubtaskStatus(
+                                        projectController.projectID,
+                                        _mainTaskID.text.trim(),
+                                        taskOfProject.taskID.trim(),
+                                        taskOfProject.taskName,
+                                        taskOfProject.taskDescription,
+                                        taskOfProject.startDate,
+                                        taskOfProject.dueDate,
+                                        taskOfProject.taskPriority,
+                                        taskOfProject.taskStatus,
+                                        'Completed');
+                                  }
+                                } else if (index == 1) {
+                                  if (mainTask) {
+                                    return ProjectCollection()
+                                        .changeMainTaskStatus(
+                                        projectController.projectID,
+                                        taskOfProject.taskID,
+                                        'In-progress');
+                                  } else {
+                                    ProjectCollection()
+                                        .changeSubtaskStatus(
+                                        projectController.projectID,
+                                        _mainTaskID.text.trim(),
+                                        taskOfProject.taskID.trim(),
+                                        taskOfProject.taskName,
+                                        taskOfProject.taskDescription,
+                                        taskOfProject.startDate,
+                                        taskOfProject.dueDate,
+                                        taskOfProject.taskPriority,
+                                        taskOfProject.taskStatus,
+                                        'In-progress');
+                                  }
+                                } else {
+                                  if (mainTask) {
+                                    return ProjectCollection()
+                                        .changeMainTaskStatus(
+                                        projectController.projectID,
+                                        taskOfProject.taskID,
+                                        'Not-Started');
+                                  } else {
+                                    ProjectCollection()
+                                        .changeSubtaskStatus(
+                                        projectController.projectID,
+                                        _mainTaskID.text.trim(),
+                                        taskOfProject.taskID.trim(),
+                                        taskOfProject.taskName,
+                                        taskOfProject.taskDescription,
+                                        taskOfProject.startDate,
+                                        taskOfProject.dueDate,
+                                        taskOfProject.taskPriority,
+                                        taskOfProject.taskStatus,
+                                        'Not-Started');
+                                  }
+                                }
+                              },
+                              buttons: [
+                                "Completed",
+                                "In-progress",
+                                "Not-Started",
+                              ],
+                              selectedButtons: [
+                                "${taskOfProject.taskStatus}"
+                              ],
+                              selectedTextStyle: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                                color: Get.textTheme.caption.color,
+                              ),
+                              unselectedTextStyle: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                                color: Colors.grey[600],
+                              ),
+                              selectedColor: Get.theme.canvasColor,
+                              unselectedColor: Colors.grey[300],
+                              selectedBorderColor: Get.theme.primaryColor,
+                              unselectedBorderColor: Colors.grey[500],
+                              borderRadius: BorderRadius.circular(2.0),
+                              selectedShadow: <BoxShadow>[
+                                BoxShadow(color: Colors.transparent)
+                              ],
+                              unselectedShadow: <BoxShadow>[
+                                BoxShadow(color: Colors.transparent)
+                              ],
+                            )
                           ],
                         ),
                       ],
@@ -876,25 +909,25 @@ class _TaskViewState extends State<TaskView> {
             Spacer(),
             isAdmin
                 ? Dash(
-                    direction: Axis.vertical,
-                    dashGap: 5,
-                    length: 50,
-                    dashLength: 5,
-                    dashColor: Get.theme.unselectedWidgetColor,
-                  )
+              direction: Axis.vertical,
+              dashGap: 5,
+              length: 50,
+              dashLength: 5,
+              dashColor: Get.theme.unselectedWidgetColor,
+            )
                 : (last
-                    ? SizedBox()
-                    : (mainTask &&
-                            (taskOfProject.subtask.isNullOrBlank ||
-                                taskOfProject.subtask.isEmpty))
-                        ? SizedBox()
-                        : Dash(
-                            direction: Axis.vertical,
-                            dashGap: 5,
-                            length: 50,
-                            dashLength: 5,
-                            dashColor: Get.theme.unselectedWidgetColor,
-                          )),
+                ? SizedBox()
+                : (mainTask &&
+                (taskOfProject.subtask.isNullOrBlank ||
+                    taskOfProject.subtask.isEmpty))
+                ? SizedBox()
+                : Dash(
+              direction: Axis.vertical,
+              dashGap: 5,
+              length: 50,
+              dashLength: 5,
+              dashColor: Get.theme.unselectedWidgetColor,
+            )),
             Spacer(),
             Expanded(
               child: Container(
@@ -959,7 +992,8 @@ class _TaskViewState extends State<TaskView> {
                   ),
                   TextFormField(
                     controller: _subtaskName,
-                    validator: (taskNameVal) => taskNameVal.isEmpty
+                    validator: (taskNameVal) =>
+                    taskNameVal.isEmpty
                         ? "Subtask name cannot be empty"
                         : null,
                     onSaved: (taskNameVal) => _subtaskName.text = taskNameVal,
@@ -975,15 +1009,16 @@ class _TaskViewState extends State<TaskView> {
                   ),
                   TextFormField(
                     controller: _subtaskDescription,
-                    validator: (taskNameVal) => taskNameVal.isEmpty
+                    validator: (taskNameVal) =>
+                    taskNameVal.isEmpty
                         ? "Subtask description cannot be empty"
                         : null,
                     onSaved: (_taskDescriptionVal) =>
-                        _subtaskDescription.text = _taskDescriptionVal,
+                    _subtaskDescription.text = _taskDescriptionVal,
                     decoration: InputDecoration(
                         labelText: 'Subtask description',
                         hintText:
-                            'Collect the requirements from the client and refine them.',
+                        'Collect the requirements from the client and refine them.',
                         prefixIcon: Icon(Icons.description),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20))),
@@ -1003,46 +1038,54 @@ class _TaskViewState extends State<TaskView> {
                       Expanded(
                         child: TextFormField(
                           controller: _subtaskStartDate,
-                          validator: (startDateVal) => startDateVal.isEmpty
+                          validator: (startDateVal) =>
+                          startDateVal.isEmpty
                               ? 'Start date cannot be empty'
                               : null,
-                          onSaved: (startDateVal) => startDateVal.length >= 10
+                          onSaved: (startDateVal) =>
+                          startDateVal.length >= 10
                               ? _subtaskStartDate.text =
-                                  startDateVal.substring(0, 10)
+                              startDateVal.substring(0, 10)
                               : _subtaskStartDate.clear(),
                           readOnly: true,
                           decoration: InputDecoration(
                               labelText: 'Start date',
                               hintText:
-                                  DateTime.now().toString().substring(0, 10),
+                              DateTime.now().toString().substring(0, 10),
                               prefixIcon: Icon(Icons.calendar_today),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.horizontal(
                                       left: Radius.circular(20)))),
-                          onTap: () async => pickDate(
-                              taskOfProject.startDate, taskOfProject.dueDate),
+                          onTap: () async =>
+                              pickDate(
+                                  taskOfProject.startDate,
+                                  taskOfProject.dueDate),
                         ),
                       ),
                       Expanded(
                         child: TextFormField(
                           controller: _subtaskDueDate,
-                          validator: (dueDateVal) => dueDateVal.isEmpty
+                          validator: (dueDateVal) =>
+                          dueDateVal.isEmpty
                               ? 'Due date cannot be empty'
                               : null,
-                          onSaved: (dueDateVal) => dueDateVal.length >= 10
+                          onSaved: (dueDateVal) =>
+                          dueDateVal.length >= 10
                               ? _subtaskDueDate.text =
-                                  dueDateVal.substring(0, 10)
+                              dueDateVal.substring(0, 10)
                               : _subtaskDueDate.clear(),
                           readOnly: true,
                           decoration: InputDecoration(
                               labelText: 'Due date',
                               hintText:
-                                  DateTime.now().toString().substring(0, 10),
+                              DateTime.now().toString().substring(0, 10),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.horizontal(
                                       right: Radius.circular(20)))),
-                          onTap: () async => pickDate(
-                              taskOfProject.startDate, taskOfProject.dueDate),
+                          onTap: () async =>
+                              pickDate(
+                                  taskOfProject.startDate,
+                                  taskOfProject.dueDate),
                         ),
                       ),
                     ],
@@ -1084,7 +1127,7 @@ class _TaskViewState extends State<TaskView> {
                             ),
                             StatefulBuilder(builder:
                                 (BuildContext context, StateSetter setState
-                                    /*You can rename this!*/) {
+                                /*You can rename this!*/) {
                               return RadioButtonGroup(
                                 labels: <String>["Low", "Medium", "High"],
                                 picked: _subtaskPriority.text,
@@ -1128,7 +1171,8 @@ class _TaskViewState extends State<TaskView> {
                               _subtaskPriority.text,
                               _subtaskStatus.text);
                           Get.snackbar('Success',
-                              "Subtask '${_subtaskName.text}' has been added successfully");
+                              "Subtask '${_subtaskName
+                                  .text}' has been added successfully");
                         }
                       },
                       child: Row(
@@ -1322,11 +1366,12 @@ class _TaskViewState extends State<TaskView> {
                   ),
                   TextFormField(
                     controller: _editedSubtaskName,
-                    validator: (taskNameVal) => taskNameVal.isEmpty
+                    validator: (taskNameVal) =>
+                    taskNameVal.isEmpty
                         ? "Task name cannot be empty"
                         : null,
                     onSaved: (taskNameVal) =>
-                        _editedSubtaskName.text = taskNameVal,
+                    _editedSubtaskName.text = taskNameVal,
                     decoration: InputDecoration(
                         labelText: 'Task name',
                         hintText: 'Meet the client.',
@@ -1339,15 +1384,16 @@ class _TaskViewState extends State<TaskView> {
                   ),
                   TextFormField(
                     controller: _editedSubtaskDescription,
-                    validator: (taskNameVal) => taskNameVal.isEmpty
+                    validator: (taskNameVal) =>
+                    taskNameVal.isEmpty
                         ? "Task description cannot be empty"
                         : null,
                     onSaved: (_taskDescriptionVal) =>
-                        _editedSubtaskDescription.text = _taskDescriptionVal,
+                    _editedSubtaskDescription.text = _taskDescriptionVal,
                     decoration: InputDecoration(
                         labelText: 'Task description',
                         hintText:
-                            'Collect the requirements from the client and refine them.',
+                        'Collect the requirements from the client and refine them.',
                         prefixIcon: Icon(Icons.description),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20))),
@@ -1369,50 +1415,56 @@ class _TaskViewState extends State<TaskView> {
                       Expanded(
                         child: TextFormField(
                           controller: _editedSubtaskStartDate,
-                          validator: (startDateVal) => startDateVal.isEmpty
+                          validator: (startDateVal) =>
+                          startDateVal.isEmpty
                               ? 'Start date cannot be empty'
                               : null,
-                          onSaved: (startDateVal) => startDateVal.length >= 10
+                          onSaved: (startDateVal) =>
+                          startDateVal.length >= 10
                               ? _editedSubtaskStartDate.text =
-                                  startDateVal.substring(0, 10)
+                              startDateVal.substring(0, 10)
                               : _editedSubtaskStartDate.clear(),
                           readOnly: true,
                           decoration: InputDecoration(
                               labelText: 'Start date',
                               hintText:
-                                  DateTime.now().toString().substring(0, 10),
+                              DateTime.now().toString().substring(0, 10),
                               prefixIcon: Icon(Icons.calendar_today),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.horizontal(
                                       left: Radius.circular(20)))),
-                          onTap: () async => mainTask
+                          onTap: () async =>
+                          mainTask
                               ? pickEditedMainTaskDate()
                               : pickEditedSubtaskDate(taskOfProject.startDate,
-                                  _mainTaskDueDate.text),
+                              _mainTaskDueDate.text),
                         ),
                       ),
                       Expanded(
                         child: TextFormField(
                           controller: _editedSubtaskDueDate,
-                          validator: (dueDateVal) => dueDateVal.isEmpty
+                          validator: (dueDateVal) =>
+                          dueDateVal.isEmpty
                               ? 'Due date cannot be empty'
                               : null,
-                          onSaved: (dueDateVal) => dueDateVal.length >= 10
+                          onSaved: (dueDateVal) =>
+                          dueDateVal.length >= 10
                               ? _editedSubtaskDueDate.text =
-                                  dueDateVal.substring(0, 10)
+                              dueDateVal.substring(0, 10)
                               : _editedSubtaskDueDate.clear(),
                           readOnly: true,
                           decoration: InputDecoration(
                               labelText: 'Due date',
                               hintText:
-                                  DateTime.now().toString().substring(0, 10),
+                              DateTime.now().toString().substring(0, 10),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.horizontal(
                                       right: Radius.circular(20)))),
-                          onTap: () async => mainTask
+                          onTap: () async =>
+                          mainTask
                               ? pickEditedMainTaskDate()
                               : pickEditedSubtaskDate(taskOfProject.startDate,
-                                  _mainTaskDueDate.text),
+                              _mainTaskDueDate.text),
                         ),
                       ),
                     ],
@@ -1477,112 +1529,112 @@ class _TaskViewState extends State<TaskView> {
                   ),
                   mainTask
                       ? InkWell(
-                          onTap: () {
-                            FocusScope.of(context)
-                                .requestFocus(new FocusNode());
-                          },
-                          child: Container(
-                            foregroundDecoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Get.theme.unselectedWidgetColor),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            child: StreamBuilder<QuerySnapshot>(
-                                stream: UserProfileCollection()
-                                    .checkUserProjectsIDs(
-                                        projectController.project.projectID),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.hasError) {
-                                    return Text(snapshot.error.toString());
+                    onTap: () {
+                      FocusScope.of(context)
+                          .requestFocus(new FocusNode());
+                    },
+                    child: Container(
+                      foregroundDecoration: BoxDecoration(
+                          border: Border.all(
+                              color: Get.theme.unselectedWidgetColor),
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(20))),
+                      child: StreamBuilder<QuerySnapshot>(
+                          stream: UserProfileCollection()
+                              .checkUserProjectsIDs(
+                              projectController.project.projectID),
+                          builder: (context,
+                              AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasError) {
+                              return Text(snapshot.error.toString());
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.active) {
+                              if (snapshot.hasData &&
+                                  snapshot.data != null) {
+                                snapshot.data.documents
+                                    .forEach((element) {
+                                  if (element.data['userID'] ==
+                                      taskOfProject.assignedTo) {
+                                    _editedTaskAssignedTo.text =
+                                        element.data['userName'] +
+                                            "," +
+                                            element.data['userID'];
                                   }
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.active) {
-                                    if (snapshot.hasData &&
-                                        snapshot.data != null) {
-                                      snapshot.data.documents
-                                          .forEach((element) {
-                                        if (element.data['userID'] ==
-                                            taskOfProject.assignedTo) {
-                                          _editedTaskAssignedTo.text =
-                                              element.data['userName'] +
-                                                  "," +
-                                                  element.data['userID'];
-                                        }
-                                      });
-                                      if (snapshot.data.documents.length == 0)
-                                        return Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Center(
-                                              child: Text(
-                                                  "No members in the project")),
-                                        );
-                                      return Column(
-                                        children: [
-                                          SearchChoices.single(
-                                            items: snapshot.data.documents
-                                                .toList()
-                                                .map((i) {
-                                              return (DropdownMenuItem(
-                                                child: Text(i.data['userName']),
-                                                value: i.data['userName'] +
-                                                    ',' +
-                                                    i.data['userID'],
-                                                onTap: () {},
-                                              ));
-                                            }).toList(),
-                                            displayItem: (item, selected) {
-                                              return (Row(children: [
-                                                selected
-                                                    ? Icon(
-                                                        Icons
-                                                            .radio_button_checked,
-                                                      )
-                                                    : Icon(
-                                                        Icons
-                                                            .radio_button_unchecked,
-                                                      ),
-                                                SizedBox(width: 7),
-                                                Expanded(
-                                                  child: item,
-                                                ),
-                                              ]));
-                                            },
-                                            underline: SizedBox(),
-                                            isCaseSensitiveSearch: false,
-                                            displayClearIcon: true,
-                                            value: _editedTaskAssignedTo.text,
-                                            searchHint: "Assign a member",
-                                            dialogBox: true,
-                                            keyboardType: TextInputType.text,
-                                            isExpanded: true,
-                                            onChanged: (assignedToVal) {
-                                              FocusScope.of(context)
-                                                  .requestFocus(
-                                                      new FocusNode());
-                                              _editedTaskAssignedTo.text =
-                                                  assignedToVal;
-                                              setState(() {});
-                                            },
-                                            onClear: () {
-                                              _editedTaskAssignedTo.clear();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  }
-                                  return Container(
+                                });
+                                if (snapshot.data.documents.length == 0)
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Center(
-                                      child: CircularProgressIndicator(
-                                        semanticsLabel: 'Loading',
-                                        strokeWidth: 4,
-                                      ),
-                                    ),
+                                        child: Text(
+                                            "No members in the project")),
                                   );
-                                }),
-                          ),
-                        )
+                                return Column(
+                                  children: [
+                                    SearchChoices.single(
+                                      items: snapshot.data.documents
+                                          .toList()
+                                          .map((i) {
+                                        return (DropdownMenuItem(
+                                          child: Text(i.data['userName']),
+                                          value: i.data['userName'] +
+                                              ',' +
+                                              i.data['userID'],
+                                          onTap: () {},
+                                        ));
+                                      }).toList(),
+                                      displayItem: (item, selected) {
+                                        return (Row(children: [
+                                          selected
+                                              ? Icon(
+                                            Icons
+                                                .radio_button_checked,
+                                          )
+                                              : Icon(
+                                            Icons
+                                                .radio_button_unchecked,
+                                          ),
+                                          SizedBox(width: 7),
+                                          Expanded(
+                                            child: item,
+                                          ),
+                                        ]));
+                                      },
+                                      underline: SizedBox(),
+                                      isCaseSensitiveSearch: false,
+                                      displayClearIcon: true,
+                                      value: _editedTaskAssignedTo.text,
+                                      searchHint: "Assign a member",
+                                      dialogBox: true,
+                                      keyboardType: TextInputType.text,
+                                      isExpanded: true,
+                                      onChanged: (assignedToVal) {
+                                        FocusScope.of(context)
+                                            .requestFocus(
+                                            new FocusNode());
+                                        _editedTaskAssignedTo.text =
+                                            assignedToVal;
+                                        setState(() {});
+                                      },
+                                      onClear: () {
+                                        _editedTaskAssignedTo.clear();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }
+                            }
+                            return Container(
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  semanticsLabel: 'Loading',
+                                  strokeWidth: 4,
+                                ),
+                              ),
+                            );
+                          }),
+                    ),
+                  )
                       : SizedBox(),
                   SizedBox(
                     height: 20,
@@ -1601,29 +1653,29 @@ class _TaskViewState extends State<TaskView> {
                         if (editTaskFormKey.currentState.validate()) {
                           mainTask
                               ? await ProjectCollection().editTask(
-                                  projectController.project.projectID,
-                                  taskOfProject.taskID,
-                                  _editedSubtaskName.text,
-                                  _editedSubtaskDescription.text,
-                                  _editedSubtaskStartDate.text,
-                                  _editedSubtaskDueDate.text,
-                                  _editedSubtaskPriority.text,
-                                  _editedTaskAssignedTo.text)
+                              projectController.project.projectID,
+                              taskOfProject.taskID,
+                              _editedSubtaskName.text,
+                              _editedSubtaskDescription.text,
+                              _editedSubtaskStartDate.text,
+                              _editedSubtaskDueDate.text,
+                              _editedSubtaskPriority.text,
+                              _editedTaskAssignedTo.text)
                               : await ProjectCollection().editSubtask(
-                                  projectController.project.projectID.trim(),
-                                  _mainTaskID.text.trim(),
-                                  taskOfProject.taskID.trim(),
-                                  _editedSubtaskName.text.trim(),
-                                  _editedSubtaskDescription.text.trim(),
-                                  _editedSubtaskStartDate.text.trim(),
-                                  _editedSubtaskDueDate.text.trim(),
-                                  _editedSubtaskPriority.text.trim(),
-                                  taskOfProject.taskName.trim(),
-                                  taskOfProject.taskDescription.trim(),
-                                  taskOfProject.startDate.trim(),
-                                  taskOfProject.dueDate.trim(),
-                                  taskOfProject.taskPriority.trim(),
-                                  taskOfProject.taskStatus);
+                              projectController.project.projectID.trim(),
+                              _mainTaskID.text.trim(),
+                              taskOfProject.taskID.trim(),
+                              _editedSubtaskName.text.trim(),
+                              _editedSubtaskDescription.text.trim(),
+                              _editedSubtaskStartDate.text.trim(),
+                              _editedSubtaskDueDate.text.trim(),
+                              _editedSubtaskPriority.text.trim(),
+                              taskOfProject.taskName.trim(),
+                              taskOfProject.taskDescription.trim(),
+                              taskOfProject.startDate.trim(),
+                              taskOfProject.dueDate.trim(),
+                              taskOfProject.taskPriority.trim(),
+                              taskOfProject.taskStatus);
                         }
                       },
                       child: Row(
@@ -1632,15 +1684,15 @@ class _TaskViewState extends State<TaskView> {
                         children: <Widget>[
                           mainTask
                               ? Text(('Update task'),
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w300,
-                                  ))
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w300,
+                              ))
                               : Text(('Update subtask'),
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w300,
-                                  )),
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w300,
+                              )),
                         ],
                       ),
                     ),

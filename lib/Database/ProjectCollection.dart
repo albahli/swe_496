@@ -884,7 +884,6 @@ class ProjectCollection {
               }),
               merge: true);
 
-      updateTaskNotificationByLeader(projectID, taskID);
     } on Exception catch (e) {
       print(e);
     }
